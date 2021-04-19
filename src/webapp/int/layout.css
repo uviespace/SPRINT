@@ -1,0 +1,339 @@
+ .topcorner{
+   position:absolute;
+    top:10px;
+    right: 10px;
+  }
+  
+   .topcorner_left{
+   position:absolute;
+    top:10px;
+    left: 10px;
+  }
+
+	.logo  {
+		<!--background:linear-gradient(left, #000, #000) no-repeat 50px 50px;-->
+  background-color: black;
+  color: white;
+  margin: 20px;
+  padding: 20px;
+	}
+	
+	.offset {
+    <!--background-image: linear-gradient(left, transparent 300px,rgba(39,39,39,.5) 300px, rgba(39,39,39,.5) 100%);-->
+	background-color: blue;
+    width: 100%;
+    height: 500px;
+}
+
+/*
+.a_btn{
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    text-decoration: none;
+
+margin: 5px;
+
+		width: 150px;
+		height: 35px;
+  
+    color: #333;
+    background-color: lightblue;
+    border-color: #ccc;
+}
+
+.a_btn:hover{
+    color: #333;
+    background-color: #e6e6e6;
+    border-color: #adadad;
+}
+*/
+
+.a_btn:link, .a_btn:visited{
+  background-color: #337AB7;
+  color: white;
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 10px 15px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  width: 150px;
+  height: 40px;
+}
+
+.a_btn:hover, .a_btn:active{
+  background-color: #286090;
+}
+
+
+
+
+
+.btn-edit{
+	color:#fff;
+	background-color:#B7B066;
+	border-color:#4cae4c
+}
+
+.btn-edit.focus,.btn-edit:focus{
+	color:#fff;
+	background-color:#9B8E36;
+	border-color:#255625
+}
+
+.btn-edit:hover{
+	color:#fff;
+	background-color:#9B8E36;
+	border-color:#398439
+}
+
+/**
+.btn-edit.active,.btn-edit:active,.open>.dropdown-toggle.btn-edit{
+	color:#fff;
+	background-color:#9B8E36;
+	border-color:#398439
+}
+
+.btn-edit.active.focus,.btn-edit.active:focus,.btn-edit.active:hover,.btn-edit:active.focus,.btn-edit:active:focus,.btn-edit:active:hover,.open>.dropdown-toggle.btn-edit.focus,.open>.dropdown-toggle.btn-edit:focus,.open>.dropdown-toggle.btn-edit:hover{
+	color:#fff;
+	background-color:#398439;
+	border-color:#255625
+}
+
+.btn-edit.active,.btn-edit:active,.open>.dropdown-toggle.btn-edit{
+	background-image:none
+}
+
+.btn-edit.disabled.focus,.btn-edit.disabled:focus,.btn-edit.disabled:hover,.btn-edit[disabled].focus,.btn-edit[disabled]:focus,.btn-edit[disabled]:hover,fieldset[disabled] .btn-edit.focus,fieldset[disabled] .btn-edit:focus,fieldset[disabled] .btn-edit:hover{
+	background-color:#B7B066;
+	border-color:#4cae4c
+}
+
+.btn-edit .badge{
+	color:#B7B066;
+	background-color:#fff
+}
+*/
+
+
+#hide_column th{
+	visibility: hidden;
+}
+
+
+.form-control-min {
+border: 0;
+}
+
+
+/* highlight results */
+
+/* Style the input */
+.on-page-search {
+/*#liveSearch {*/
+width: 100%;
+font-size: 14px;
+line-height: 26px;
+color: #787d85;
+background-color: #fcfcfc;
+border: 1px solid #e0e1e1;
+padding: 5px 15px;
+}
+
+/* Style the list */
+.demo-links {
+border-bottom: none;
+padding: 5px 5px;
+line-height: 36px;
+}
+
+/* Style the results */
+.results {
+background: #de1919;
+color: white;
+}
+.results:hover {
+background: #333;
+color: white;
+}
+
+.noresults {
+color:#f3f4f5;
+}
+
+
+.hide {
+  display: none;
+}
+
+
+.highlight {
+  background-color: yellow;
+  border-radius: .125em;
+}
+
+/*
+td {
+*/
+    /*display: inline-block;*/
+/*
+    max-width: 200px;
+    min-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+}
+*/
+
+/*
+td:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal;*/ /* break-all */
+/*
+}
+*/
+
+.td-fix {
+    max-width: 210px;
+    min-width: 210px;
+}
+
+/*
+#myTable tr td:nth-child(11) {
+    max-width: 100px;
+    min-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+#myTable tr td:nth-child(11):hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal; 
+}
+*/
+
+.td-hover {
+    /*display: inline-block;*/
+    max-width: 100px;
+    min-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.td-hover:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: normal; /* break-all */
+}
+
+.td-hover-break {
+    /*display: inline-block;*/
+    max-width: 100px;
+    min-width: 50px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+.td-hover-break:hover {
+    text-overflow: clip;
+    white-space: normal;
+    word-break: break-all; /* normal */
+}
+
+
+
+/* input id="liveSearch" type="search" */
+#liveSearch {
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  height:32px;
+  background-color: white;
+  background-image: url('../img/searchicon.png');
+  background-position: 10px 5px;
+  background-repeat: no-repeat;
+  padding-left: 40px;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+
+  /* Remove default */
+  -webkit-appearance: none;
+    
+  /* Now your own custom styles */
+  height: 20px;
+  width: 20px;
+  /*background: red;*/
+  background-image: url('../img/del20.png');
+  /* Will place small red box on the right of input (positioning carries over) */
+
+}
+
+/* div class="search" */
+.search {
+	/*border: 3px dashed #F00;*/
+	height: auto;
+	padding: 10px;
+	position: absolute;
+	left: 45%;
+	top: 92px;
+	width: 500px;
+}
+
+
+
+a[target="_blank"]:after {
+    content: url(../img/12px_icon_external-link-.png);
+}
+
+
+/* div class="result_nmb_rows" */
+.result_nmb_rows {
+	/*border: 3px dashed #F00;*/
+	height: auto;
+	padding: 10px;
+	position: absolute;
+	left: 33%;
+	top: 105px;
+	width: 70px;
+}
+
+/* input class="result_nmb" */
+.result_nmb {
+	border: none;
+	outline: none;
+	width: 40px;
+}
+
+
+
+
+
+

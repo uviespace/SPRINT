@@ -6,6 +6,7 @@ $num_rec_per_page = 5;
 
 if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
+if (isset($_GET["dpDomain"])) { $dpDomain  = $_GET["dpDomain"]; } else { $dpDomain=""; };
 if (isset($_GET["showAll"])) { $showAll  = $_GET["showAll"]; } else { $showAll=0; };
 
 if ($showAll == 1) {
@@ -37,6 +38,7 @@ $sqlTotal =
   "WHERE ".
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType = t.id AND ".
+  "    p.domain = '".$dpDomain."' AND ".
   "    (p.kind = 3 OR ".
   "    p.kind = 4 OR ".
   "    p.kind = 5 OR ".
@@ -59,6 +61,7 @@ $sql =
   "WHERE ".
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType = t.id AND ".
+  "    p.domain = '".$dpDomain."' AND ".
   "    (p.kind = 3 OR ".
   "    p.kind = 4 OR ".
   "    p.kind = 5 OR ".

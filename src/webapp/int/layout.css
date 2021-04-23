@@ -325,6 +325,16 @@ a[target="_blank"]:after {
 	width: 70px;
 }
 
+.result_nmb_rows_import {
+	/*border: 3px dashed #F00;*/
+	height: auto;
+	padding: 10px;
+	position: absolute;
+	left: 33%;
+	top: 165px;
+	width: 70px;
+}
+
 /* input class="result_nmb" */
 .result_nmb {
 	border: none;

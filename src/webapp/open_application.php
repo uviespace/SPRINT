@@ -224,16 +224,9 @@ if ($result->num_rows > 0) {
 -->
 
 				<!--<form  action="upload_DpList.php" method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px;">-->
-				<form  action="view_datapool-import.php" method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px;">
+				<form id="formGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
+
                   <div class="table">
-                  <div class="table-row">
-                      <div class="table-cell" style="width:20%;">
-                          Select Data Pool List to Upload
-                      </div>
-                      <div class="table-cell" style="width:80%;">
-                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
-                      </div>
-                  </div>
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Data Pool Domain
@@ -272,6 +265,28 @@ if ($result->num_rows > 0) {
 }
 ?>
                           </select>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Data Pool Item Name Prefix
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="dpNamePrefix" class="form-control" data-error="Please enter DP name prefix." />
+                      </div>
+                  </div>
+                  </div>
+
+                </form>
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_datapool-import.php?'+Array.prototype.slice.call(formGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_datapool-import.php" --> <!-- padding: top right bottom left -->
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Select Data Pool List to Upload
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
                       </div>
                   </div>
                   </div>

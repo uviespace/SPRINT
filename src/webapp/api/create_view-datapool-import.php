@@ -20,9 +20,9 @@ $sql =
   "VALUES ".
   "('".$post['idStandard']."','".$post['idType']."','".$post['kind']."','".$post['domain']."','".$post['name']."','".$post['shortDesc']."','".$desc."','".$post['value']."','".$size."','".$post['unit']."','".$post['multiplicity']."')";
 
-//$result = $mysqli->query($sql);
+$result = $mysqli->query($sql);
 
-$sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT 1"; 
+$sql = "SELECT * FROM `parameter` WHERE idStandard = ".$post['idStandard']." AND domain = '".$post['domain']."' ORDER BY id DESC LIMIT 1"; 
 
 $result = $mysqli->query($sql);
 

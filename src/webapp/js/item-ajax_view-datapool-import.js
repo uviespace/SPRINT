@@ -7,11 +7,12 @@ var is_ajax_fire = 0;
 var dropdown = "";
 
 var idStandard = getUrlVars()["idStandard"];
+var dpDomain = getUrlVars()["dpDomain"];
 
     getDropdownDataKindCreate();
     getDropdownDataParameterDatatypeCreate();
 
-//manageData();
+manageData();
 
 /* get variables from URL */
 function getUrlVars() {
@@ -26,11 +27,12 @@ function getUrlVars() {
 function manageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-datapool.php?idStandard='+idStandard,
+		url: url+'api/getData_view-datapool-import.php?idStandard='+idStandard+'&dpDomain='+dpDomain,
 		data: {page:page}
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
 		current_page = page;
+		//alert('A) Domain = '+dpDomain+' | Standard = '+idStandard)
 
 		$('#pagination').twbsPagination({
 			totalPages: total_page,
@@ -49,7 +51,7 @@ function manageData() {
 		is_ajax_fire = 1;
 
 	});
-
+	//alert('B) Domain = '+dpDomain+' | Standard = '+idStandard)
 }
 
 /* manage data list for all items */
@@ -86,7 +88,7 @@ function manageDataAll() {
 function getPageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-datapool.php?idStandard='+idStandard,
+		url: url+'api/getData_view-datapool-import.php?idStandard='+idStandard+'&dpDomain='+dpDomain,
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);
@@ -94,7 +96,7 @@ function getPageData() {
 }
 
 /* Get Dropdown Data for Kind */
-function getDropdownDataKind(kind) {
+function getDropdownDataKind(kind, id) {
     var data = { 
         "data": [ 
             { "kind":"3", "name":"Par", "desc":"Parameter" }, 
@@ -103,40 +105,40 @@ function getDropdownDataKind(kind) {
             { "kind":"6", "name":"Var Imp", "desc":"Variable Imported" }
         ]
     };
-    manageOptionKind(data.data, kind);
+    manageOptionKind(data.data, kind, id);
 }
 
 /* Get Dropdown Data for Packet Parameter */
-function getDropdownDataParameterDatatype(idType) {
+function getDropdownDataParameterDatatype(idType, id) {
 	$.ajax({
 		dataType: 'json',
 		url: url+'api/getData_dd-parameter-datatype.php?idStandard='+idStandard,
 		data: {dropdown:dropdown}
 	}).done(function(data){
-		manageOptionParameterDatatype(data.data, idType);
+		manageOptionParameterDatatype(data.data, idType, id);
 	});
 }
 
 /* Add new option to select */
-function manageOptionKind(data, kind) {
-	$("#sel_kind").empty();
+function manageOptionKind(data, kind, id) {
+	$(id).empty();
 	$.each( data, function( key, value ) {
 		if (kind==value.kind) {
-			$("#sel_kind").append('<option value="'+value.kind+'" selected>'+value.name+'</option>');
+			$(id).append('<option value="'+value.kind+'" selected>'+value.name+'</option>');
 		} else {
-			$("#sel_kind").append('<option value="'+value.kind+'">'+value.name+'</option>');
+			$(id).append('<option value="'+value.kind+'">'+value.name+'</option>');
 		}
 	});
 }
 
 /* Add new option to select */
-function manageOptionParameterDatatype(data, idType) {
-	$("#sel_datatype").empty();
+function manageOptionParameterDatatype(data, idType, id) {
+	$(id).empty();
 	$.each( data, function( key, value ) {
 		if (idType==value.id) {
-			$("#sel_datatype").append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+' ('+value.id+')</option>');
+			$(id).append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+' ('+value.id+')</option>');
 		} else {
-			$("#sel_datatype").append('<option value="'+value.id+'">'+value.domain+' / '+value.name+' ('+value.id+')</option>');
+			$(id).append('<option value="'+value.id+'">'+value.domain+' / '+value.name+' ('+value.id+')</option>');
 		}
 	});
 }
@@ -208,7 +210,8 @@ function manageRow(data) {
 	  	rows = rows + '</tr>';
 	});
 
-	$("tbody").html(rows);
+	//$("tbody").html(rows);
+	$("#myTable").html(rows);
 }
 
 /* Show all Items */
@@ -229,7 +232,7 @@ $(".crud-submit").click(function(e){
     } else {
       var kind = $("#create-item").find("select[name='kind']").val();
     }
-    var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
+    var shortDesc = $("#create-item").find("textarea[name='shortDesc']").val();
     if (!idStandard.length) {
       var idType = $("#create-item").find("input[name='idType']").val();
     } else {
@@ -257,7 +260,7 @@ $(".crud-submit").click(function(e){
             } else {
               $("#create-item").find("select[name='kind']").val('');
             }
-            $("#create-item").find("input[name='shortDesc']").val('');
+            $("#create-item").find("textarea[name='shortDesc']").val('');
             if (!idStandard.length) {
               $("#create-item").find("input[name='idType']").val('');
             } else {
@@ -280,6 +283,7 @@ $(".crud-submit").click(function(e){
 /* Add Item */
 $("body").on("click",".add-item",function(){
 	var id = $(this).parent("td").data('id');
+    var idStandard = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
@@ -288,18 +292,27 @@ $("body").on("click",".add-item",function(){
     var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
     var value = $(this).parent("td").prev("td").prev("td").text();
     var unit = $(this).parent("td").prev("td").text();
+	//toastr.success('Item ['+domain+' / '+name+'] for '+idStandard+' Added Successfully.', 'Success Alert', {timeOut: 5000});
 	
 	var c_obj = $(this).parents("tr");
 	$.ajax({
-		dataType: 'json',
+		/*dataType: 'json',*/
 		type:'POST',
 		url: url + 'api/create_view-datapool-import.php',
-		data:{id:id}
+		data:{id:id, idStandard:idStandard, domain:domain, name:name, kind:kind, 
+		      shortDesc:shortDesc, idType:idType, multiplicity:multiplicity, value:value, unit:unit},
+		success: function(result) { // we got the response
+			//alert('Successfully called');
+		},
+		error: function(jqxhr, status, exception) {
+			alert(status + ' | '+jqxhr+' | Exception:', exception);
+		}
 	}).done(function(data){
 		c_obj.remove();
 		toastr.success('Item Added Successfully.', 'Success Alert', {timeOut: 5000});
 		getPageData();
 	});
+	//toastr.success('B) Item Added Successfully.', 'Success Alert', {timeOut: 5000});
 
 });
 
@@ -333,8 +346,8 @@ $("body").on("click",".edit-item",function(){
     var value = $(this).parent("td").prev("td").prev("td").text();
     var unit = $(this).parent("td").prev("td").text();
 
-    getDropdownDataKind(kind);
-    getDropdownDataParameterDatatype(idType);
+    getDropdownDataKind(kind, "#sel_kind");
+    getDropdownDataParameterDatatype(idType, "#sel_datatype");
 
     $("#edit-item").find("input[name='domain']").val(domain);
     $("#edit-item").find("input[name='name']").val(name);
@@ -358,6 +371,44 @@ $("body").on("click",".edit-item",function(){
 
 });
 
+/* Show Item */
+$("body").on("click",".show-item",function(){
+
+    var id = $(this).parent("td").data('id');
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var value = $(this).parent("td").prev("td").prev("td").text();
+    var unit = $(this).parent("td").prev("td").text();
+
+    getDropdownDataKind(kind, "#sel_kind_show");
+    getDropdownDataParameterDatatype(idType, "#sel_datatype_show");
+
+    $("#show-item").find("input[name='domain']").val(domain);
+    $("#show-item").find("input[name='name']").val(name);
+    /*if (!idStandard.length) {
+      $("#show-item").find("input[name='kind']").val(kind);
+    } else {
+      $("#show-item").find("select[name='kind']").val(kind);
+    }*/
+    $("#show-item").find("select[name='kind']").val(kind);
+    $("#show-item").find("textarea[name='shortDesc']").val(shortDesc);
+    /*if (!idStandard.length) {
+      $("#show-item").find("input[name='idType']").val(idType);
+    } else {
+      $("#show-item").find("select[name='idType']").val(idType);
+    }*/
+    $("#show-item").find("select[name='idType']").val(idType);
+    $("#show-item").find("input[name='multiplicity']").val(multiplicity);
+    $("#show-item").find("input[name='value']").val(value);
+    $("#show-item").find("input[name='unit']").val(unit);
+    $("#show-item").find(".show-id").val(id);
+
+});
+
 /* Updated new Item */
 $(".crud-submit-edit").click(function(e){
 
@@ -370,7 +421,7 @@ $(".crud-submit-edit").click(function(e){
     } else {
       var kind = $("#edit-item").find("select[name='kind']").val();
     }
-    var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
+    var shortDesc = $("#edit-item").find("textarea[name='shortDesc']").val();
     if (!idStandard.length) {
       var idType = $("#edit-item").find("input[name='idType']").val();
     } else {

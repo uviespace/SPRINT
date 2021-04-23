@@ -12,8 +12,9 @@ $imageFileType = strtolower(pathinfo($target_file,PATHINFO_EXTENSION));
 
 if (isset($_POST["idProject"])) { $idProject  = $_POST["idProject"]; } else { $idProject=0; };
 if (isset($_POST["idApplication"])) { $idApplication  = $_POST["idApplication"]; } else { $idApplication=0; };
-if (isset($_POST["idStandard"])) { $idStandard  = $_POST["idStandard"]; } else { $idStandard=0; };
-if (isset($_POST["dpDomain"])) { $dpDomain  = $_POST["dpDomain"]; } else { $dpDomain=""; };
+if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
+if (isset($_GET["dpDomain"])) { $dpDomain  = $_GET["dpDomain"]; } else { $dpDomain=""; };
+if (isset($_GET["dpNamePrefix"])) { $dpNamePrefix  = $_GET["dpNamePrefix"]; } else { $dpNamePrefix=""; };
 $project_name = "";
 $application_name = "";
 $application_desc = "";
@@ -69,6 +70,35 @@ if ($result->num_rows > 0) {
 } else {
     echo "0 results";
 }
+
+
+$sqlTotal = 
+  "SELECT ".
+  "    * ".
+  "FROM ".
+  "    `parameter` ".
+  "WHERE ".
+  "    idStandard = ".$idStandard." AND ".
+  "    domain = '".$dpDomain."' AND ".
+  "    (kind = 3 OR ".
+  "    kind = 4 OR ".
+  "    kind = 5 OR ".
+  "    kind = 6) ";
+  
+$result = $mysqli->query($sqlTotal);
+
+$num_rows = mysqli_num_rows($result);
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+		//echo "found: ".$row["name"]."<br/>";
+        $arrNames[] = $row["name"];
+    }
+} else {
+    echo "0 results";
+}
+
 
 // Check if image file is a actual image or fake image
 if(isset($_POST["importDpList"])) {
@@ -148,17 +178,17 @@ if ($uploadOk == 0) {
 					<b>Domain:</b> <?php echo $dpDomain;?><br/>
 					<b>Standard:</b> <?php echo $standard_name;?><br/><br/>
 		        </div>
-		        <div class="pull-right">
+		        <!--<div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
 				</button>
-		        </div>
+		        </div>-->
 		    </div>
 		</div>
 
 		<ul id="pagination" class="pagination-sm"></ul>
 
-		<div class="result_nmb_rows">
+		<div class="result_nmb_rows_import">
 			<input id="result_nmb" class="result_nmb" type="text" readonly />
 		</div>
 
@@ -184,7 +214,26 @@ if ($uploadOk == 0) {
 				<th width="150px">Action</th>
 			    </tr>
 			</thead>
-			
+			<tbody id="myTable">
+			</tbody>
+		</table>
+
+		<table class="table table-bordered" style="word-break:break-all;">
+			<thead>
+			    <tr>
+				<th>ID</th>
+				<th>Domain</th>
+				<th>Name</th> 
+				<th>Kind</th> <!-- Dropdown -->
+				<th width="250px">Short Description</th>
+				<th>Datatype</th> <!-- Dropdown -->
+				<th>Multiplicity</th>
+				<th width="135px">Value</th>
+				<th>Unit</th>
+				<th width="150px">Action</th>
+			    </tr>
+			</thead>
+			<tbody id="myTableImport">
 <?php
 
 // read CSV file
@@ -207,6 +256,18 @@ if($imageFileType == "csv") {
 	  }
       $row++;
 	  
+	  // name
+	  $name = $data[0];
+	  // check if name exists already in Data Pool
+	  $foundName = false;
+	  foreach ($arrNames as $arrName) {
+	    if($arrName == $dpNamePrefix.$name) {
+				//echo "Value: ".$arrName."<br/>";
+				$foundName = true;
+			break;
+		}
+	  }
+	  
 	  // kind
 	  if($data[5]=="PAR") {
 	    $kind = 5; // PAR IMP
@@ -214,7 +275,14 @@ if($imageFileType == "csv") {
 	    $kind = 6; // VAR IMP
 	  }
 	  
-	  // bitsize
+	  // description
+	  if ($num==8) {
+	    $shortDesc = $data[7];
+	  }else {
+	    $shortDesc = "";
+	  }
+	  
+	  // datatype <-> bitsize
 	  if($data[3]<="8") {
 	    $datatype = "200";
 	  } else if($data[3]<="16") {
@@ -225,26 +293,32 @@ if($imageFileType == "csv") {
 	    $datatype = $data[3];
 	  }
 	  
-	  // description
-	  if ($num==8) {
-	    $shortDesc = $data[7];
-	  }else {
-	    $shortDesc = "";
-	  }
-		  
+	  // multiplicity
+	  $multiplicity = $data[4];
+	  
+	  // value
+	  $value = $data[6];
+	  
+	  // unit
+	  $unit = ""; // "bitsize: ".$data[3];
+	  
 	echo "<tr>";
-	echo "<td></td>"; // id
+	echo "<td style=\"color: #fff;\">".$idStandard."</td>"; // id = idStandard (hidden)
 	echo "<td>".$dpDomain."</td>"; // domain
-	echo "<td>".$data[0]."</td>"; // name
+	echo "<td>".$dpNamePrefix.$name."</td>"; // name
 	echo "<td>".$kind."</td>"; // kind
 	echo "<td>".$shortDesc."</td>"; // short description
 	echo "<td>".$datatype."</td>"; // datatype
-	echo "<td>".$data[4]."</td>"; // multiplicity
-	echo "<td class=\"td-hover-break\">".$data[6]."</td>"; // value
-	echo "<td>bitsize: ".$data[3]."</td>"; // unit
+	echo "<td>".$multiplicity."</td>"; // multiplicity
+	echo "<td class=\"td-hover-break\">".$value."</td>"; // value
+	echo "<td>".$unit."</td>"; // unit
 	echo "<td data-id=\"'+value.id+'\">";
-	echo "<button data-toggle=\"modal\" data-target=\"#edit-item\" class=\"btn btn-primary edit-item\">Show</button> ";
-	echo "<button class=\"btn btn-success add-item\">Add</button>";
+	if ($foundName) {
+		echo "Item already found in Data Pool!";
+	} else {
+		echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+		echo "<button class=\"btn btn-success add-item\">Add</button>";
+	}
 	echo "</td>";
 	echo "</tr>";
 	  
@@ -254,8 +328,6 @@ if($imageFileType == "csv") {
 }
 
 ?>
-			
-			<tbody id="myTable">
 			</tbody>
 		</table>
 
@@ -373,7 +445,7 @@ if($imageFileType == "csv") {
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-datapool-import.php" method="put">
+					<form data-toggle="validator" action="api/update_view-datapool.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
@@ -396,7 +468,7 @@ if($imageFileType == "csv") {
 								<option value="3">Par</option>
 								<option value="4">Var</option>
 							</select>-->
-							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
+							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required >
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -405,14 +477,14 @@ if($imageFileType == "csv") {
 						<div class="form-group">
 							<label class="control-label" for="title">Short Description:</label>
 							<!--<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />-->
-                            <textarea name="shortDesc" class="form-control" data-error="Please enter short description." required></textarea>
+                            <textarea name="shortDesc" class="form-control" data-error="Please enter short description." required ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Datatype:</label>
 							<!--<input type="text" name="datatype" class="form-control" data-error="Please enter datatype." />-->
-							<select id="sel_datatype" name="idType" class="form-control" data-error="Please enter datatype." required>
+							<select id="sel_datatype" name="idType" class="form-control" data-error="Please enter datatype." required >
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -438,6 +510,86 @@ if($imageFileType == "csv") {
 
 						<div class="form-group">
 							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
+						</div>
+
+		      		</form>
+
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Show Item Modal -->
+		<div class="modal fade" id="show-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Show Item</h4>
+		      </div>
+
+		      <div class="modal-body">
+					<form data-toggle="validator" action="api/update_view-datapool.php" method="put">
+
+		      			<input type="hidden" name="id" class="edit-id">
+
+						<div class="form-group">
+							<label class="control-label" for="title">Domain:</label>
+							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Name:</label>
+							<input type="text" name="name" class="form-control" data-error="Please enter name." required readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Kind:</label>
+							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." />-->
+							<!--<select name="kind" class="form-control" data-error="Please enter kind." required>
+								<option value="3">Par</option>
+								<option value="4">Var</option>
+							</select>-->
+							<select id="sel_kind_show" name="kind" class="form-control" data-error="Please enter kind." required readonly >
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Short Description:</label>
+							<!--<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />-->
+                            <textarea name="shortDesc" class="form-control" data-error="Please enter short description." required readonly ></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Datatype:</label>
+							<!--<input type="text" name="datatype" class="form-control" data-error="Please enter datatype." />-->
+							<select id="sel_datatype_show" name="idType" class="form-control" data-error="Please enter datatype." required readonly>
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Multiplicity:</label>
+							<input type="text" name="multiplicity" class="form-control" data-error="Please enter multiplicity." readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Value:</label>
+							<input type="text" name="value" class="form-control" data-error="Please enter value." required readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Unit:</label>
+							<input type="text" name="unit" class="form-control" data-error="Please enter unit." readonly />
+							<div class="help-block with-errors"></div>
 						</div>
 
 		      		</form>

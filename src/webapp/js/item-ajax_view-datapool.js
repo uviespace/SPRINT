@@ -98,7 +98,9 @@ function getDropdownDataKind(kind) {
     var data = { 
         "data": [ 
             { "kind":"3", "name":"Par", "desc":"Parameter" }, 
-            { "kind":"4", "name":"Var", "desc":"Variable" }
+            { "kind":"4", "name":"Var", "desc":"Variable" },
+            { "kind":"5", "name":"Par Imp", "desc":"Parameter Imported" }, 
+            { "kind":"6", "name":"Var Imp", "desc":"Variable Imported" }
         ]
     };
     manageOptionKind(data.data, kind);
@@ -145,7 +147,9 @@ function getDropdownDataKindCreate() {
         "data": [ 
             { "kind":"", "name":"--- Please select ---", "desc":"" }, 
             { "kind":"3", "name":"Par", "desc":"Parameter" }, 
-            { "kind":"4", "name":"Var", "desc":"Variable" }
+            { "kind":"4", "name":"Var", "desc":"Variable" },
+            { "kind":"5", "name":"Par Imp", "desc":"Parameter Imported" }, 
+            { "kind":"6", "name":"Var Imp", "desc":"Variable Imported" }
         ]
     };
     manageOptionKindCreate(data.data);

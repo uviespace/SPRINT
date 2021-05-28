@@ -72,6 +72,8 @@ if ($result->num_rows > 0) {
 }
 
 
+$arrNames[] = null;
+if ($dpDomain != "") {
 $sqlTotal = 
   "SELECT ".
   "    * ".
@@ -84,6 +86,19 @@ $sqlTotal =
   "    kind = 4 OR ".
   "    kind = 5 OR ".
   "    kind = 6) ";
+} else {
+$sqlTotal = 
+  "SELECT ".
+  "    * ".
+  "FROM ".
+  "    `parameter` ".
+  "WHERE ".
+  "    idStandard = ".$idStandard." AND ".
+  "    (kind = 3 OR ".
+  "    kind = 4 OR ".
+  "    kind = 5 OR ".
+  "    kind = 6) ";
+}
   
 $result = $mysqli->query($sqlTotal);
 
@@ -92,7 +107,7 @@ $num_rows = mysqli_num_rows($result);
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-		//echo "found: ".$row["name"]."<br/>";
+        //echo "found: ".$row["name"]."<br/>";
         $arrNames[] = $row["name"];
     }
 } else {
@@ -244,8 +259,8 @@ if($imageFileType == "csv") {
     while (($data = fgetcsv($handle, 1024, "|")) !== FALSE) {
       $num = count($data);
 	  
-	  // name | pid | datatype | bitsize |multiplicity | kind | value | description
-	  // 0    | 1   | 2        | 3       | 4           | 5    | 6     | 7
+	  // name | pid | datatype | bitsize |multiplicity | kind | value | description | domain
+	  // 0    | 1   | 2        | 3       | 4           | 5    | 6     | 7           | 8
 	  
 	  if ($num<8) {
           echo "<p> $num fields in line $row: <br /></p>\n";
@@ -255,6 +270,13 @@ if($imageFileType == "csv") {
           echo "<br />\n";
 	  }
       $row++;
+	  
+	  // domain
+	  if ($num==9 AND $dpDomain == "") {
+	    $domain = $data[8];
+	  }else {
+	    $domain = $dpDomain;
+	  }
 	  
 	  // name
 	  $name = $data[0];
@@ -304,7 +326,7 @@ if($imageFileType == "csv") {
 	  
 	echo "<tr>";
 	echo "<td style=\"color: #fff;\">".$idStandard."</td>"; // id = idStandard (hidden)
-	echo "<td>".$dpDomain."</td>"; // domain
+	echo "<td>".$domain."</td>"; // domain
 	echo "<td>".$dpNamePrefix.$name."</td>"; // name
 	echo "<td>".$kind."</td>"; // kind
 	echo "<td>".$shortDesc."</td>"; // short description

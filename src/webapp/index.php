@@ -96,11 +96,27 @@
 
 		<div>
 			<hr>
-			<a href="mng_project.php" target="_self"><button>Manage my projects...</button></a><br/>
+			<a href="mng_user.php" style="width:180px;" target="_self">
+				<button style="width:200px;text-align:left;">
+					<img src="img/users_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage users...
+				</button>
+			</a>
 			<br/>
-			<div style="background-color:#EEEEEE;padding:2px;">
-				<a href="sel_project.php" target="_self">Open project</a>
-			</div>
+			<hr>
+			<a href="mng_project.php" target="_self">
+				<button style="width:200px;text-align:left;">
+					<img src="img/projects_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage my projects...
+				</button>
+			</a>
+			<br/>
+			<br/>
+			<a href="sel_project.php" target="_self">
+				<button style="width:200px;text-align:left;">
+					&nbsp;&nbsp;<img src="img/open_64x64.png" width="16" height="16">&nbsp;&nbsp;Open projects...
+				</button>
+			</a>
+			<br/>
+			<hr>
 			<br/>
 			<br/>
 			<br/>

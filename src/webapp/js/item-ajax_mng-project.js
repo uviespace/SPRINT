@@ -4,8 +4,97 @@ var page = 1;
 var current_page = 1;
 var total_page = 0;
 var is_ajax_fire = 0;
+var dropdown = "";
 
 manageData();
+getDropdownDataPublicCreate();
+getDropdownDataOwnerCreate();
+
+/* Get Dropdown Data for Owner */
+function getDropdownDataOwner(owner) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-owner.php',
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionOwner(data.data, owner);
+	});
+}
+
+/* Add new option to select */
+function manageOptionOwner(data, owner) {
+	$("#sel_owner").empty();
+	$.each( data, function( key, value ) {
+		if (owner==value.name) {
+			$("#sel_owner").append('<option value="'+value.name+'" selected>'+value.name+' ('+value.email+')</option>');
+		} else {
+			$("#sel_owner").append('<option value="'+value.name+'">'+value.name+' ('+value.email+')</option>');
+		}
+	});
+}
+
+/* Get Dropdown Data for Owner */
+function getDropdownDataOwnerCreate() {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-owner.php',
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionOwnerCreate(data.data);
+	});
+}
+
+/* Add new option to select */
+function manageOptionOwnerCreate(data) {
+	$("#sel_owner_create").empty();
+	$("#sel_owner_create").append('<option value="" selected>Please select ...</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_owner_create").append('<option value="'+value.name+'">'+value.name+' ('+value.email+')</option>');
+	});
+}
+
+/* Get Dropdown Data for isPublic */
+function getDropdownDataPublic(isPublic) {
+    var data = { 
+        "data": [ 
+            { "isPublic":"0", "name":"no", "desc":"Project is not public." }, 
+            { "isPublic":"1", "name":"yes", "desc":"Project is public." }
+        ]
+    };
+    manageOptionPublic(data.data, isPublic);
+}
+
+/* Add new option to select */
+function manageOptionPublic(data, isPublic) {
+	$("#sel_public").empty();
+	$.each( data, function( key, value ) {
+		if (isPublic==value.isPublic) {
+			$("#sel_public").append('<option value="'+value.isPublic+'" selected>'+value.name+'</option>');
+		} else {
+			$("#sel_public").append('<option value="'+value.isPublic+'">'+value.name+'</option>');
+		}
+	});
+}
+
+/* Get Dropdown Data for isPublic */
+function getDropdownDataPublicCreate() {
+    var data = { 
+        "data": [ 
+            { "isPublic":"0", "name":"no", "desc":"Project is not public." }, 
+            { "isPublic":"1", "name":"yes", "desc":"Project is public." }
+        ]
+    };
+    manageOptionPublicCreate(data.data);
+}
+
+/* Add new option to select */
+function manageOptionPublicCreate(data) {
+	$("#sel_public_create").empty();
+	$("#sel_public_create").append('<option value="" selected>Please select ...</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_public_create").append('<option value="'+value.isPublic+'">'+value.name+'</option>');
+	});
+}
 
 /* manage data list */
 function manageData() {
@@ -74,8 +163,8 @@ $(".crud-submit").click(function(e){
     var id = $("#create-item").find("input[name='id']").val();
 	var name = $("#create-item").find("input[name='name']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
-    var owner = $("#create-item").find("input[name='owner']").val();
-    var isPublic = $("#create-item").find("input[name='isPublic']").val();
+    var owner = $("#create-item").find("select[name='owner']").val();
+    var isPublic = $("#create-item").find("select[name='isPublic']").val();
 	var setting = $("#create-item").find("textarea[name='setting']").val();
 
     if(id != '' && name != '' && desc != '' && owner != '' && isPublic != ''){
@@ -88,15 +177,15 @@ $(".crud-submit").click(function(e){
             $("#create-item").find("input[name='id']").val('');
 			$("#create-item").find("input[name='name']").val('');
             $("#create-item").find("textarea[name='desc']").val('');
-			$("#create-item").find("input[name='owner']").val('');
-            $("#create-item").find("input[name='isPublic']").val('');
+			$("#create-item").find("select[name='owner']").val('');
+            $("#create-item").find("select[name='isPublic']").val('');
             $("#create-item").find("textarea[name='setting']").val('');
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
         });
     }else{
-        alert('You are missing title or description.')
+        alert('You are missing name, description, owner or is Public.')
     }
 
 });
@@ -123,16 +212,19 @@ $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-	var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
-	var owner = $(this).parent("td").prev("td").prev("td").prev("td").text();
-	var isPublic = $(this).parent("td").prev("td").prev("td").text();
+    var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var owner = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var isPublic = $(this).parent("td").prev("td").prev("td").text();
     var setting = $(this).parent("td").prev("td").text();
+
+    getDropdownDataOwner(owner);
+    getDropdownDataPublic(isPublic);
 
     $("#edit-item").find("input[name='name']").val(name);
     $("#edit-item").find("textarea[name='desc']").val(desc);
-	$("#edit-item").find("input[name='owner']").val(owner);
-	$("#edit-item").find("input[name='isPublic']").val(isPublic);
-	$("#edit-item").find("textarea[name='setting']").val(setting);
+    $("#edit-item").find("select[name='owner']").val(owner);
+    $("#edit-item").find("select[name='isPublic']").val(isPublic);
+    $("#edit-item").find("textarea[name='setting']").val(setting);
     $("#edit-item").find(".edit-id").val(id);
 
 });
@@ -143,9 +235,9 @@ $(".crud-submit-edit").click(function(e){
     e.preventDefault();
     var form_action = $("#edit-item").find("form").attr("action");
     var name = $("#edit-item").find("input[name='name']").val();
-	var desc = $("#edit-item").find("textarea[name='desc']").val();
-	var owner = $("#edit-item").find("input[name='owner']").val();
-	var isPublic = $("#edit-item").find("input[name='isPublic']").val();
+    var desc = $("#edit-item").find("textarea[name='desc']").val();
+    var owner = $("#edit-item").find("select[name='owner']").val();
+    var isPublic = $("#edit-item").find("select[name='isPublic']").val();
     var setting = $("#edit-item").find("textarea[name='setting']").val();
     var id = $("#edit-item").find(".edit-id").val();
 

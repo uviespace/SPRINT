@@ -93,12 +93,12 @@ if ($result->num_rows > 0) {
         echo "<br/>";
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 ?>
 
-<a href="view_project-application.php?idProject=<?php echo $idProject; ?>"><button>Manage Applications</button></a>
+<a href="view_project-application.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Applications ...</button></a>
 
 <?php
 
@@ -120,12 +120,64 @@ if ($result->num_rows > 0) {
         echo "<br/>";
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 ?>
 
-<a href="view_project-standard.php?idProject=<?php echo $idProject; ?>"><button>Manage Standards</button></a>
+<a href="view_project-standard.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Standards ...</button></a>
+
+<?php
+
+$sql = "SELECT u.id, u.name, u.email FROM `user` AS u, `project` AS p, `userproject` AS up WHERE u.id = up.idUser AND p.id = up.idProject AND up.idRole = 2 AND p.id = $id";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "<h3>Owner</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_user.php?idProject=$id&idApplication=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b> (".$row["email"].")</a>";
+        echo "</div>";
+        echo "<br/>";
+    }
+} else {
+    //echo "0 results";
+}
+
+?>
+
+<?php
+
+$sql = "SELECT u.id, u.name, up.email FROM `user` AS u, `project` AS p, `userproject` AS up WHERE u.id = up.idUser AND p.id = up.idProject AND up.idRole = 3 AND p.id = $id";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "<h3>Contributors</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_user.php?idProject=$id&idApplication=".$row["id"]."' >".$row["id"]." <b>".$row["email"]."</b></a>";
+        echo "</div>";
+        echo "<br/>";
+    }
+} else {
+    //echo "0 results";
+}
+
+?>
+
+<a href="view_project-user.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Contributors ...</button></a>
 
 				<div class="topcorner_left">
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>

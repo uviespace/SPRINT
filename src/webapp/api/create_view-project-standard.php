@@ -4,45 +4,18 @@ require 'db_config.php';
 
 $post = $_POST;
 
-if ($post['gse']==0) {
-  $setting = "{\"PUS\": {\"type\": \"\", \"ptc\": null, \"pfc\": null}}";
-} else if ($post['gse']==1) {
-  $setting = "{\"CC\": {\"type\": \"\"}}";
-} else {
-  $setting = "";
-}
-
-$schema = 
-  "{\n".
-  "    \"title\": \"Enumeration field definition\",\n".
-  "    \"type\": \"object\",\n".
-  "    \"properties\": {\n".
-  "        \"Enumerations\" : {\n".
-  "            \"type\": \"array\",\n".
-  "            \"format\": \"table\",\n".
-  "            \"uniqueItems\": true,\n".
-  "            \"items\": {\n".
-  "                \"type\": \"object\",\n".
-  "                \"properties\": {\n".
-  "                    \"Value\": {\"type\":\"string\"},\n".
-  "                    \"Name\": { \"type\": \"string\" },\n".
-  "                    \"Description\" : { \"type\": \"string\" }\n".
-  "                }\n".
-  "            }\n".
-  "        }\n".
-  "    }\n".
-  "}";
+$setting = "{\"datapool\":{\"parameter\":{\"offset\":1},\"variable\":{\"offset\":9}}}";
 
 $sql = 
   "INSERT INTO ".
-  "`type` ".
-  "(`idStandard`, `domain`, `name`, `nativeType`, `size`, `value`, `desc`, `setting`, `schema`) ".
+  "`standard` ".
+  "(`idProject`, `name`, `desc`, `setting`) ".
   "VALUES ".
-  "('".$post['idStandard']."','".$post['domain']."','".$post['name']."','".$post['nativeType']."','".$post['size']."','".$post['value']."','".$post['desc']."','".$setting."','".$schema."')";
+  "('".$post['idProject']."','".$post['name']."','".$post['desc']."','".$setting."')";
 
 $result = $mysqli->query($sql);
 
-$sql = "SELECT * FROM `type` ORDER BY id DESC LIMIT 1"; 
+$sql = "SELECT * FROM `standard` ORDER BY id DESC LIMIT 1"; 
 
 $result = $mysqli->query($sql);
 

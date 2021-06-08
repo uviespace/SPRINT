@@ -1,3 +1,30 @@
+<?php
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
+require 'api/db_config.php';
+
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+//echo "Hallo User: ".$userid;
+
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+
+$result = $mysqli->query($sql);
+
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -73,6 +100,8 @@
 							<input type="text" name="id" class="form-control" data-error="Please enter id." required />
 							<div class="help-block with-errors"></div>
 						</div>-->
+
+						<input type="hidden" name="userid" value="<?php echo $userid; ?>" />
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>

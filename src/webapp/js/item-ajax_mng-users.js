@@ -100,6 +100,11 @@ $(".crud-submit").click(function(e){
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
+	
+	var confirmation = confirm("Are you sure to remove the item?");
+	
+	if (confirmation){
+	
 	var id = $(this).parent("td").data('id');
 	var c_obj = $(this).parents("tr");
 	$.ajax({
@@ -112,6 +117,8 @@ $("body").on("click",".remove-item",function(){
 		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
 		getPageData();
 	});
+	
+	}
 
 });
 

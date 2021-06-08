@@ -1,3 +1,26 @@
+<?php
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
+require 'api/db_config.php';
+
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+$userEmail = $row["email"];
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -47,9 +70,22 @@
 
 <?php
 
-require 'api/db_config.php';
+//require 'api/db_config.php';
 
-$sql = "SELECT * FROM `project` ORDER BY `id`";
+if ($userid == 1 || $userid == 1001) {
+    $sql = "SELECT * FROM `project` ORDER BY `id`";
+} else {
+    $sql = "SELECT p.* ".
+           "FROM `project` p ".
+           "LEFT JOIN `userproject` up ".
+           "ON p.id = up.idProject ".
+           "WHERE p.isPublic = 1 ".
+           "OR (up.idUser = ".$userid." ".
+           "AND up.idRole = 2) ".
+           "OR (up.email = '".$userEmail."' ".
+           "AND up.idRole = 3) ".
+           "ORDER BY p.id";
+}
 
 $result = $mysqli->query($sql);
 
@@ -63,6 +99,9 @@ if ($result->num_rows > 0) {
         // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
         echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
         echo "<a href='open_project.php?id=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b></a>";
+        if ($row["isPublic"] == 1) {
+            echo "<span style='float:right;'><img src='img/isPublic20.png' />&nbsp;</span>";
+        }
         echo "</div>";
         echo "<br/>";
     }
@@ -102,6 +141,11 @@ if ($result->num_rows > 0) {
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
 					<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
+					<br/><br/>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
 					<br/><br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

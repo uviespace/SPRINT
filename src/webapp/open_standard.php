@@ -69,7 +69,7 @@ $idApplication = 0;
 		var url = "http://localhost/dbeditor/";
 
 	</script>
-	<script type="text/javascript" src="js/item-ajax.js"></script>
+	<script type="text/javascript" src="js/item-ajax_view-project-standard.js"></script>
 	<style type="text/css">
 
 	</style>
@@ -95,10 +95,11 @@ $idApplication = 0;
 		</div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_spec-standard.php" method="put">
+					<!--<form data-toggle="validator" action="api/update_view-project-standard.php" method="put">
 
-						<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
-						<input type="hidden" name="idStandard" class="edit-id" value="<?php echo $idStandard; ?>">
+						<input type="hidden" name="id" class="edit-id">
+						<input type="hidden" name="idProject" value="<?php echo $idProject; ?>">
+						<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>">
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
@@ -115,6 +116,29 @@ $idApplication = 0;
 						<div class="form-group">
 							<button type="submit" class="btn btn-success crud-submit-edit">Save</button>
 						</div>
+
+		      		</form>-->
+					
+					
+					<form data-toggle="validator" action="api/update_view-project-standard.php" method="put">
+
+		      			<input type="hidden" name="id" class="edit-id">
+
+						<div class="form-group">
+							<label class="control-label" for="title">Name:</label>
+							<input type="text" name="name" class="form-control" data-error="Please enter name." value="<?php echo $standard_name; ?>" readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Description:</label>
+							<textarea name="desc" class="form-control" data-error="Please enter description." rows="2" readonly ><?php echo $standard_desc; ?></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<!--<div class="form-group">
+							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
+						</div>-->
 
 		      		</form>
 
@@ -170,6 +194,12 @@ if ($result->num_rows > 0) {
 */
 
 ?>
+
+				<div>
+					<a href="view_standard-import.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>"><button style="width:180px;">Import to Standard ...</button></a>
+				</div>
+
+				<br/>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_tcheader.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">TC Header...</a>

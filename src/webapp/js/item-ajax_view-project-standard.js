@@ -116,18 +116,18 @@ $(".crud-submit-show").click(function(e){
 $(".crud-submit").click(function(e){
     //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
+    var idProject = $("#create-item").find("input[name='idProject']").val();
     var name = $("#create-item").find("input[name='name']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
 
-    if(id != '' && name != '' && desc != ''){
+    if(idProject != '' && name != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, name:name, desc:desc}
+            data:{idProject:idProject, name:name, desc:desc}
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='idProject']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("textarea[name='desc']").val('');
             getPageData();
@@ -135,13 +135,18 @@ $(".crud-submit").click(function(e){
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
         });
     }else{
-        alert('You are missing title or description.')
+        alert('You are missing name.')
     }
 
 });
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
+	
+	var confirmation = confirm("Are you sure to remove the item?");
+	
+	if (confirmation){
+	
 	var id = $(this).parent("td").data('id');
 	var c_obj = $(this).parents("tr");
 	$.ajax({
@@ -154,6 +159,8 @@ $("body").on("click",".remove-item",function(){
 		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
 		getPageData();
 	});
+	
+	}
 
 });
 

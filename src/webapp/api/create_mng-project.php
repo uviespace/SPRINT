@@ -15,8 +15,7 @@ $result = $mysqli->query($sql);
 
 // get project id
 
-
-
+$projectId = $mysqli->insert_id;
 
 // link project with user as owner
 
@@ -25,7 +24,7 @@ $sql =
   "`userproject` ".
   "(`idUser`, `idProject`, `idRole`) ".
   "VALUES ".
-  "('".$post['name']."','".$post['desc']."','".$post['isPublic']."','".$post['setting']."')";
+  "('".$post['userid']."','".$projectId."','2')";
 
 $result = $mysqli->query($sql);
 

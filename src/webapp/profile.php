@@ -10,12 +10,46 @@ if(!isset($_SESSION['userid'])) {
 }
 require 'api/db_config.php';
 
+function password_verify_md5($pwd, $hash) {
+    if (md5($pwd) == $hash) {
+        return true;
+    } else {
+        return false;
+    }
+}
+
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
  
 //echo "Hallo User: ".$userid;
 
-// get user name from database
+if(isset($_GET['saved'])) {
+    $email = $_POST['email'];
+    $name = $_POST['name'];
+    //echo "Email: ".$email."<br/>";
+    //echo "Name: ".$name."<br/>";
+    $editMessage = "";
+
+    // get info from DB to current user 
+    $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+    $result = $mysqli->query($sql);
+    $num_rows = mysqli_num_rows($result);
+    //echo "Found: ".$num_rows."<br/>";
+    $row = $result->fetch_assoc();
+
+    if ($email != $row["email"]) {
+        $sql = "UPDATE user SET `email` = '".$email."' WHERE `id` = ".$userid;
+        $result = $mysqli->query($sql);
+        $editMessage .= "<font color=blue>Email changed successfully.</font><br/>";
+    }
+    if ($name != $row["name"]) {
+        $sql = "UPDATE user SET `name` = '".$name."' WHERE `id` = ".$userid;
+        $result = $mysqli->query($sql);
+        $editMessage .= "<font color=blue>Name changed successfully.</font><br/>";
+    }
+}
+
+// get user information from database
 $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
 
 $result = $mysqli->query($sql);
@@ -24,6 +58,37 @@ $row = $result->fetch_assoc();
 
 $userName = $row["name"];
 
+if(isset($_GET['changed'])) {
+    $passwort = $_POST['passwort'];
+    $passwortNew = $_POST['passwortNew'];
+    $passwortNew2 = $_POST['passwortNew2'];
+    //echo "Old password: ".$passwort."<br/>";
+    //echo "New password: ".$passwortNew."<br/>";
+    //echo "New password again: ".$passwortNew2."<br/>";
+    $changeMessage = "";
+    $continue = true;
+
+    if (!password_verify_md5($passwort, $row["password"])) {
+        $changeMessage .= "<font color=red>Wrong old password entered!</font><br/>";
+        $continue = false;
+    }
+
+    if ($passwortNew != $passwortNew2) {
+        $changeMessage .= "<font color=red>New entered passwords are different!</font><br/>";
+        $continue = false;
+    } else if (strlen($passwortNew) < 6) {
+        $changeMessage .= "<font color=red>New entered password is too short! Please use a password with at least 6 characters.</font><br/>";
+        $continue = false;
+    }
+
+    if ($continue) {
+        // Write new password to DB
+        $passwort_hash = md5($passwortNew);
+        $sql = "UPDATE user SET `password` = '".$passwort_hash."' WHERE `id` = ".$userid;
+        $result = $mysqli->query($sql);
+        $changeMessage .= "<font color=blue>Password changed successfully.</font><br/>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -98,67 +163,56 @@ $userName = $row["name"];
 		</div>
 
 		<div>
-			The CORDET FW Editor is a web-based tool to support the specification of a PUS-based system communication 
-			standard and of the applications which use it. The PUS 
-			(<a href="http://www.ecss.nl/wp-content/uploads/standards/ecss-e/ECSS-E-70-41A30Jan2003.pdf" target="_blank">Packet Utilization Standard</a>) 
-			is an interface 
-			standard promoted by the European Space Agency for on-board applications.
-			<br/>
-			The CORDET FW Editor allows a user to enter the specification information for a PUS-based system and to 
-			generate from it the following items:
-			<ul>
-				<li>An Interface Control Document (ICD)</li>
-				<li>A C-language component which implements the data pool for the applications in the PUS system</li>
-				<li>A set of tables which specify the telecommands and telemetry reports in the PUS system and which 
-				can be imported in a specification document</li>
-				<li>The configuration files to instantiate the <a href="https://www.pnp-software.com/cordetfw/" target="_blank">CORDET Framework</a>
-				for the applications in the PUS system</li>
-			</ul>
-			The <img<a href="https://www.pnp-software.com/cordetfw/editor-1.1/_lib/libraries/grp/doc/UserManual.html" target="_blank">help pages</a>
-			explains how to use the CORDET FW Editor. The editor is publicly accessible for 
-			registered users. Registration is free and only requires the user to enter a valid e-mail address. Local 
-			installations of the editor are available on a commercial basis from 
-			<a href="https://www.pnp-software.com/" target="_blank">P&P Software GmbH</a>.
+<h3>Edit Profile</h3>
+
+<?php 
+if(isset($editMessage)) {
+    echo $editMessage;
+}
+?>
+
+<br/>
+
+<form action="?saved=1" method="post">
+E-Mail:<br>
+<input type="email" size="40" maxlength="250" name="email" value="<?php echo $row["email"]; ?>"><br><br>
+ 
+Name:<br>
+<input type="name" size="40" maxlength="250" name="name" value="<?php echo $row["name"]; ?>"><br><br>
+
+<input type="submit" value="Save">
+</form>
+
+<br/>
+
 		</div>
 
 		<div>
-			<hr>
-<?php
-if ($userid == 1 || $userid == 1001) {
-?>
-			<a href="mng_user.php" style="width:180px;" target="_self">
-				<button style="width:200px;text-align:left;">
-					<img src="img/users_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage users...
-				</button>
-			</a>
-			<br/>
-			<hr>
-<?php
+<h3>Change Password</h3>
+
+<?php 
+if(isset($changeMessage)) {
+    echo $changeMessage;
 }
 ?>
-			<a href="mng_project.php" target="_self">
-				<button style="width:200px;text-align:left;">
-					<img src="img/projects_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage my projects...
-				</button>
-			</a>
-			<br/>
-			<br/>
-			<a href="sel_project.php" target="_self">
-				<button style="width:200px;text-align:left;">
-					&nbsp;&nbsp;<img src="img/open_64x64.png" width="16" height="16">&nbsp;&nbsp;Open projects...
-				</button>
-			</a>
-			<br/>
-			<hr>
-			<br/>
-			<br/>
-			<br/>
-			<br/>
-			<br/>
-			<hr>
-			<div style="text-align:right;">(c) 2019, University of Vienna</div>
-			<hr>
-			<br/>
+
+<br/>
+
+<form action="?changed=1" method="post">
+Old Password:<br>
+<input type="password" size="40"  maxlength="250" name="passwort"><br>
+
+New Password:<br>
+<input type="password" size="40"  maxlength="250" name="passwortNew"><br>
+ 
+New Password again:<br>
+<input type="password" size="40" maxlength="250" name="passwortNew2"><br><br>
+ 
+<input type="submit" value="Change">
+</form>
+
+<br/>
+
 		</div>
 
 		<div class="topcorner_left">
@@ -169,10 +223,9 @@ if ($userid == 1 || $userid == 1001) {
 			You are logged in as: <br/>
 			<?php 
 			    echo "<b>".$userName."</b><br/>";
-			    echo "<a href='profile.php'>Edit Profile</a>";
 			?>
 			<br/><br/>
-			<a href="logout.php">Logout</a>
+			<a href="index.php">Back</a>
 		<div/>
 		
 	</div>

@@ -6,8 +6,9 @@
 
  $id  = $_POST["id"];
 
+  // TODO: check dependencies for this standard 
 
- $sql = "DELETE FROM `limit` WHERE id = '".$id."'";
+ $sql = "DELETE FROM `standard` WHERE id = '".$id."'";
 
 
  $result = $mysqli->query($sql);

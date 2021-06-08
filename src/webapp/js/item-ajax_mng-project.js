@@ -160,21 +160,21 @@ function manageRow(data) {
 $(".crud-submit").click(function(e){
     //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
-	var name = $("#create-item").find("input[name='name']").val();
+    var userid = $("#create-item").find("input[name='userid']").val();
+    var name = $("#create-item").find("input[name='name']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
     var owner = $("#create-item").find("select[name='owner']").val();
     var isPublic = $("#create-item").find("select[name='isPublic']").val();
-	var setting = $("#create-item").find("textarea[name='setting']").val();
+    var setting = $("#create-item").find("textarea[name='setting']").val();
 
-    if(id != '' && name != '' && desc != '' && owner != '' && isPublic != ''){
+    if(userid != '' && name != '' && desc != '' && owner != '' && isPublic != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, name:name, desc:desc, owner:owner, isPublic:isPublic, setting:setting}
+            data:{userid:userid, name:name, desc:desc, owner:owner, isPublic:isPublic, setting:setting}
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='userid']").val('');
 			$("#create-item").find("input[name='name']").val('');
             $("#create-item").find("textarea[name='desc']").val('');
 			$("#create-item").find("select[name='owner']").val('');
@@ -192,18 +192,25 @@ $(".crud-submit").click(function(e){
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
-	var id = $(this).parent("td").data('id');
-	var c_obj = $(this).parents("tr");
-	$.ajax({
-		dataType: 'json',
-		type:'POST',
-		url: url + 'api/delete_mng-project.php',
-		data:{id:id}
-	}).done(function(data){
-		c_obj.remove();
-		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
-		getPageData();
-	});
+	
+	var confirmation = confirm("Are you sure to remove the item?");
+	
+	if (confirmation){
+	
+		var id = $(this).parent("td").data('id');
+		var c_obj = $(this).parents("tr");
+		$.ajax({
+			dataType: 'json',
+			type:'POST',
+			url: url + 'api/delete_mng-project.php',
+			data:{id:id}
+		}).done(function(data){
+			c_obj.remove();
+			toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
+			getPageData();
+		});
+	
+	}
 
 });
 

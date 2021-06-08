@@ -110,6 +110,8 @@ if ($result->num_rows > 0) {
 				<div class="modal-body">
 					<form data-toggle="validator" action-data="api/create_view-project-standard.php" method="POST">
 
+                        <input type="hidden" name="idProject" value="<?php echo $idProject ?>" />
+
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
 							<input type="text" name="name" class="form-control" data-error="Please enter name." required />

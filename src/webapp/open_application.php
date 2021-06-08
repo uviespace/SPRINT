@@ -195,19 +195,19 @@ if ($result->num_rows > 0) {
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." value="<?php echo $application_name; ?>" required />
+							<input type="text" name="name" class="form-control" data-error="Please enter name." value="<?php echo $application_name; ?>" readonly />
 							<div class="help-block with-errors"></div>
 						</div>
  
  						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description."><?php echo $application_desc; ?></textarea>
+							<textarea name="desc" class="form-control" data-error="Please enter description." readonly ><?php echo $application_desc; ?></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
  
-						<div class="form-group">
+						<!--<div class="form-group">
 							<button type="submit" class="btn btn-success crud-submit-edit">Save</button>
-						</div>
+						</div>-->
 
 		      		</form>
 

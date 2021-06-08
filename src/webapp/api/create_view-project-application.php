@@ -13,7 +13,7 @@ $sql =
 
 $result = $mysqli->query($sql);
 
-$sql = "SELECT * FROM `type` ORDER BY id DESC LIMIT 1"; 
+$sql = "SELECT * FROM `application` ORDER BY id DESC LIMIT 1"; 
 
 $result = $mysqli->query($sql);
 

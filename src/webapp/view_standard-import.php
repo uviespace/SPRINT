@@ -61,12 +61,12 @@ function get_sub_types($mysqli, $std, $typ, $servid, $checked) {
         while($row = $result->fetch_assoc()) {
             //echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
             echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
-            if (in_array($row["id"], $checked)) {
+            if (in_array($row["id"], $checked) OR empty($checked)) {
             //if ($checked) {
-                echo "<input type='checkbox' name='sel_service_subtype[".$servid."][]' value='".$row["id"]."' onchange='form.submit()' checked>(".$row["type"].",".$row["subtype"].",".$row["discriminant"].") ".$row["name"]."</input><br/>";
+                echo "<input type='checkbox' name='sel_service_subtype[".$servid."][]' value='".$row["id"]."' onchange='form.submit()' checked> (".$row["type"].",".$row["subtype"].",".$row["discriminant"].") ".$row["name"]."</input><br/>";
                 $array[] = $row["id"];
             } else {
-                echo "<input type='checkbox' name='sel_service_subtype[".$servid."][]' value='".$row["id"]."' onchange='form.submit()'>(".$row["type"].",".$row["subtype"].",".$row["discriminant"].") ".$row["name"]."</input><br/>";
+                echo "<input type='checkbox' name='sel_service_subtype[".$servid."][]' value='".$row["id"]."' onchange='form.submit()'> (".$row["type"].",".$row["subtype"].",".$row["discriminant"].") ".$row["name"]."</input><br/>";
             }
             //$project_name = $row["name"];
         }
@@ -125,7 +125,7 @@ function get_sub_types($mysqli, $std, $typ, $servid, $checked) {
 
 		<div>
 		<form action="view_standard-import.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" method="post">
-			Select Project: 
+			<b>Select Project:</b>
 <?php
 $sql = "SELECT * FROM `project` WHERE `id` <> ".$idProject;
 
@@ -152,7 +152,7 @@ if ($result->num_rows > 0) {
 }
 ?>
 			<br/>
-			Select Standard: 
+			<b>Select Standard:</b>
 <?php
 if (isset($_POST["sel_project"]) && $_POST["sel_project"] != '-') {
 
@@ -183,40 +183,90 @@ if ($result->num_rows > 0) {
 	echo "<b>no project selected, please select project first!</b>";
 }
 ?>
-<!--
 			<br/>
-			Select Service: -->
+			<b>Select Header Definition:</b>
 <?php
-/*if (isset($_POST["sel_standard"]) && $_POST["sel_standard"] != '-' && $_POST["sel_project"] != '-') {
+if (isset($_POST["sel_standard"]) && $_POST["sel_standard"] != '-' && $_POST["sel_project"] != '-') {
+    // are headers already defined?
 
-$sql = "SELECT * FROM `service` WHERE `idStandard` = ".$_POST["sel_standard"];
+ echo "<br/>";
 
-$result = $mysqli->query($sql);
+    // type = 0: TC header
+    $sql = "SELECT * FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 0 AND p.kind = 1 AND p.idStandard = ".$idStandard." ORDER BY ps.order ASC"; 
+    $result = $mysqli->query($sql);
+    //$rows_tc = $result->fetch_assoc();
 
-$num_rows = mysqli_num_rows($result);
-
-if ($result->num_rows > 0) {
-    echo "<select name='sel_service' onchange='form.submit()'>";
-    // output data of each row
     while($row = $result->fetch_assoc()) {
-        //echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
-        if ($row["id"] == $_POST["sel_service"]) {
-            echo "<option value='".$row["id"]."' selected>".$row["name"]." (Type: ".$row["type"].")</option>";
-		} else {
-            echo "<option value='".$row["id"]."'>".$row["name"]." (Type: ".$row["type"].")</option>";
-		}
-        //$project_name = $row["name"];
+        echo $row['name']."<br/>";
     }
-    echo "</select>";
+
+    $num_rows_tc = mysqli_num_rows($result);
+
+    if ($num_rows_tc > 0) {
+        echo "TC Header is already defined!";
+    } else {
+		
+        if (isset($_POST["sel_tc_header"]) && $_POST["sel_tc_header"] == 'on') {
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_tc_header' onchange='form.submit()' checked> TC Header";
+		} else {
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_tc_header' onchange='form.submit()' > TC Header";
+		}
+
+        $sql = "SELECT * FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 0 AND p.kind = 1 AND p.idStandard = ".$_POST["sel_standard"]." ORDER BY ps.order ASC"; 
+        $result = $mysqli->query($sql);
+        $rows_tc = $result->fetch_all();
+
+    }
+
+ echo "<br/>";
+ 
+    // type = 1: TM header
+    $sql = "SELECT * FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 1 AND p.kind = 1 AND p.idStandard = ".$idStandard." ORDER BY ps.order ASC";  
+    $result = $mysqli->query($sql);
+    //$row_tm = $result->fetch_all();
+
+    while($row = $result->fetch_assoc()) {
+        echo $row['name']."<br/>";
+    }
+
+    $num_rows_tm = mysqli_num_rows($result);
+
+    if ($num_rows_tm > 0) {
+        echo "TM Header is already defined!";
+    } else {
+        if (isset($_POST["sel_tm_header"]) && $_POST["sel_tm_header"] == 'on') {
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_tm_header' onchange='form.submit()' checked> TM Header";
+        } else {
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_tm_header' onchange='form.submit()' > TM Header";
+        }
+
+        $sql = "SELECT * FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 1 AND p.kind = 1 AND p.idStandard = ".$_POST["sel_standard"]." ORDER BY ps.order ASC"; 
+        $result = $mysqli->query($sql);
+        $rows_tm = $result->fetch_all();
+
+    }
+
+    // kind = 1: for parameters which can only be used in TC/TM header definitions; CordetEditorDatabaseModel.pdf (PP-DF-COR-0004, Revision 1.0)
+/*    $sql = "SELECT * FROM `parameter` WHERE `kind` = 1 AND `idStandard` = ".$idStandard; 
+    $result = $mysqli->query($sql);
+	
+    while($row = $result->fetch_assoc()) {
+        echo $row['name']."<br/>";
+    }
+	
+    $num_rows = mysqli_num_rows($result);
+    if ($num_rows > 0) {
+        echo "TM/TC Headers are already defined!";
+    } else {
+        echo "<br/><input type='checkbox' name='sel_header' > TM/TC Header";
+    }*/
 } else {
-    echo "0 results";
+    echo "<b>no standard selected, please select standard first!</b>";
 }
-} else {
-	echo "<b>no standard selected, please select standard first!</b>";
-}*/
+
 ?>
 			<br/>
-			Select Service: <br/>
+			<b>Select Service:</b>
 <?php
 if (isset($_POST["sel_standard"]) && $_POST["sel_standard"] != '-' && $_POST["sel_project"] != '-') {
 
@@ -229,13 +279,13 @@ $num_rows = mysqli_num_rows($result);
 if (isset($_POST["sel_service_type"])) { $sel_service_type  = $_POST["sel_service_type"]; } else { $sel_service_type=array(); };
 
 if ($result->num_rows > 0) {
-    echo "<fieldset>";  
+    echo "<br/><fieldset>";  
     // output data of each row
     while($row = $result->fetch_assoc()) {
         //echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
         if (isset($_POST["sel_service_subtype"][$row["id"]])) { $sel_service_subtype[$row["id"]]  = $_POST["sel_service_subtype"][$row["id"]]; } else { $sel_service_subtype[$row["id"]]=array(); };
         if (in_array($row["id"], $sel_service_type)) {
-            echo "<input type='checkbox' name='sel_service_type[]' value='".$row["id"]."' onchange='form.submit()' checked>".$row["name"]." (Type: ".$row["type"].")<br/>";
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_service_type[]' value='".$row["id"]."' onchange='form.submit()' checked> ".$row["name"]." (Type: ".$row["type"].")<br/>";
 
 
 
@@ -245,14 +295,37 @@ if ($result->num_rows > 0) {
 
 
         } else {
-            echo "<input type='checkbox' name='sel_service_type[]' value='".$row["id"]."' onchange='form.submit()'>".$row["name"]." (Type: ".$row["type"].")<br/>";
+            echo "&nbsp;&nbsp;&nbsp;<input type='checkbox' name='sel_service_type[]' value='".$row["id"]."' onchange='form.submit()'> ".$row["name"]." (Type: ".$row["type"].")<br/>";
         }
         //$project_name = $row["name"];
     }
-    echo "<input type='submit' value='Submit now'>";
-    echo "</fieldset>";  
+    echo "</fieldset>";
 } else {
-    echo "0 results";
+    echo "0 results<br/>";
+}
+    echo "<br/>";
+    echo "<input type='submit' value='Submit now'>";
+    echo "<br/>";
+    echo "<br/>";
+
+
+if (isset($_POST["sel_tc_header"]) && $_POST["sel_tc_header"] == 'on') {
+    echo "Import TC Header<br/>";
+
+    foreach($rows_tc as $row_tc) {
+        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$row_tc[5]."<br/>";
+    }
+
+    /*foreach($rows_tc as $x => $x_value) {
+      echo "Key=" . $x . ", Value=" . $x_value[5]."<br/>";
+    }*/
+}
+
+if (isset($_POST["sel_tm_header"]) && $_POST["sel_tm_header"] == 'on') {
+    echo "Import TM Header<br/>";
+    foreach($rows_tm as $row_tm) {
+        echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;".$row_tm[5]."<br/>";
+    }
 }
 
 if(!empty($sel_service_type)) {

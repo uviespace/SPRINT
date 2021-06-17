@@ -191,7 +191,7 @@ $(".crud-submit").click(function(e){
     var descDest = $("#create-item").find("input[name='descDest']").val();
     var code = $("#create-item").find("input[name='code']").val();
 
-    if(idStandard != '' && idParent != '' && discriminant != '' && name != '' && shortDesc != ''){
+    if(idStandard != '' && idParent != '' && discriminant != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
@@ -329,12 +329,15 @@ $(".crud-submit-edit").click(function(e){
     var code = $("#edit-item").find("textarea[name='code']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
-    if(id != '' && discriminant != '' && name != '' && shortDesc != ''){
+    if(id != '' && discriminant != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
             data:{id:id, discriminant:discriminant, name:name, shortDesc:shortDesc, desc:desc, descParam:descParam, descDest:descDest, code:code}
+        }).fail(function(data) {
+            if ( data.responseCode )
+                console.log( data.responseCode );
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');

@@ -254,19 +254,19 @@ if ($basePacket_kind == 0) {
 -->
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<input type="text" name="name" class="form-control" data-error="Please enter name." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Short Desc.:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter shortDesc." required />
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter shortDesc." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div if="descr" class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea id="descr_textarea" name="desc" class="form-control" data-error="Please enter description." ></textarea>
+							<textarea id="descr_textarea" name="desc" class="form-control" data-error="Please enter description." required ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -379,19 +379,19 @@ if ($basePacket_kind == 0) {
 -->
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name."  required />
+							<input type="text" name="name" class="form-control" data-error="Please enter name." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Short Desc.:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter shortDesc." required />
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter shortDesc." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description." ></textarea>
+							<textarea name="desc" class="form-control" data-error="Please enter description." required ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 

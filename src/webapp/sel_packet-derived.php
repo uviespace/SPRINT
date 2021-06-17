@@ -133,11 +133,61 @@ if ($result->num_rows > 0) {
 ?>
 
 <div>
-<h2>Base Packets</h2>
+<h2>Base Packets with Discriminants defined</h2>
 </div>
 
 <?php
 
+$sql = 
+  "SELECT ".
+  "p.* ".
+  "FROM ".
+  "`packet` AS p, `parametersequence` AS ps ".
+  "WHERE ".
+  "p.idStandard = ".$idStandard." AND ".
+  "p.id = ps.idPacket AND ".
+  "ps.role = 3 ";
+  "ORDER BY ".
+  "p.type, p.subtype ".
+  "DESC";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "$num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        //echo "(".$row['type'].",".$row['subtype'].") ".$row['name']." ";
+        
+        $sql_disc = "SELECT * FROM `packet` WHERE idParent = ".$row['id']." AND discriminant <> ''";
+        $result_disc = $mysqli->query($sql_disc);
+        $num_rows_disc = mysqli_num_rows($result_disc);
+        //echo "($num_rows_disc discriminants)<br/>";
+        
+        if ($num_rows_disc == 0) {
+            //echo "(".$row['type'].",".$row['subtype'].") ".$row['name']." <br/>";
+            
+            
+        echo "<div style='height:24px; padding:2px; margin-bottom: 2px; width:50%; background-color:lightblue;'>";
+        if ($row["kind"] == 1) {
+            echo "<a href='view_packet-derived.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TM(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a>";
+        } else {
+            echo "<a href='view_packet-derived.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TC(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a>";
+        }
+        echo "</div>";
+            
+            
+        }
+        
+    }
+}
+
+/* OLD */
+
+/**
 //$sql = "SELECT DISTINCT t.* FROM `type` t LEFT JOIN `enumeration` e ON t.id = e.idType WHERE  t.idStandard = ".$idStandard." AND e.idType IS NULL ORDER BY e.value";
 $sql =
   "SELECT DISTINCT ".
@@ -175,6 +225,7 @@ if ($result->num_rows > 0) {
 } else {
     echo "0 results";
 }
+*/
 
 ?>
 

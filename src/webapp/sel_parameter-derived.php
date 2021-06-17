@@ -175,6 +175,50 @@ if ($result->num_rows > 0) {
 
 ?>
 
+<div>
+<h2>Base Packets with no Discriminats defined</h2>
+</div>
+
+<?php
+
+$sql = 
+  "SELECT ".
+  "p.* ".
+  "FROM ".
+  "`packet` AS p, `parametersequence` AS ps ".
+  "WHERE ".
+  "p.idStandard = ".$idStandard." AND ".
+  "p.id = ps.idPacket AND ".
+  "ps.role = 3 ";
+  "ORDER BY ".
+  "p.type, p.subtype ".
+  "DESC";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "$num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        //echo "(".$row['type'].",".$row['subtype'].") ".$row['name']." ";
+        
+        $sql_disc = "SELECT * FROM `packet` WHERE idParent = ".$row['id']." AND discriminant <> ''";
+        $result_disc = $mysqli->query($sql_disc);
+        $num_rows_disc = mysqli_num_rows($result_disc);
+        //echo "($num_rows_disc discriminants)<br/>";
+        
+        if ($num_rows_disc == 0) {
+            echo "(".$row['type'].",".$row['subtype'].") ".$row['name']." <br/>";
+        }
+        
+    }
+}
+
+?>
+
 				<div class="topcorner_left">
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>

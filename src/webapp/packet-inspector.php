@@ -103,6 +103,60 @@ if ($result->num_rows > 0) {
     $derivedPacket_discr = "";
 }
 
+function get_header_len($mysqli, $standard_id, $header_type) {
+    
+    $sql = "SELECT p.* FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND (p.kind = 1 OR p.kind = 0) AND ps.type = ".$header_type." AND ps.idStandard = ".$standard_id;
+    
+    $result = $mysqli->query($sql);
+
+    $num_rows = mysqli_num_rows($result);
+
+    if ($result->num_rows > 0) {
+        
+        $calc_size = 0;
+        
+        while ($row = $result->fetch_assoc()) {
+            
+            //echo "Parameter: ".$row['name']."<br/>";
+            
+            if ($row['domain'] == 'predefined') {
+                
+                $add_size = $row['size'];
+                
+            } else if ($row['idType'] >= 101 AND $row['idType'] < 200) {
+                
+                $add_size = $row['size'];
+                
+            } else {
+                
+                $sql_param_size = "SELECT size FROM `type` WHERE id = ".$row['idType'];
+                
+                $result_param_size = $mysqli->query($sql_param_size);
+                
+                $num_rows_param_size = mysqli_num_rows($result_param_size);
+                
+                $row_param_size = $result_param_size->fetch_assoc();
+                
+                $add_size = $row_param_size['size'];
+                
+            }
+            
+            if (isset($row['multiplicity']) AND $row['multiplicity'] > 1) {
+                $add_size = $add_size*$row['multiplicity'];
+            }
+            
+            //echo $add_size."<br/>";
+            
+            $calc_size += $add_size;
+            
+        }
+        
+    }
+    
+    return $calc_size/8;
+}
+
+
 ?>
 
 <head>
@@ -203,14 +257,18 @@ $nbGroup = 0;
 
 // ### HEADER ###
 
+/*$header_type = $basePacket_kind; // TC: 0 ; TM: 1
+$header_len = get_header_len($mysqli, $idStandard, $header_type);
+echo "Calculated Header Length: ".$header_len." Bytes<br/><br/>";*/
+
 if ($basePacket_kind == 0) {
     //$basePacket_kind_str = "TC";
-    $field_len_B = 10; // Bytes
+    $field_len_B = get_header_len($mysqli, $idStandard, $basePacket_kind); // =10 Bytes (PUS-A)
     $field_len = $field_len_B * $scale * 8;
     echo "<div style='width:".strval($field_len)."px; height:42px; background-color:#6495ED; border:1px solid black; padding-left:2px; font-size: x-small; display: inline-block;'><b>TC Header</b><br/>(".strval($field_len_B)."B)</div>";
 } else if ($basePacket_kind == 1) {
     //$basePacket_kind_str = "TM";
-    $field_len_B = 18; // Bytes
+    $field_len_B = get_header_len($mysqli, $idStandard, $basePacket_kind); // =18 Bytes (PUS-A)
     $field_len = $field_len_B * $scale * 8;
     echo "<div style='width:".strval($field_len)."px; height:42px; background-color:#6495ED; border:1px solid black; padding-left:2px; font-size: x-small; display: inline-block;'><b>TM Header</b><br/>(".strval($field_len_B)."B)</div>";
 } else {

@@ -213,7 +213,15 @@ if ($result->num_rows > 0) {
 
 		      </div>
 
-				<br/><br/>
+				<br/>
+
+                <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 15px 15px;" onsubmit="this.action='sel_application-component.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
+                    <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+                    <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist">
+                </form>
+
+                <br/><br/>
 
 <!--
 <form action="upload_DpList.php" method="post" enctype="multipart/form-data">

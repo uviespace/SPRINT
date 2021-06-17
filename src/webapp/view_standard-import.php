@@ -196,9 +196,9 @@ if (isset($_POST["sel_standard"]) && $_POST["sel_standard"] != '-' && $_POST["se
     $result = $mysqli->query($sql);
     //$rows_tc = $result->fetch_assoc();
 
-    while($row = $result->fetch_assoc()) {
+    /*while($row = $result->fetch_assoc()) {
         echo $row['name']."<br/>";
-    }
+    }*/
 
     $num_rows_tc = mysqli_num_rows($result);
 
@@ -225,9 +225,9 @@ if (isset($_POST["sel_standard"]) && $_POST["sel_standard"] != '-' && $_POST["se
     $result = $mysqli->query($sql);
     //$row_tm = $result->fetch_all();
 
-    while($row = $result->fetch_assoc()) {
+    /*while($row = $result->fetch_assoc()) {
         echo $row['name']."<br/>";
-    }
+    }*/
 
     $num_rows_tm = mysqli_num_rows($result);
 
@@ -304,7 +304,7 @@ if ($result->num_rows > 0) {
     echo "0 results<br/>";
 }
     echo "<br/>";
-    echo "<input type='submit' value='Submit now'>";
+    echo "<input type='submit' name='import' value='Import now'>";
     echo "<br/>";
     echo "<br/>";
 
@@ -350,6 +350,185 @@ if(!empty($sel_service_type)) {
 } else {
 	echo "<b>no standard selected, please select standard first!</b>";
 }
+
+if (isset($_POST["import"])) {
+    echo "Submit Button clicked...<br/>";
+
+    if (isset($_POST["sel_tc_header"]) && $_POST["sel_tc_header"] == 'on') {
+    // Import TC Header
+    $sql = "SELECT p.id as pid, p.desc as pdesc, p.value as pvalue, p.setting as psetting, p.role as prole, ps.id as psid, p.*, ps.* FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 0 AND p.kind = 1 AND p.idStandard = ".$_POST["sel_standard"]." ORDER BY ps.order ASC";
+    $result = $mysqli->query($sql);
+    $num_rows = mysqli_num_rows($result);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "<b>TC parameter:</b> (".$row['pid'].",".$row['idStandard'].",".$row['idType'].",".$row['kind'].",".$row['domain'].",".$row['name'].",".$row['shortDesc'].",".$row['pdesc'].",".$row['pvalue'].",".$row['size'].",".$row['unit'].",".$row['multiplicity'].",".$row['psetting'].",".$row['prole'].")<br/>";
+            echo "<b>TC parametersequence:</b> (".$row['psid'].",".$row['idStandard'].",".$row['idParameter'].",".$row['idPacket'].",".$row['type'].",".$row['role'].",".$row['order'].",".$row['group'].",".$row['repetition'].",".$row['value'].",".$row['desc'].",".$row['setting'].")<br/>";
+
+            $sql_type = "SELECT * FROM `type` WHERE id = ".$row['idType'];
+            $result_type = $mysqli->query($sql_type);
+            $row_type = $result_type->fetch_assoc();
+            if (empty($row_type['idStandard'])) {
+                echo "<font color=red><b>TC type:</b> (".$row_type['id'].")</font><br/><br/>";
+            } else {
+                // check if type already inserted: $idStandard / $row['idStandard']
+                $sql_type_check = "SELECT id FROM `type` WHERE `idStandard` = '".$idStandard."' AND `domain` = '".$row_type['domain']."' AND `name` = '".$row_type['name']."' AND `nativeType` = '".$row_type['nativeType']."' AND `desc` = '".$row_type['desc']."' AND `size` = '".$row_type['size']."' AND `value` = '".$row_type['value']."' AND `setting` = '".$row_type['setting']."' AND `schema` = '".$row_type['schema']."'";
+                $result_type_check = $mysqli->query($sql_type_check);
+                $num_rows_type_check = $result_type_check->num_rows;
+                echo "<font color=blue>=> ".$num_rows_type_check."</font><br/>";
+                if ($num_rows_type_check == 0) {
+                    echo "<font color=blue><b>TC type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/><br/>";
+               } else {
+                   $row_type_check = $result_type_check->fetch_assoc();
+                   echo "<font color=blue>TC type exists already with id = ".$row_type_check['id'].".</font><br/><br/>";
+               }
+            }
+
+        }
+    } else {
+        echo "<b>NO TC HEADER FOUND</b><br/><br/>";
+    }
+    }
+
+    if (isset($_POST["sel_tm_header"]) && $_POST["sel_tm_header"] == 'on') {
+    // Import TM Header
+    $sql = "SELECT p.id as pid, p.desc as pdesc, p.value as pvalue, p.setting as psetting, p.role as prole, ps.id as psid, p.*, ps.* FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND ps.type = 1 AND p.kind = 1 AND p.idStandard = ".$_POST["sel_standard"]." ORDER BY ps.order ASC";
+    $result = $mysqli->query($sql);
+    $num_rows = mysqli_num_rows($result);
+    if ($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "<b>TM parameter:</b> (".$row['pid'].",".$row['idStandard'].",".$row['idType'].",".$row['kind'].",".$row['domain'].",".$row['name'].",".$row['shortDesc'].",".$row['pdesc'].",".$row['pvalue'].",".$row['size'].",".$row['unit'].",".$row['multiplicity'].",".$row['psetting'].",".$row['prole'].")<br/>";
+            echo "<b>TM parametersequence:</b> (".$row['psid'].",".$row['idStandard'].",".$row['idParameter'].",".$row['idPacket'].",".$row['type'].",".$row['role'].",".$row['order'].",".$row['group'].",".$row['repetition'].",".$row['value'].",".$row['desc'].",".$row['setting'].")<br/>";
+
+            $sql_type = "SELECT * FROM `type` WHERE id = ".$row['idType'];
+            $result_type = $mysqli->query($sql_type);
+            $row_type = $result_type->fetch_assoc();
+            if (empty($row_type['idStandard'])) {
+                echo "<font color=red><b>TM type:</b> (".$row_type['id'].")</font><br/><br/>";
+            } else {
+                // check if type already inserted: $idStandard / $row['idStandard']
+                $sql_type_check = "SELECT id FROM `type` WHERE `idStandard` = '".$idStandard."' AND `domain` = '".$row_type['domain']."' AND `name` = '".$row_type['name']."' AND `nativeType` = '".$row_type['nativeType']."' AND `desc` = '".$row_type['desc']."' AND `size` = '".$row_type['size']."' AND `value` = '".$row_type['value']."' AND `setting` = '".$row_type['setting']."' AND `schema` = '".$row_type['schema']."'";
+                $result_type_check = $mysqli->query($sql_type_check);
+                $num_rows_type_check = $result_type_check->num_rows;
+                echo "<font color=blue>=> ".$num_rows_type_check."</font><br/>";
+                if ($num_rows_type_check == 0) {
+                    echo "<font color=blue><b>TM type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/><br/>";
+               } else {
+                   $row_type_check = $result_type_check->fetch_assoc();
+                   echo "<font color=blue>TM type exists already with id = ".$row_type_check['id'].".</font><br/><br/>";
+               }
+            }
+
+        }
+    } else {
+        echo "<b>NO TM HEADER FOUND</b><br/><br/>";
+    }
+    }
+    
+    if(!empty($sel_service_type)) {
+        foreach($sel_service_type as $check) {
+            echo "Service: id = ".$check." <br/>";
+            
+            $sql_serv = "SELECT * FROM `service` WHERE `idStandard` = '".$_POST["sel_standard"]."' AND `id` = ".$check;
+            $result_serv = $mysqli->query($sql_serv);
+            $num_rows_serv = $result_serv->num_rows;
+            if ($num_rows_serv == 1) {
+                $row_serv = $result_serv->fetch_assoc();
+                // check if service with same type already exists: $idStandard / $row_serv['idStandard']
+                $sql_serv_check = "SELECT * FROM `service` WHERE `idStandard` = '".$idStandard."' AND `type` = ".$row_serv['type'];
+                $result_serv_check = $mysqli->query($sql_serv_check);
+                $num_rows_serv_check = $result_serv_check->num_rows;
+                echo "<font color=blue>=> ".$num_rows_serv_check."</font><br/>";
+                if ($num_rows_serv_check == 0) {
+                    echo "<font color=blue><b>Service</b></font> (".$row_serv['id'].",".$row_serv['idStandard'].",".$row_serv['name'].",".$row_serv['desc'].",".$row_serv['type'].",".$row_serv['setting'].")<br/><br/>";
+                } else {
+                   $row_serv_check = $result_serv_check->fetch_assoc();
+                   echo "<font color=blue>Service exists already with id = ".$row_serv_check['id'].".</font><br/><br/>";
+                }
+            } else {
+                echo "<b>NO SERVICE FOUND (id = ".$check.")</b><br/><br/>";
+            }
+            
+            // Sub-Services
+            if(!empty($sel_service_subtypes[$check])) {
+                foreach($sel_service_subtypes[$check] as $subtypes) {
+                   echo $subtypes." | ";
+                }
+            }
+            echo "<br/>";
+            if(!empty($sel_service_subtype[$check])) {
+                foreach($sel_service_subtype[$check] as $subtype) {
+                   echo "Sub-Service: id = ".$subtype." <br/>";
+                   
+                   $sql_subserv = "SELECT * FROM `packet` WHERE `idStandard` = ".$_POST["sel_standard"]." AND `id`= ".$subtype;
+                   $result_subserv = $mysqli->query($sql_subserv);
+                   $num_rows_subserv = mysqli_num_rows($result_subserv);
+                   if ($num_rows_subserv == 1) {
+                        $row_subserv = $result_subserv->fetch_assoc();
+                   
+                        // check if sub-service with same sub-type already exists: $idStandard / $row_serv['idStandard']
+                        $sql_subserv_check = "SELECT * FROM `packet` WHERE `idStandard` = '".$idStandard."' AND `type` = ".$row_serv['type']." AND `subtype`= ".$row_subserv['subtype'];
+                        $result_subserv_check = $mysqli->query($sql_subserv_check);
+                        $num_rows_subserv_check = $result_subserv_check->num_rows;
+                        echo "<font color=blue>=> ".$num_rows_subserv_check."</font><br/>";
+                        if ($num_rows_subserv_check == 0) {
+                            echo "<font color=blue><b>Sub-Service</b></font> (".$row_subserv['id'].",".$row_subserv['idStandard'].",".$row_subserv['type'].",".$row_subserv['name'].",".$row_subserv['desc'].",".$row_subserv['setting'].")<br/><br/>";
+                        
+                            // get packet parameters
+                            $sql_pckt_param = "SELECT * FROM `parametersequence` WHERE `idPacket` = ".$row_subserv['id'];
+                            $result_pckt_param = $mysqli->query($sql_pckt_param);
+                            $num_rows_pckt_param = mysqli_num_rows($result_pckt_param);
+                            if ($num_rows_pckt_param > 0) {
+                                while ($row_pckt_param = $result_pckt_param->fetch_assoc()) {
+
+                                    // check if parametersequence already exists IS NOT DONE
+                                    echo "<b>Parametersequence:</b> (".$row_pckt_param['id'].", ".$row_pckt_param['idParameter'].", ".$row_pckt_param['desc'].")<br/>";
+                                
+                                    $sql_param = "SELECT * FROM `parameter` WHERE id = ".$row_pckt_param['idParameter'];
+                                    $result_param = $mysqli->query($sql_param);
+                                    $num_rows_param = mysqli_num_rows($result_param);
+                                    if ($num_rows_param == 1) {
+                                        $row_param = $result_param->fetch_assoc();
+                                        
+                                        // check if parameter already exists:: $idStandard / $row_serv['idStandard']
+                                        //$sql_param_check = "SELECT * FROM `parameter` WHERE `idStandard` = ".$row_serv['idStandard']." AND `kind` = ".$row_param['kind']." AND `domain` = '".$row_param['domain']."' AND `name` = '".$row_param['name']."' AND `shortDesc` = '".$row_param['shortDesc']."' AND `desc` = '".$row_param['desc']."' AND `value` = '".$row_param['value']."' AND `size` = '".$row_param['size']."' AND `unit` = '".$row_param['unit']."' AND `multiplicity` = '".$row_param['multiplicity']."' AND `setting` = '".$row_param['setting']."' AND `role` = '".$row_param['role']."'";
+                                        $sql_param_check = "SELECT * FROM `parameter` WHERE `idStandard` = ".$idStandard." AND `kind` = ".$row_param['kind']." AND `domain` = '".$row_param['domain']."' AND `name` = '".$row_param['name']."' AND `shortDesc` = '".$row_param['shortDesc']."' AND `desc` = '".$row_param['desc']."' AND `value` = '".$row_param['value']."' AND `unit` = '".$row_param['unit']."' AND `setting` = '".$row_param['setting']."'";
+                                        echo $sql_param_check."<br/>";
+                                        $result_param_check = $mysqli->query($sql_param_check);
+                                        $num_rows_param_check = $result_param_check->num_rows;
+                                        echo "<font color=blue>=> ".$num_rows_param_check."</font><br/>";
+                                        if ($num_rows_param_check == 0) {
+                                            echo "<b>Parameter:</b> (".$row_param['id'].", ".$row_param['name'].")<br/><br/>";
+                                            
+                                            // check type !!!
+                                            
+                                            
+                                            
+                                            
+                                        } else {
+                                            echo "<font color=red><b>Parameter exists already!</b></font><br/><br/>";
+                                        }
+                                    
+                                    }
+                                
+                                }
+                            } else {
+                                echo "No parameters found!<br/><br/>";
+                            }
+                        
+                        } else {
+                            echo "EXISTS<br/><br/>";
+                        }
+                        
+                   }
+                   
+                }
+            }
+            echo "<br/>";
+        }
+    }
+
+}
+
 ?>
 
 

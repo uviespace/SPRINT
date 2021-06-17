@@ -100,6 +100,8 @@ if ($result->num_rows > 0) {
 
 <a href="view_project-application.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Applications ...</button></a>
 
+<br/>
+
 <?php
 
 $sql = "SELECT * FROM `standard` WHERE idProject = $id";
@@ -126,6 +128,16 @@ if ($result->num_rows > 0) {
 ?>
 
 <a href="view_project-standard.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Standards ...</button></a>
+
+<br/><br/>
+
+<h3>Document Management</h3>
+
+<a href="sel_project-documentation.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Documents ...</button></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="sel_project-acronyms.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Acronyms ...</button></a>
+
+<br/><br/>
 
 <?php
 

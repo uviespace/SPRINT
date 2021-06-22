@@ -2,7 +2,15 @@
 <html>
 
 <?php
-
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
 require 'api/db_config.php';
 
 if (isset($_GET["id"])) { $idComponent  = $_GET["id"]; } else { $idComponent=0; };
@@ -59,6 +67,17 @@ if ($result->num_rows > 0) {
     echo "0 results";
 }
 
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+$userEmail = $row["email"];
+
 ?>
 
 <head>
@@ -77,6 +96,26 @@ if ($result->num_rows > 0) {
 	<script type="text/javascript" src="ext/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+    
+    
+    
+    <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
+    <!--<link rel='stylesheet' href='//cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css'>-->
+    <!-- Font Awesome icons (Bootstrap, Foundation, and jQueryUI also supported) -->
+    <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
+
+    <!--<link rel='stylesheet' href='//cdn.jsdelivr.net/sceditor/1.4.3/jquery.sceditor.default.min.css'>-->
+    <!--<link rel='stylesheet' href='//cdn.jsdelivr.net/sceditor/1.4.3/themes/modern.min.css'>-->
+    <script src='//cdn.jsdelivr.net/jquery/2.1.1/jquery.min.js'></script>
+    <script src='//cdn.jsdelivr.net/sceditor/1.4.3/jquery.sceditor.min.js'></script>
+    <script src='//cdn.jsdelivr.net/sceditor/1.4.3/plugins/xhtml.js'></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/json-editor/0.7.28/jsoneditor.min.js"></script>
+    <script src='int/json_editor_component.js'></script>
+    
+    
+    
+    
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
 	<script type="text/javascript">
 		var url = "http://localhost/dbeditor/";
@@ -91,7 +130,7 @@ if ($result->num_rows > 0) {
 			toastr.success('Debug: ... END', 'Success Alert', {timeOut: 5000}); 
 		}
 	</script>
-	<script type="text/javascript" src="js/item-ajax.js"></script>
+	<!--<script type="text/javascript" src="js/item-ajax.js"></script>-->
 	<style type="text/css">
 @media (min-width: 40em) {
 .table { 
@@ -127,7 +166,6 @@ if ($result->num_rows > 0) {
 <h2>Editor for Component <?php echo $component_name; ?></h2>
 
 <?php
-
 $sql = "SELECT * FROM `applicationcomponent` WHERE `idApplication` = ".$idApplication." AND `idComponent` = ".$idComponent;
 
 $result = $mysqli->query($sql);
@@ -136,12 +174,34 @@ $num_rows = mysqli_num_rows($result);
 
 if ($result->num_rows == 1) {
     $row = $result->fetch_assoc();
-    echo "Setting: <br/><br/>" . $row["setting"]. "<br/>";
+    echo "setting: " . $row["setting"]. "<br/><br/>";
 } else {
     echo "0 results";
 }
-
 ?>
+
+
+
+    <div class='row' style='padding-bottom: 15px;'>
+        <div class='col-md-12'>
+            <button id='save' class='btn btn-success'>Save</button>
+            <button id='submit' class='btn btn-info'>Submit (console.log)</button>
+            <button id='restore' class='btn btn-info'>Restore to Default</button>
+            <button id='enable_disable' class='btn btn-info'>Disable/Enable Form</button>
+            <span id='valid_indicator' class='label label-success'></span>
+        </div>
+    </div>
+    <div class='row'>
+        <div class='col-md-12'>
+<?php
+            echo "<div id='editor_holder_".$idComponent."'></div>";
+?>
+        </div>
+    </div>
+
+
+
+
 
 
 				<div class="topcorner_left">
@@ -149,7 +209,12 @@ if ($result->num_rows == 1) {
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
 					<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
 					<br/><br/>
-					<a class="a_btn" href="open_project.php?id=<?php echo $idProject?>" target="_self">>> BACK <<</a>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
+					<br/><br/>
+					<a class="a_btn" href="sel_application-component.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>" target="_self">>> BACK <<</a>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

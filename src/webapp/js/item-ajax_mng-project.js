@@ -205,9 +205,13 @@ $("body").on("click",".remove-item",function(){
 			url: url + 'api/delete_mng-project.php',
 			data:{id:id}
 		}).done(function(data){
+            if (data['status'] == 2001 | data['status'] == 2002) {
+                toastr.warning('Item can not be deleted! '+data['statusText'], 'Failure Alert', {timeOut: 5000});
+            } else {
 			c_obj.remove();
 			toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
 			getPageData();
+            }
 		});
 	
 	}

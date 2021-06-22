@@ -270,7 +270,7 @@ if ($result->num_rows > 0) {
 				</div>
 				
 				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="">Settings...</a>
+					<a href="open_standard_editor.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Settings...</a>
 				</div>
 
 				<br/><br/>

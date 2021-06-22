@@ -60,7 +60,8 @@ function manageRow(data) {
         rows = rows + '<td>'+value.setting+'</td>';
         rows = rows + '<td data-id="'+value.id+'">';
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
-        /*rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';*/
+        rows = rows + '<button class="btn btn-success change-status">Chg</button> ';
+        rows = rows + '<button class="btn btn-danger remove-item">Del</button>';
         rows = rows + '</td>';
         rows = rows + '</tr>';
     });
@@ -113,9 +114,13 @@ $("body").on("click",".remove-item",function(){
 		url: url + 'api/delete_mng-user.php',
 		data:{id:id}
 	}).done(function(data){
+        if (data['status'] == 1001) {
+            toastr.warning('Item can not be deleted! '+data['statusText'], 'Failure Alert', {timeOut: 5000});
+        } else {
 		c_obj.remove();
 		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
 		getPageData();
+        }
 	});
 	
 	}

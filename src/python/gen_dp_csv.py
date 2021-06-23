@@ -461,7 +461,8 @@ def gen_dp_list(app, path):
                 '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,
                 'PAR'+delimiter,
                 param["value"]+delimiter if additionalInfo else delimiter,
-                param["shortDesc"] if additionalInfo else ""
+                param["shortDesc"]+delimiter if additionalInfo else delimiter,
+                param["domain"] if additionalInfo else ""
             ])
     if len(vars_list) > 0:
         #writeln(f, "/* Variables */")
@@ -488,7 +489,8 @@ def gen_dp_list(app, path):
                 '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,
                 'VAR'+delimiter,
                 param["value"]+delimiter if additionalInfo else delimiter,
-                param["shortDesc"] if additionalInfo else ""
+                param["shortDesc"]+delimiter if additionalInfo else delimiter,
+                param["domain"] if additionalInfo else ""
             ])
 
     close_file(f)
@@ -543,7 +545,8 @@ def gen_dp_pckt_list(app, path):
                                         '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,
                                         ''+delimiter,
                                         param["value"]+delimiter if additionalInfo else delimiter,
-                                        param["shortDesc"] if additionalInfo else ""
+                                        param["shortDesc"]+delimiter if additionalInfo else delimiter,
+                                        param["domain"] if additionalInfo else ""
                                     ])
                                 written = 1
                                 break
@@ -563,7 +566,8 @@ def gen_dp_pckt_list(app, path):
                                             '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,
                                             ''+delimiter,
                                             param["value"]+delimiter if additionalInfo else delimiter,
-                                            param["shortDesc"] if additionalInfo else ""
+                                            param["shortDesc"]+delimiter if additionalInfo else delimiter,
+                                            param["domain"] if additionalInfo else ""
                                         ])
                                     written = 1
                                     break

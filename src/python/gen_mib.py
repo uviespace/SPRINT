@@ -609,11 +609,13 @@ def gen_cpc(app, path):
                         break  # only once
                 else:
                     par_limit_id = ''
+                '''
                 if len(limit) > 1:  # TODO: DEBUG!!!
                     for x in limit:
                         print ("id: ", x)
                         for y in limit[x]:
                             print ("key: ", y, ', value: ', limit[x][y])
+                '''
                 writeln(f, [
                     get_cpc_name(param),           # CPC_PNAME
                     outp(param["name"], 24),       # CPC_DESCR

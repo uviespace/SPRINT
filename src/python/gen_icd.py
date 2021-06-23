@@ -104,7 +104,7 @@ def outp_type_def(type_, g):
         g.write(["\\textbf{"+tname+"}", tdesc, ntname])
         if len(type_["enums"]) > 0:        
              for enum in type_["enums"]:
-                 g.write(["\\hspace{0.5cm}"+enum["Name"], enum["Description"], enum["_dec"]])
+                 g.write(["\\hspace{0.5cm}"+enum["Name"], enum["desc"], enum["_dec"]])
 
 #-------------------------------------------------------------------------------------
 # Generate the file defining the data types defined in all the standards

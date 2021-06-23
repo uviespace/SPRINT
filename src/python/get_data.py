@@ -419,6 +419,10 @@ def get_params(db, standard):
             standard["datapool"]["params"].append(param)
         if param["kind"] == 4:
             standard["datapool"]["vars"].append(param)
+        if param["kind"] == 5:
+            standard["datapool"]["params"].append(param)
+        if param["kind"] == 6:
+            standard["datapool"]["vars"].append(param)
 
     params = {}
     params["list"] = as_list

@@ -714,7 +714,7 @@ def gen_cfw(path, comp):
         return
 
     for spec in app["specifications"]:
-        print("SPEC - ", spec["packet"]["type"], spec["packet"]["subtype"], spec["packet"]["kind"], spec["packet"]["name"]) # 76 spec for SMILE IASW
+        #print("SPEC - ", spec["packet"]["type"], spec["packet"]["subtype"], spec["packet"]["kind"], spec["packet"]["name"]) # 76 spec for SMILE IASW
         gen_spec(path, spec)
 
     spec_in_cmd = []

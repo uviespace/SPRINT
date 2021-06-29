@@ -146,11 +146,15 @@ if ($result->num_rows > 0) {
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_view-enumeration.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_view-type-enumeration.php" method="POST">
 
                 <div class="form-group">
                     for data type <b><?php echo $type_name; ?></b> (<?php echo $idType; ?>)
                 </div>
+
+						<div class="form-group">
+							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
+						</div>
 
 						<div class="form-group">
 							<!--<label class="control-label" for="title">Data Type:</label>-->
@@ -198,7 +202,7 @@ if ($result->num_rows > 0) {
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-enumeration.php" method="put">
+					<form data-toggle="validator" action="api/update_view-type-enumeration.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 

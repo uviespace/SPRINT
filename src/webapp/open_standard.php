@@ -266,10 +266,6 @@ if ($result->num_rows > 0) {
                 <br/>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="">Relations...</a>
-				</div>
-				
-				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="open_standard_editor.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Settings...</a>
 				</div>
 

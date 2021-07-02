@@ -215,10 +215,18 @@ if ($result->num_rows > 0) {
 
 				<br/>
 
-                <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 15px 15px;" onsubmit="this.action='sel_application-component.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
+                <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 5px 15px;" onsubmit="this.action='sel_application-standard.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
                     <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist">
+                    <input type="submit" name="openRelationList" value="Relations" class="btn btn-success crud-submit-open-rellist"> &nbsp;&nbsp;&nbsp; Relations of Application to Standard(s) (service user or service provider)
+                </form>
+
+                <!--<br/>-->
+
+                <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 5px 15px 15px 15px;" onsubmit="this.action='sel_application-component.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
+                    <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+                    <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist"> &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
                 </form>
 
                 <br/><br/>

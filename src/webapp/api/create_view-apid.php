@@ -7,19 +7,19 @@ $post = $_POST;
 $sql = 
   "INSERT INTO ".
   "`process` ".
-  "(`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `value`, `size`, `unit`, `multiplicity`) ".
+  "(`idProject`, `name`, `desc`, `address`) ".
   "VALUES ".
-  "('".$post['idStandard']."','".$post['idType']."','".$post['kind']."','".$post['domain']."','".$post['name']."','".$post['shortDesc']."','".$post['value']."','".$post['size']."','".$post['unit']."','".$post['multiplicity']."')";
+  "('".$post['idProject']."','".$post['name']."','".$post['desc']."','".$post['address']."')";
 
 $result = $mysqli->query($sql);
 
-$sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT 1"; 
+$sql = "SELECT * FROM `process` ORDER BY id DESC LIMIT 1"; 
 
 $result = $mysqli->query($sql);
 
 $data = $result->fetch_assoc();
 
-//echo json_encode($data);
-header('Location: ../index.php');
+echo json_encode($data);
+//header('Location: ../index.php');
 
 ?>

@@ -132,6 +132,10 @@ if ($result->num_rows > 0) {
 					<form data-toggle="validator" action-data="api/create_view-apid.php" method="POST">
 
 						<div class="form-group">
+							<input type="hidden" name="idProject" value="<?php echo $idProject; ?>" />
+						</div>
+
+						<div class="form-group">
 							<label class="control-label" for="title">Address:</label>
 							<input type="text" name="address" class="form-control" data-error="Please enter address." required />
 							<div class="help-block with-errors"></div>

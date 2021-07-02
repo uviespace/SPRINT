@@ -115,21 +115,28 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
+    var idProject = $("#create-item").find("input[name='idProject']").val();
     var address = $("#create-item").find("input[name='address']").val();
     var name = $("#create-item").find("input[name='name']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
 
-    if(id != '' && address != '' && name != '' && desc != ''){
+    if(idProject != '' && address != '' && name != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, address:address, name:name, desc:desc}
+            data:{idProject:idProject, address:address, name:name, desc:desc},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='idProject']").val('');
             $("#create-item").find("input[name='address']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("textarea[name='desc']").val('');
@@ -138,25 +145,29 @@ $(".crud-submit").click(function(e){
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
         });
     }else{
-        alert('You are missing title or description.')
+        alert('You are missing address or name.')
     }
 
 });
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
-	var id = $(this).parent("td").data('id');
-	var c_obj = $(this).parents("tr");
-	$.ajax({
-		dataType: 'json',
-		type:'POST',
-		url: url + 'api/delete_view-apid.php',
-		data:{id:id}
-	}).done(function(data){
-		c_obj.remove();
-		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
-		getPageData();
-	});
+    var id = $(this).parent("td").data('id');
+    var c_obj = $(this).parents("tr");
+
+    var confirmation = confirm("Are you sure you want to remove this item?");
+    if (confirmation) {
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + 'api/delete_view-apid.php',
+            data:{id:id}
+        }).done(function(data){
+            c_obj.remove();
+            toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
+            getPageData();
+        });
+    }
 
 });
 

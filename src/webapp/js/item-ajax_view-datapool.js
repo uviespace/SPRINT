@@ -218,10 +218,9 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
+    //var id = $("#create-item").find("input[name='id']").val();
     var domain = $("#create-item").find("input[name='domain']").val();
     var name = $("#create-item").find("input[name='name']").val();
     if (!idStandard.length) {
@@ -239,17 +238,26 @@ $(".crud-submit").click(function(e){
     var value = $("#create-item").find("input[name='value']").val();
     var unit = $("#create-item").find("input[name='unit']").val();
 
-    if(id != '' && idStandard != '' && domain != '' && name != '' && kind != '' && 
-       idType != '' && value != ''){
+    toastr.success('Create Entered. Stanbdard = ' + idStandard, 'Success Alert', {timeOut: 5000});
+
+    if(idStandard != '' && domain != '' && name != '' && kind != '' && idType != '' && value != ''){
+        toastr.success('Checked necessary items.', 'Success Alert', {timeOut: 5000});
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, idStandard:idStandard, domain:domain, name:name, kind:kind, 
+            data:{idStandard:idStandard, domain:domain, name:name, kind:kind, 
             shortDesc:shortDesc,idType:idType, multiplicity:multiplicity, value:value,
-            unit:unit}
+            unit:unit},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            //$("#create-item").find("input[name='id']").val('');
             $("#create-item").find("input[name='domain']").val('');
             $("#create-item").find("input[name='name']").val('');
             if (!idStandard.length) {
@@ -270,9 +278,13 @@ $(".crud-submit").click(function(e){
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
+        }).fail(function(xhr, err) { 
+            toastr.error('Failure. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+        }).always(function() { 
+            alert("complete"); 
         });
     }else{
-        alert('You are missing title or description or other mandatory item.')
+        alert('You are missing name or another mandatory item.')
     }
 
 });

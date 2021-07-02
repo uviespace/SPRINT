@@ -4,6 +4,8 @@ require 'db_config.php';
 
 $post = $_POST;
 
+// TODO: check if combination of domain/name exists already
+
 // get bit size from idType
 $sql_size = "SELECT `size` FROM `type` WHERE `id` = ".$post['idType'];
 $result = $mysqli->query($sql_size);
@@ -28,7 +30,7 @@ $result = $mysqli->query($sql);
 
 $data = $result->fetch_assoc();
 
-//echo json_encode($data);
-header('Location: ../index.php');
+echo json_encode($data);
+//header('Location: ../index.php');
 
 ?>

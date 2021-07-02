@@ -214,11 +214,11 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var id = $("#create-item").find("input[name='id']").val();
-    var idStandard = $("#create-item").input("input[name='idStandard']").val();
-    var idPacket = $("#create-item").input("input[name='idPacket']").val();
+    var idStandard = $("#create-item").find("input[name='idStandard']").val();
+    var idPacket = $("#create-item").find("input[name='idPacket']").val();
     var parameter = $("#create-item").find("select[name='parameter']").val();
     var order = $("#create-item").find("input[name='order']").val();
     var role = $("#create-item").find("select[name='role']").val();
@@ -233,7 +233,14 @@ $(".crud-submit").click(function(e){
             type:'POST',
             url: url + form_action,
             data:{id:id, idStandard:idStandard, idPacket:idPacket, parameter:parameter, order:order, role:role,
-            group:group, repetition:repetition, value:value, desc:desc}
+            group:group, repetition:repetition, value:value, desc:desc},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
             $("#create-item").find("input[name='id']").val('');
             $("#create-item").find("input[name='idStandard']").val('');
@@ -257,18 +264,22 @@ $(".crud-submit").click(function(e){
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
-	var id = $(this).parent("td").data('id');
-	var c_obj = $(this).parents("tr");
-	$.ajax({
-		dataType: 'json',
-		type:'POST',
-		url: url + 'api/delete_view-packet-params.php',
-		data:{id:id}
-	}).done(function(data){
-		c_obj.remove();
-		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
-		getPageData();
-	});
+    var id = $(this).parent("td").data('id');
+    var c_obj = $(this).parents("tr");
+
+    var confirmation = confirm("Are you sure you want to remove this item?");
+    if (confirmation) {
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + 'api/delete_view-packet-params.php',
+            data:{id:id}
+        }).done(function(data){
+            c_obj.remove();
+            toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
+            getPageData();
+        });
+    }
 
 });
 

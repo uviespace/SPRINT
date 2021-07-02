@@ -41,9 +41,7 @@ $sqlTotal =
   "    pa.id = ps.idPacket AND ".
   "    ps.idParameter = p.id AND ".
   "    p.idType = t.id AND ".
-  "    (p.kind = 0 OR ".
-  "    p.kind = 1 OR ".
-  "    p.kind = 2) ".
+  "    p.kind <> 1 ".
   "ORDER BY ps.order ASC"; 
 $sql = 
   "SELECT ".
@@ -66,9 +64,7 @@ $sql =
   "    pa.id = ps.idPacket AND ".
   "    ps.idParameter = p.id AND ".
   "    p.idType = t.id AND ".
-  "    (p.kind = 0 OR ".
-  "    p.kind = 1 OR ".
-  "    p.kind = 2) ";
+  "    p.kind <> 1 ";
   "ORDER BY ps.order ASC LIMIT $start_from, $num_rec_per_page"; 
 }
 

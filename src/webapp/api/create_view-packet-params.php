@@ -9,7 +9,7 @@ $sql =
   "`parametersequence` ".
   "(`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, `repetition`, `value`, `desc`) ".
   "VALUES ".
-  "('".$post['idStandard']."','".$post['parameter']."','".$post['idPacket']."','".$post['type']."','".$post['role']."','".$post['order']."','".$post['group']."','".$post['repetition']."','".$post['value']."','".$post['desc']."')";
+  "('".$post['idStandard']."','".$post['parameter']."','".$post['idPacket']."','0','".$post['role']."','".$post['order']."','".$post['group']."','".$post['repetition']."','".$post['value']."','".$post['desc']."')";
 
 $result = $mysqli->query($sql);
 
@@ -19,7 +19,7 @@ $result = $mysqli->query($sql);
 
 $data = $result->fetch_assoc();
 
-//echo json_encode($data);
-header('Location: ../index.php');
+echo json_encode($data);
+//header('Location: ../index.php');
 
 ?>

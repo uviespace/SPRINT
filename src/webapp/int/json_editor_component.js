@@ -51,7 +51,8 @@ $.ajax({
     // MIB Generator           (idComponent = 4; mib)
     // Packet access functions (idComponent = 5; pck)
     // CordetFw                (idComponent = 6; cfw)
-
+    // Datapool v2             (idComponent = 7; dp2)
+    
     // ICD Generator           (idComponent = 1; icd)
     if (document.getElementById('editor_holder_1') != null) {
 
@@ -279,6 +280,49 @@ $.ajax({
                         "CrFwInFactoryMaxNOfInCmd",
                         "CrFwInFactoryMaxNOfInRep",
                         "CrFwOutRegistryN",
+                        "includes"
+                    ],
+                    patternProperties: {
+                      // Self-referntial schema in patternProperties
+                      "^cousin_[0-9]+$": {
+                        $ref: "#/definitions/setting"
+                      }
+                    },
+                    properties: {
+                    }
+                },
+                year: {
+                    type: "integer",
+                    pattern: "^[0-9]{4}$",
+                    minimum: 1900,
+                    maximum: 2100
+                }
+            }
+        }
+    });
+
+    // Datapool v2             (idComponent = 7; dp2)
+    } else if (document.getElementById('editor_holder_7') != null) {
+
+    // Initialize the editor
+    var editor = new JSONEditor(document.getElementById('editor_holder_7'),{
+        // The schema for the editor
+        schema: {
+            title: "setting",
+            $ref: "#/definitions/setting",
+            definitions: {
+                setting: {
+                    type: "object",
+                    id: "setting",
+                    // The object will start with only these properties
+                    defaultProperties: [
+                        "prefix",
+                        "author",
+                        "copyright",
+                        "param_attr",
+                        "var_attr",
+                        "max_line_length",
+                        "indent",
                         "includes"
                     ],
                     patternProperties: {

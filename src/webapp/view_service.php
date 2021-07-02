@@ -130,9 +130,7 @@ if ($result->num_rows > 0) {
 					<form data-toggle="validator" action-data="api/create_view-service.php" method="POST">
 
 						<div class="form-group">
-							<label class="control-label" for="title">ID:</label>
-							<input type="text" name="id" class="form-control" data-error="Please enter id." required />
-							<div class="help-block with-errors"></div>
+							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
 						</div>
 
 						<div class="form-group">
@@ -181,7 +179,7 @@ if ($result->num_rows > 0) {
 
 						<div class="form-group">
 							<label class="control-label" for="title">Type:</label>
-							<input type="text" name="type" class="form-control" data-error="Please enter type." readonly required />
+							<input type="text" name="type" class="form-control" data-error="Please enter type." required />
 							<div class="help-block with-errors"></div>
 						</div>
 

@@ -118,19 +118,19 @@ $(".crud-submit-show").click(function(e){
 $(".crud-submit").click(function(e){
     //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
+    var idStandard = $("#create-item").find("input[name='idStandard']").val();
     var type = $("#create-item").find("input[name='type']").val();
     var name = $("#create-item").find("input[name='name']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
 
-    if(id != '' && type != '' && name != '' && desc != ''){
+    if(idStandard != '' && type != '' && name != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, type:type, name:name, desc:desc}
+            data:{idStandard:idStandard, type:type, name:name, desc:desc}
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='idStandard']").val('');
             $("#create-item").find("input[name='type']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("textarea[name='desc']").val('');
@@ -139,25 +139,29 @@ $(".crud-submit").click(function(e){
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
         });
     }else{
-        alert('You are missing title or description.')
+        alert('You are missing type, name or description.')
     }
 
 });
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
-	var id = $(this).parent("td").data('id');
-	var c_obj = $(this).parents("tr");
-	$.ajax({
-		dataType: 'json',
-		type:'POST',
-		url: url + 'api/delete_view-service.php',
-		data:{id:id}
-	}).done(function(data){
-		c_obj.remove();
-		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
-		getPageData();
-	});
+    var id = $(this).parent("td").data('id');
+    var c_obj = $(this).parents("tr");
+
+    var confirmation = confirm("Are you sure you want to remove this item?");
+    if (confirmation) {
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + 'api/delete_view-service.php',
+            data:{id:id}
+        }).done(function(data){
+            c_obj.remove();
+            toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
+            getPageData();
+        });
+    }
 
 });
 

@@ -105,6 +105,7 @@ if ($result->num_rows > 0) {
 			<thead>
 			    <tr>
 				<th>ID</th>
+                <th class="hide">idParameter</th>
 				<th>Parameter</th> <!-- Dropdown -->
 				<th>Order</th> 
 				<th>Role</th> <!-- Dropdown -->
@@ -134,26 +135,31 @@ if ($result->num_rows > 0) {
 					<form data-toggle="validator" action-data="api/create_view-tcheader.php" method="POST">
 
 						<div class="form-group">
-							<label class="control-label" for="title">ID:</label>
-							<input type="text" name="id" class="form-control" data-error="Please enter id." required />
-							<div class="help-block with-errors"></div>
+							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
+						</div>
+
+						<div class="form-group">
+							<input type="hidden" name="type" value="0" /> <!-- for TC header -->
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Parameter:</label>
-							<input type="text" name="parameter" class="form-control" data-error="Please enter parameter." required />
-							<div class="help-block with-errors"></div>
+							<select id="sel_parameter_tc_create" name="parameter" class="form-control" data-error="Please enter parameter." required>
+								<option value="select"></option>
+							</select>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Order:</label>
-							<input type="text" name="order" class="form-control" data-error="Please enter order." />
+							<input type="text" name="order" class="form-control" data-error="Please enter order." required />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Role:</label>
-							<input type="text" name="role" class="form-control" data-error="Please enter role." />
+							<select id="sel_role_tc_create" name="role" class="form-control" data-error="Please enter role." required >
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -210,7 +216,7 @@ if ($result->num_rows > 0) {
 						<div class="form-group">
 							<label class="control-label" for="title">Parameter:</label>
 							<!--<input type="text" name="parameter" class="form-control" data-error="Please enter parameter." required />-->
-							<select id="sel_parameter" name="parameter" class="form-control" data-error="Please enter parameter." required>
+							<select id="sel_parameter_tc" name="parameter" class="form-control" data-error="Please enter parameter." required readonly>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -225,7 +231,7 @@ if ($result->num_rows > 0) {
 						<div class="form-group">
 							<label class="control-label" for="title">Role:</label>
 							<!--<input type="text" name="role" class="form-control" data-error="Please enter role." />-->
-							<select id="sel_role" name="role" class="form-control" data-error="Please enter role.">
+							<select id="sel_role_tc" name="role" class="form-control" data-error="Please enter role.">
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>

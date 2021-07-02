@@ -21,42 +21,42 @@ $sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT $start_from, $num_rec_p
 } else {
 $sqlTotal = 
   "SELECT ".
-  "    p.id, ".
+  "    ps.id, ".
+  "    p.id AS idParameter, ".
   "    concat(p.domain, ' / ', p.name) AS parameter, ".
   "    ps.order, ".
   "    ps.role, ".
   "    ps.group, ".
   "    ps.repetition, ".
-  "    p.value, ".
-  "    p.desc ".
+  "    ps.value, ".
+  "    ps.desc ".
   "FROM ".
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
   "    (p.idStandard = ".$idStandard." OR ".
   "    p.idStandard IS NULL) AND ".
-  "    ps.idStandard = ".$idStandard." AND ".
   "    ps.idParameter = p.id AND ".
   "    (p.kind = 1 OR ".
   "    p.kind = 0) AND ".
   "    ps.type = 1";
 $sql =
   "SELECT ".
-  "    p.id, ".
+  "    ps.id, ".
+  "    p.id AS idParameter, ".
   "    concat(p.domain, ' / ', p.name) AS parameter, ".
   "    ps.order, ".
   "    ps.role, ".
   "    ps.group, ".
   "    ps.repetition, ".
-  "    p.value, ".
-  "    p.desc ".
+  "    ps.value, ".
+  "    ps.desc ".
   "FROM ".
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
   "    (p.idStandard = ".$idStandard." OR ".
   "    p.idStandard IS NULL) AND ".
-  "    ps.idStandard = ".$idStandard." AND ".
   "    ps.idParameter = p.id AND ".
   "    (p.kind = 1 OR ".
   "    p.kind = 0) AND ".

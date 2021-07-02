@@ -21,41 +21,47 @@ $sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT $start_from, $num_rec_p
 } else {
 $sqlTotal = 
   "SELECT ".
-  "    p.id, ".
+  "    ps.id, ".
+  "    p.id AS idParameter, ".
   "    concat(p.domain, ' / ', p.name) AS parameter, ".
   "    ps.order, ".
   "    ps.role, ".
   "    ps.group, ".
   "    ps.repetition, ".
-  "    p.value, ".
-  "    p.desc ".
+  "    ps.value, ".
+  "    ps.desc ".
   "FROM ".
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
-  "    p.idStandard = ".$idStandard." AND ".
+  "    (p.idStandard = ".$idStandard." OR ".
+  "    p.idStandard IS NULL) AND ".
   "    ps.idParameter = p.id AND ".
-  "    p.kind = 1 AND ".
+  "    (p.kind = 1 OR ".
+  "    p.kind = 0) AND ".
   "    ps.type = 0";
-$sql = 
+$sql =
   "SELECT ".
-  "    p.id, ".
+  "    ps.id, ".
+  "    p.id AS idParameter, ".
   "    concat(p.domain, ' / ', p.name) AS parameter, ".
   "    ps.order, ".
   "    ps.role, ".
   "    ps.group, ".
   "    ps.repetition, ".
-  "    p.value, ".
-  "    p.desc ".
+  "    ps.value, ".
+  "    ps.desc ".
   "FROM ".
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
-  "    p.idStandard = ".$idStandard." AND ".
+  "    (p.idStandard = ".$idStandard." OR ".
+  "    p.idStandard IS NULL) AND ".
   "    ps.idParameter = p.id AND ".
-  "    p.kind = 1 AND ".
+  "    (p.kind = 1 OR ".
+  "    p.kind = 0) AND ".
   "    ps.type = 0 ".
-  "    ORDER BY ps.order ASC LIMIT $start_from, $num_rec_per_page"; 
+  "ORDER BY ps.order ASC LIMIT $start_from, $num_rec_per_page"; 
 }
 
 $result = $mysqli->query($sql);

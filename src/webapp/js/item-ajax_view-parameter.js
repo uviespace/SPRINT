@@ -165,17 +165,13 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
+    var idStandard = $("#create-item").find("input[name='idStandard']").val();
     var domain = $("#create-item").find("input[name='domain']").val();
     var name = $("#create-item").find("input[name='name']").val();
     var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
-    if (idStandard.length) {
-    var idType = $("#create-item").find("input[name='idType']").val();
-    } else {
     var idType = $("#create-item").find("select[name='idType']").val();
-    }
     var multiplicity = $("#create-item").find("input[name='multiplicity']").val();
     var value = $("#create-item").find("input[name='value']").val();
     var unit = $("#create-item").find("input[name='unit']").val();
@@ -185,10 +181,17 @@ $(".crud-submit").click(function(e){
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, domain:domain, name:name, shortDesc:shortDesc,
-            idType:idType, multiplicity:multiplicity, value:value, unit:unit}
+            data:{idStandard:idStandard, domain:domain, name:name, shortDesc:shortDesc,
+                  idType:idType, multiplicity:multiplicity, value:value, unit:unit},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='idStandard']").val('');
             $("#create-item").find("input[name='domain']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("input[name='shortDesc']").val('');

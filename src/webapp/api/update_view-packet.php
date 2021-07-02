@@ -9,7 +9,7 @@
   $post = $_POST;
 
 
-  $sql = "UPDATE `packet` SET `kind` = '".$post['kind']."', `type` = '".$post['type']."', `subtype` = '".$post['subtype']."', `discriminant` = '".$post['discriminant']."', `domain` = '".$post['domain']."', `name` = '".$post['name']."', `shortDesc` = '".$post['shortDesc']."' WHERE `id` = '".$id."'";
+  $sql = "UPDATE `packet` SET `idProcess` = '".$post['idProcess']."', `kind` = '".$post['kind']."', `type` = '".$post['type']."', `subtype` = '".$post['subtype']."', `domain` = '".$post['domain']."', `name` = '".$post['name']."', `shortDesc` = '".$post['shortDesc']."' WHERE `id` = '".$id."'";
 
 
   $result = $mysqli->query($sql);

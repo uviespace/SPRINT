@@ -107,9 +107,7 @@ if ($result->num_rows > 0) {
 			<thead>
 			    <tr>
 				<th>ID</th>
-				<!--<th>Standard ID</th>
-				<th>Parent ID</th>
-				<th>Process ID</th>-->
+				<th class="hide">Process ID</th>
 				<th>Kind</th>
 				<th>Type</th>
 				<th>Subtype</th>
@@ -118,10 +116,10 @@ if ($result->num_rows > 0) {
 				<th>Name</th>
 				<th>Short Desc.</th>
 				<th>Description</th>
-				<th>Parameter Desc.</th>
-				<th>Destination Desc.</th>
-				<th>Code</th>
-				<th>Setting</th>
+				<th class="hide">Parameter Desc.</th>
+				<th class="hide">Destination Desc.</th>
+				<th class="hide">Code</th>
+				<th class="hide">Setting</th>
 				<th>Action</th> <!--  style="width:250px" -->
 			    </tr>
 			</thead>
@@ -142,53 +140,38 @@ if ($result->num_rows > 0) {
 
 				<div class="modal-body">
 					<form data-toggle="validator" action-data="api/create_view-packet.php" method="POST">
-<!--
+
 						<div class="form-group">
-							<label class="control-label" for="title">ID:</label>
-							<input type="text" name="id" class="form-control" data-error="Please enter id." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Standard ID:</label>
-							<input type="text" name="idStandard" class="form-control" data-error="Please enter idStandard." required />
-							<div class="help-block with-errors"></div>
+							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Parent ID:</label>
-							<input type="text" name="idParent" class="form-control" data-error="Please enter idParent." required />
-							<div class="help-block with-errors"></div>
+							<label class="control-label" for="title">Process/APID:</label>
+							<select id="sel_process_create" name="idProcess" class="form-control" data-error="Please enter process/APID." required>
+								<option value="select"></option>
+							</select>
+                            <div class="help-block with-errors"></div>
 						</div>
 
-						<div class="form-group">
-							<label class="control-label" for="title">Process ID:</label>
-							<input type="text" name="idProcess" class="form-control" data-error="Please enter idProcess." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
 						<div class="form-group">
 							<label class="control-label" for="title">Kind:</label>
-							<input type="text" name="kind" class="form-control" data-error="Please enter kind." required />
+							<select id="sel_kind_create" name="kind" class="form-control" data-error="Please enter kind." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Type:</label>
-							<input type="text" name="type" class="form-control" data-error="Please enter type." required />
+							<select id="sel_type_create" name="type" class="form-control" data-error="Please enter type." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Subtype:</label>
 							<input type="text" name="subtype" class="form-control" data-error="Please enter subtype." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Discriminant:</label>
-							<input type="text" name="discriminant" class="form-control" data-error="Please enter discriminant." />
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -286,6 +269,14 @@ if ($result->num_rows > 0) {
 						</div>
 -->
 						<div class="form-group">
+							<label class="control-label" for="title">Process/APID:</label>
+							<select id="sel_process" name="idProcess" class="form-control" data-error="Please enter process/APID." required>
+								<option value="select"></option>
+							</select>
+                            <div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
 							<label class="control-label" for="title">Kind:</label>
 							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." required />-->
 							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
@@ -297,7 +288,7 @@ if ($result->num_rows > 0) {
 						<div class="form-group">
 							<label class="control-label" for="title">Type:</label>
 							<!--<input type="text" name="type" class="form-control" data-error="Please enter type." required />-->
-							<select id="sel_type" name="idType" class="form-control" data-error="Please enter type." required>
+							<select id="sel_type" name="type" class="form-control" data-error="Please enter type." required>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -306,12 +297,6 @@ if ($result->num_rows > 0) {
 						<div class="form-group">
 							<label class="control-label" for="title">Subtype:</label>
 							<input type="text" name="subtype" class="form-control" data-error="Please enter subtype." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Discriminant:</label>
-							<input type="text" name="discriminant" class="form-control" data-error="Please enter discriminant." />
 							<div class="help-block with-errors"></div>
 						</div>
 

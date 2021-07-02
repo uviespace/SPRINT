@@ -6,7 +6,12 @@ var total_page = 0;
 var is_ajax_fire = 0;
 var dropdown = "";
 
+var idProject = getUrlVars()["idProject"];
 var idStandard = getUrlVars()["idStandard"];
+
+    getDropdownDataProcessCreate();
+    getDropdownDataTypeCreate();
+    getDropdownDataKindCreate();
 
 manageData();
 
@@ -90,6 +95,91 @@ function getPageData() {
 	});
 }
 
+
+/* Get Dropdown Data for Process/APID */
+function getDropdownDataProcessCreate() {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-apid.php?idProject='+idProject,
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionProcessCreate(data.data);
+	});
+}
+
+/* Add new option to select */
+function manageOptionProcessCreate(data) {
+	$("#sel_process_create").empty();
+	$("#sel_process_create").append('<option value="" selected>--- Please select ---</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_process_create").append('<option value="'+value.id+'">'+value.address+' / '+value.name+' ('+value.id+')</option>');
+	});
+}
+
+/* Get Dropdown Data for Service Types */
+function getDropdownDataTypeCreate() {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-service.php?idStandard='+idStandard,
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionTypeCreate(data.data);
+	});
+}
+
+/* Get Dropdown Data for Kind */
+function getDropdownDataKindCreate() {
+    var data = { 
+        "data": [ 
+            { "kind":"0", "name":"TC", "desc":"Telecommand" }, 
+            { "kind":"1", "name":"TM", "desc":"Telemetry" }
+        ]
+    };
+    manageOptionKindCreate(data.data);
+}
+
+/* Add new option to select */
+function manageOptionTypeCreate(data, type) {
+	$("#sel_type_create").empty();
+	$("#sel_type_create").append('<option value="" selected>--- Please select ---</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_type_create").append('<option value="'+value.type+'">'+value.type+' ('+value.name+')</option>');
+	});
+}
+
+/* Add new option to select */
+function manageOptionKindCreate(data) {
+	$("#sel_kind_create").empty();
+	$("#sel_kind_create").append('<option value="" selected>--- Please select ---</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_kind_create").append('<option value="'+value.kind+'">'+value.name+'</option>');
+	});
+}
+
+
+/* Get Dropdown Data for Process/APID */
+function getDropdownDataProcess(process) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-apid.php?idProject='+idProject,
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionProcess(data.data, process);
+	});
+}
+
+/* Add new option to select */
+function manageOptionProcess(data, process) {
+	$("#sel_process").empty();
+	$.each( data, function( key, value ) {
+		if (process==value.id) {
+			$("#sel_process").append('<option value="'+value.id+'" selected>'+value.address+' / '+value.name+' ('+value.id+')</option>');
+		} else {
+			$("#sel_process").append('<option value="'+value.id+'">'+value.address+' / '+value.name+' ('+value.id+')</option>');
+		}
+	});
+}
+
 /* Get Dropdown Data for Service Types */
 function getDropdownDataType(type) {
 	$.ajax({
@@ -151,9 +241,7 @@ function manageRow(data) {
 	$.each( data, function( key, value ) {
 	  	rows = rows + '<tr>';
 	  	rows = rows + '<td>'+value.id+'</td>';
-	  	/*rows = rows + '<td>'+value.idStandard+'</td>';*/
-	  	/*rows = rows + '<td>'+value.idParent+'</td>';*/
-	  	/*rows = rows + '<td>'+value.idProcess+'</td>';*/
+	  	rows = rows + '<td class="hide">'+value.idProcess+'</td>';
 	  	rows = rows + '<td>'+value.kind+'</td>';
 	  	rows = rows + '<td>'+value.type+'</td>';
 	  	rows = rows + '<td>'+value.subtype+'</td>';
@@ -162,10 +250,10 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.name+'</td>';
 	  	rows = rows + '<td>'+value.shortDesc+'</td>';
 	  	rows = rows + '<td class="td-hover">'+value.desc+'</td>';      /* Detail */
-	  	rows = rows + '<td class="td-hover">'+value.descParam+'</td>'; /* Detail */
-	  	rows = rows + '<td class="td-hover">'+value.descDest+'</td>';  /* Detail */
-	  	rows = rows + '<td>'+value.code+'</td>';      /* Detail */
-		rows = rows + '<td>'+value.setting+'</td>';
+	  	rows = rows + '<td class="td-hover hide">'+value.descParam+'</td>'; /* Detail */
+	  	rows = rows + '<td class="td-hover hide">'+value.descDest+'</td>';  /* Detail */
+	  	rows = rows + '<td class="hide">'+value.code+'</td>';      /* Detail */
+		rows = rows + '<td class="hide">'+value.setting+'</td>';
 	  	rows = rows + '<td class="td-fix" data-id="'+value.id+'">';
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
         rows = rows + '<button data-toggle="modal" data-target="#edit-detail" class="btn btn-primary edit-detail">Detail</button> ';
@@ -184,21 +272,14 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var id = $("#create-item").find("input[name='id']").val();
     var idStandard = $("#create-item").find("input[name='idStandard']").val();
-    var idParent = $("#create-item").find("input[name='idParent']").val();
-    var idProcess = $("#create-item").find("input[name='idProcess']").val();
-    if (idStandard.length) {
-    var kind = $("#create-item").find("input[name='kind']").val();
-    var type = $("#create-item").find("input[name='type']").val();
-    } else {
+    var idProcess = $("#create-item").find("select[name='idProcess']").val();
     var kind = $("#create-item").find("select[name='kind']").val();
     var type = $("#create-item").find("select[name='type']").val();
-    }
     var subtype = $("#create-item").find("input[name='subtype']").val();
-    var discriminant = $("#create-item").find("input[name='discriminant']").val();
     var domain = $("#create-item").find("input[name='domain']").val();
     var name = $("#create-item").find("input[name='name']").val();
     var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
@@ -208,32 +289,31 @@ $(".crud-submit").click(function(e){
     var code = $("#create-item").find("input[name='code']").val();
     var setting = $("#create-item").find("textarea[name='setting']").val();
 
-    if(id != '' && idStandard != '' && idParent != '' && idProcess != '' && kind != '' && 
-       type != '' && subtype != '' && discriminant != '' && domain != '' && name != '' && 
-       shortDesc != '' && desc != '' && descParam != '' && descDest != '' && code != '' && 
-       setting != ''){
+    if(id != '' && idStandard != '' && idProcess != '' && kind != '' && 
+       type != '' && subtype != '' && domain != '' && name != '' && 
+       shortDesc != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, idStandard:idStandard, idParent:idParent, idProcess:idProcess, kind:kind,
-            type:type, subtype:subtype, discriminant:discriminant, domain:domain, name:name, 
+            data:{id:id, idStandard:idStandard, idProcess:idProcess, kind:kind,
+            type:type, subtype:subtype, domain:domain, name:name, 
             shortDesc:shortDesc, desc:desc, descParam:descParam, descDest:descDest, code:code,
-            setting:setting}
+            setting:setting},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
             $("#create-item").find("input[name='id']").val('');
             $("#create-item").find("input[name='idStandard']").val('');
-            $("#create-item").find("input[name='idParent']").val('');
-            $("#create-item").find("input[name='idProcess']").val('');
-            if (idStandard.length) {
-            $("#create-item").find("input[name='kind']").val('');
-            $("#create-item").find("input[name='type']").val('');
-            } else {
+            $("#create-item").find("select[name='idProcess']").val('');
             $("#create-item").find("select[name='kind']").val('');
             $("#create-item").find("select[name='type']").val('');
-            }
             $("#create-item").find("input[name='subtype']").val('');
-            $("#create-item").find("input[name='discriminant']").val('');
             $("#create-item").find("input[name='domain']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("input[name='shortDesc']").val('');
@@ -247,25 +327,29 @@ $(".crud-submit").click(function(e){
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
         });
     }else{
-        alert('You are missing title or description.')
+        alert('You are missing something.')
     }
 
 });
 
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
-	var id = $(this).parent("td").data('id');
-	var c_obj = $(this).parents("tr");
-	$.ajax({
-		dataType: 'json',
-		type:'POST',
-		url: url + 'api/delete_view-packet.php',
-		data:{id:id}
-	}).done(function(data){
-		c_obj.remove();
-		toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
-		getPageData();
-	});
+    var id = $(this).parent("td").data('id');
+    var c_obj = $(this).parents("tr");
+
+    var confirmation = confirm("Are you sure you want to remove this item?");
+    if (confirmation) {
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + 'api/delete_view-packet.php',
+            data:{id:id}
+        }).done(function(data){
+            c_obj.remove();
+            toastr.success('Item Deleted Successfully.', 'Success Alert', {timeOut: 5000});
+            getPageData();
+        });
+    }
 
 });
 
@@ -273,8 +357,6 @@ $("body").on("click",".remove-item",function(){
 $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
-    var idStandard = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var idParent = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var idProcess = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var type = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
@@ -283,35 +365,20 @@ $("body").on("click",".edit-item",function(){
     var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    /*var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var descParam = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
-    var descDest = $(this).parent("td").prev("td").prev("td").prev("td").text();
-    var code = $(this).parent("td").prev("td").prev("td").text();
-    var setting = $(this).parent("td").prev("td").text();*/
 
+    getDropdownDataProcess(idProcess)
     getDropdownDataKind(kind);
     getDropdownDataType(type);
 
     $("#edit-item").find("input[name='idStandard']").val(idStandard);
-    $("#edit-item").find("input[name='idParent']").val(idParent);
-    $("#edit-item").find("input[name='idProcess']").val(idProcess);
-    if (idStandard.length) {
-    $("#edit-item").find("input[name='kind']").val(kind);
-    $("#edit-item").find("input[name='type']").val(type);
-    } else {
+    $("#edit-item").find("select[name='idProcess']").val(idProcess);
     $("#edit-item").find("select[name='kind']").val(kind);
     $("#edit-item").find("select[name='type']").val(type);
-    }
     $("#edit-item").find("input[name='subtype']").val(subtype);
     $("#edit-item").find("input[name='discriminant']").val(discriminant);
     $("#edit-item").find("input[name='domain']").val(domain);
     $("#edit-item").find("input[name='name']").val(name);
     $("#edit-item").find("input[name='shortDesc']").val(shortDesc);
-    /*$("#edit-item").find("textarea[name='desc']").val(desc);
-    $("#edit-item").find("input[name='descParam']").val(descParam);
-    $("#edit-item").find("input[name='descDest']").val(descDest);
-    $("#edit-item").find("input[name='code']").val(code);
-    $("#edit-item").find("textarea[name='setting']").val(setting);*/
     $("#edit-item").find(".edit-id").val(id);
 
 });
@@ -322,39 +389,33 @@ $(".crud-submit-edit").click(function(e){
     e.preventDefault();
     var form_action = $("#edit-item").find("form").attr("action");
     var idStandard = $("#edit-item").find("input[name='idStandard']").val();
-    var idParent = $("#edit-item").find("input[name='idParent']").val();
-    var idProcess = $("#edit-item").find("input[name='idProcess']").val();
-    if (idStandard.length) {
-    var kind = $("#edit-item").find("input[name='kind']").val();
-    var type = $("#edit-item").find("input[name='type']").val();
-    } else {
+    var idProcess = $("#edit-item").find("select[name='idProcess']").val();
     var kind = $("#edit-item").find("select[name='kind']").val();
     var type = $("#edit-item").find("select[name='type']").val();
-    }
     var subtype = $("#edit-item").find("input[name='subtype']").val();
-    var discriminant = $("#edit-item").find("input[name='discriminant']").val();
     var domain = $("#edit-item").find("input[name='domain']").val();
+    var discriminant = $("#edit-item").find("input[name='discriminant']").val();
     var name = $("#edit-item").find("input[name='name']").val();
     var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
-    var desc = $("#edit-item").find("textarea[name='desc']").val();
-    var descParam = $("#edit-item").find("input[name='descParam']").val();
-    var descDest = $("#edit-item").find("input[name='descDest']").val();
-    var code = $("#edit-item").find("input[name='code']").val();
-    var setting = $("#edit-item").find("textarea[name='setting']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
-    if(id != '' && idStandard != '' && idParent != '' && idProcess != '' && kind != '' && 
-       type != '' && subtype != '' && discriminant != '' && domain != '' && name != '' && 
-       shortDesc != '' && desc != '' && descParam != '' && descDest != '' && code != '' && 
-       setting != ''){
+    if(id != '' && idStandard != '' && idProcess != '' && kind != '' && 
+       type != '' && subtype != '' && domain != '' && name != '' && 
+       shortDesc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, idStandard:idStandard, idParent:idParent, idProcess:idProcess, kind:kind,
-            type:type, subtype:subtype, discriminant:discriminant, domain:domain, name:name, 
-            shortDesc:shortDesc, desc:desc, descParam:descParam, descDest:descDest, code:code,
-            setting:setting}
+            data:{id:id, idStandard:idStandard, idProcess:idProcess, kind:kind,
+            type:type, subtype:subtype, domain:domain, name:name, 
+            shortDesc:shortDesc},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');

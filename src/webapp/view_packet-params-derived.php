@@ -26,7 +26,7 @@ if ($result->num_rows > 0) {
         $project_name = $row["name"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 $sql = "SELECT * FROM `standard` WHERE `id` = ".$idStandard;
@@ -43,7 +43,7 @@ if ($result->num_rows > 0) {
         $standard_desc = $row["desc"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 //if (isset($_GET["idParent"])) { $idParent  = $_GET["idParent"]; } else { $idParent=0; };
@@ -71,7 +71,7 @@ if ($result->num_rows > 0) {
         $basePacket_subt = $row["subtype"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 if ($basePacket_kind == 0) {
@@ -96,7 +96,7 @@ if ($result->num_rows > 0) {
         $derivedPacket_discr = $row["discriminant"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
     $basePacket_name .= " [".$derivedPacket_discr."]";
 } else {

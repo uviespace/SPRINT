@@ -32,6 +32,10 @@ function manageData() {
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
 		current_page = page;
+		if (data.total == 0) {
+			total_page = 1;
+			current_page = 1;
+		}
 		//alert('A) Domain = '+dpDomain+' | Standard = '+idStandard)
 
 		$('#pagination').twbsPagination({

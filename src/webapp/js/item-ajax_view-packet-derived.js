@@ -159,7 +159,7 @@ function manageRow(data) {
 	  	//rows = rows + '<td>'+value.setting+'</td>';
 	  	rows = rows + '<td data-id="'+value.id+'">';
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
-        //rows = rows + '<button data-toggle="modal" data-target="#edit-detail" class="btn btn-primary edit-detail">Body</button> ';
+        rows = rows + '<button data-toggle="modal" data-target="#edit-detail" class="btn btn-primary edit-detail">Detail</button> ';
         rows = rows + '<button data-toggle="modal" data-target="#open-body" class="btn btn-primary open-body">Body</button> ';
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
         rows = rows + '</td>';
@@ -246,17 +246,19 @@ $("body").on("click",".edit-item",function(){
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
-    var descParam = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    /*var descParam = $(this).parent("td").prev("td").prev("td").prev("td").text();
     var descDest = $(this).parent("td").prev("td").prev("td").text();
-    var code = $(this).parent("td").prev("td").text();
+    var code = $(this).parent("td").prev("td").text();*/
 
-    $("#edit-item").find("input[name='discriminant']").val(discriminant);
+    getDropdownDataDiscriminant(discriminant);
+
+    $("#edit-item").find("select[name='discriminant']").val(discriminant);
     $("#edit-item").find("input[name='name']").val(name);
     $("#edit-item").find("input[name='shortDesc']").val(shortDesc);
     $("#edit-item").find("textarea[name='desc']").val(desc);
-    $("#edit-item").find("input[name='descParam']").val(descParam);
+    /*$("#edit-item").find("input[name='descParam']").val(descParam);
     $("#edit-item").find("input[name='descDest']").val(descDest);
-    $("#edit-item").find("input[name='code']").val(code);
+    $("#edit-item").find("input[name='code']").val(code);*/
     $("#edit-item").find(".edit-id").val(id);
 
 });
@@ -265,18 +267,6 @@ $("body").on("click",".edit-item",function(){
 $("body").on("click",".edit-detail",function(){
 
     var id = $(this).parent("td").data('id');
-    /*var type = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var subtype = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var discriminant = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var descParam = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
-    var descDest = $(this).parent("td").prev("td").prev("td").prev("td").text();
-    var code = $(this).parent("td").prev("td").prev("td").text();
-    var setting = $(this).parent("td").prev("td").text();*/
-
     var discriminant = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
@@ -285,20 +275,17 @@ $("body").on("click",".edit-detail",function(){
     var descDest = $(this).parent("td").prev("td").prev("td").text();
     var code = $(this).parent("td").prev("td").text();
 
-    /*$("#edit-detail").find("input[name='type']").val(type);
-    $("#edit-detail").find("input[name='subtype']").val(subtype);*/
     $("#edit-detail").find("input[name='discriminant']").val(discriminant);
-    /*$("#edit-detail").find("input[name='domain']").val(domain);*/
     $("#edit-detail").find("input[name='name']").val(name);
     $("#edit-detail").find("input[name='shortDesc']").val(shortDesc);
-    $("#edit-detail").find("textarea[name='desc']").val(desc);
+    $("#edit-detail").find("input[name='desc']").val(desc);
     $("#edit-detail").find("input[name='descParam']").val(descParam);
     $("#edit-detail").find("input[name='descDest']").val(descDest);
     $("#edit-detail").find("input[name='code']").val(code);
-    /*$("#edit-detail").find("textarea[name='setting']").val(setting);*/
     $("#edit-detail").find(".edit-id").val(id);
 
 });
+
 
 /* Open Body of Item */
 $("body").on("click",".open-body",function(){
@@ -320,13 +307,13 @@ $(".crud-submit-edit").click(function(e){
 
     e.preventDefault();
     var form_action = $("#edit-item").find("form").attr("action");
-    var discriminant = $("#edit-item").find("input[name='discriminant']").val();
+    var discriminant = $("#edit-item").find("select[name='discriminant']").val();
     var name = $("#edit-item").find("input[name='name']").val();
     var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
     var desc = $("#edit-item").find("textarea[name='desc']").val();
-    var descParam = $("#edit-item").find("textarea[name='descParam']").val();
-    var descDest = $("#edit-item").find("textarea[name='descDest']").val();
-    var code = $("#edit-item").find("textarea[name='code']").val();
+    /*var descParam = $("#edit-item").find("input[name='descParam']").val();
+    var descDest = $("#edit-item").find("input[name='descDest']").val();
+    var code = $("#edit-item").find("input[name='code']").val();*/
     var id = $("#edit-item").find(".edit-id").val();
 
     if(id != '' && discriminant != '' && desc != ''){
@@ -334,7 +321,55 @@ $(".crud-submit-edit").click(function(e){
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, discriminant:discriminant, name:name, shortDesc:shortDesc, desc:desc, descParam:descParam, descDest:descDest, code:code}
+            data:{id:id, discriminant:discriminant, name:name, shortDesc:shortDesc, desc:desc},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
+        }).fail(function(data) {
+            if ( data.responseCode )
+                console.log( data.responseCode );
+        }).done(function(data){
+            getPageData();
+            $(".modal").modal('hide');
+            toastr.success('Item Updated Successfully.', 'Success Alert', {timeOut: 5000});
+        });
+    }else{
+        alert('You are missing something.')
+    }
+
+});
+
+/* Updated new Item */
+$(".crud-submit-edit-detail").click(function(e){
+
+    e.preventDefault();
+    var form_action = $("#edit-item").find("form").attr("action");
+    var discriminant = $("#edit-item").find("input[name='discriminant']").val();
+    var name = $("#edit-item").find("input[name='name']").val();
+    var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
+    var desc = $("#edit-item").find("input[name='desc']").val();
+    var descParam = $("#edit-item").find("input[name='descParam']").val();
+    var descDest = $("#edit-item").find("input[name='descDest']").val();
+    var code = $("#edit-item").find("input[name='code']").val();
+    var id = $("#edit-item").find(".edit-id").val();
+
+    if(id != ''){
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + form_action,
+            data:{id:id, discriminant:discriminant, name:name, shortDesc:shortDesc, desc:desc},
+            success: function(results, textStatus) {
+                toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
+            },
+            error: function(xhr, status, error)
+            {
+                toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
+            }
         }).fail(function(data) {
             if ( data.responseCode )
                 console.log( data.responseCode );
@@ -356,6 +391,29 @@ $(".crud-submit-edit").click(function(e){
 var dropdown = ""; // needed for dropdown menus for initialization
 
 /* Get Dropdown Data for Discriminant */
+function getDropdownDataDiscriminant(discriminant) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-discriminant.php',
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionDiscriminant(data.data, discriminant);
+	});
+}
+
+/* Add new option to select */
+function manageOptionDiscriminant(data, discriminant) {
+	$("#sel_discriminant").empty();
+	$.each( data, function( key, value ) {
+        if (discriminant==value.name) {
+            $("#sel_discriminant").append('<option value="'+value.name+'" selected>'+value.idType+' / '+value.name+'</option>');
+        } else {
+            $("#sel_discriminant").append('<option value="'+value.name+'">'+value.idType+' / '+value.name+'</option>');
+        }
+	});
+}
+
+/* Get Dropdown Data for Discriminant */
 function getDropdownDataDiscriminantCreate(enumset) {
 	$.ajax({
 		dataType: 'json',
@@ -375,7 +433,7 @@ function manageOptionDiscriminantCreate(data, enumset) {
 	});
 }
 
-function updateDivDiscriminant() {
+function updateDivDiscriminantCreate() {
 	var x = document.getElementById("sel_enumeration-set_create");
 	var ele = document.getElementById("disc");
 
@@ -398,22 +456,24 @@ function updateDivDiscriminant() {
 function getDropdownDataDiscriminantDescriptionCreate(disc) {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_dd-discriminant-description.php?id='+disc,
+		url: url+'api/getData_dd-discriminant-description.php?id='+disc, // TODO: id=disc does not work
 		data: {dropdown:dropdown}
 	}).done(function(data){
-		manageOptionDiscriminantDescriptionCreate(data.data);
+		manageOptionDiscriminantDescriptionCreate(data.data, disc);
 	});
 }
 
 /* Insert value to textarea */
-function manageOptionDiscriminantDescriptionCreate(data) {
-	$("#descr_textarea").empty();
+function manageOptionDiscriminantDescriptionCreate(data, disc) {
+	$("#descr_textarea_create").empty();
 	$.each( data, function( key, value ) {
-		$("#descr_textarea").val(value.desc);
+        if (disc==value.name) {
+            $("#descr_textarea_create").val(value.desc);
+        }
 	});
 }
 
-function updateDivDiscriminantDescription() {
+function updateDivDiscriminantDescriptionCreate() {
 	var x = document.getElementById("sel_discriminant_create");
 	var ele = document.getElementById("descr");
 
@@ -424,6 +484,46 @@ function updateDivDiscriminantDescription() {
     //updateDiv();
 
     getDropdownDataDiscriminantDescriptionCreate(""+x.value);
+
+    //var container = document.getElementById("sel_pusdatatype");
+    //var content = container.innerHTML;
+    //container.innerHTML= content; 
+
+    //$('#pusdatatype').trigger('change');
+}
+
+/* Get Description Data for Discriminant */
+function getDropdownDataDiscriminantDescription(disc) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-discriminant-description.php?id='+disc, // TODO: id=disc does not work
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionDiscriminantDescription(data.data, disc);
+	});
+}
+
+/* Insert value to textarea */
+function manageOptionDiscriminantDescription(data, disc) {
+	$("#descr_textarea").empty();
+	$.each( data, function( key, value ) {
+        if (disc==value.name) {
+            $("#descr_textarea").val(value.desc);
+        }
+	});
+}
+
+function updateDivDiscriminantDescription() {
+	var x = document.getElementById("sel_discriminant");
+	var ele = document.getElementById("descr");
+
+	//ele.style.display = "block";
+
+    //x.value = x.value.toUpperCase();
+
+    //updateDiv();
+
+    getDropdownDataDiscriminantDescription(""+x.value);
 
     //var container = document.getElementById("sel_pusdatatype");
     //var content = container.innerHTML;

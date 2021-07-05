@@ -193,7 +193,7 @@ if ($basePacket_kind == 0) {
 
 						<div class="form-group">
 							<label class="control-label" for="title">Enumeration Set:</label>
-							<select id="sel_enumeration-set_create" name="enumeration-set" class="form-control" onchange="updateDivDiscriminant();" data-error="Please enter parameter." required>
+							<select id="sel_enumeration-set_create" name="enumeration-set" class="form-control" onchange="updateDivDiscriminantCreate();" data-error="Please enter parameter." required>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -201,57 +201,12 @@ if ($basePacket_kind == 0) {
 
 						<div id="disc" class="form-group">
 							<label class="control-label" for="title">Discriminant:</label>
-							<select id="sel_discriminant_create" name="discriminant" class="form-control" onchange="updateDivDiscriminantDescription();" data-error="Please enter parameter." required>
+							<select id="sel_discriminant_create" name="discriminant" class="form-control" onchange="updateDivDiscriminantDescriptionCreate();" data-error="Please enter parameter." required>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Standard ID:</label>
-							<input type="text" name="idStandard" class="form-control" data-error="Please enter idStandard." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Parent ID:</label>
-							<input type="text" name="idParent" class="form-control" data-error="Please enter idParent." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Process ID:</label>
-							<input type="text" name="idProcess" class="form-control" data-error="Please enter idProcess." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Kind:</label>
-							<input type="text" name="kind" class="form-control" data-error="Please enter kind." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Type:</label>
-							<input type="text" name="type" class="form-control" data-error="Please enter type." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Subtype:</label>
-							<input type="text" name="subtype" class="form-control" data-error="Please enter subtype." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Domain:</label>
-							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
 							<input type="text" name="name" class="form-control" data-error="Please enter name." />
@@ -266,7 +221,7 @@ if ($basePacket_kind == 0) {
 
 						<div if="descr" class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea id="descr_textarea" name="desc" class="form-control" data-error="Please enter description." required ></textarea>
+							<textarea id="descr_textarea_create" name="desc" class="form-control" data-error="Please enter description." required ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -287,13 +242,6 @@ if ($basePacket_kind == 0) {
 							<input type="text" name="code" class="form-control" data-error="Please enter code." />
 							<div class="help-block with-errors"></div>
 						</div>
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting."></textarea>
-							<div class="help-block with-errors"></div>
-						</div>
--->
 
 						<div class="form-group">
 							<button type="submit" class="btn crud-submit btn-success">Submit</button>
@@ -324,59 +272,15 @@ if ($basePacket_kind == 0) {
                 </div>
 
 		      			<input type="hidden" name="id" class="edit-id">
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Standard ID:</label>
-							<input type="text" name="idStandard" class="form-control" data-error="Please enter idStandard." readonly required />
-							<div class="help-block with-errors"></div>
-						</div>
 
-						<div class="form-group">
-							<label class="control-label" for="title">Parent ID:</label>
-							<input type="text" name="idParent" class="form-control" data-error="Please enter idParent." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Process ID:</label>
-							<input type="text" name="idProcess" class="form-control" data-error="Please enter idProcess." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Kind:</label>
-							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
-								<option value="select"></option>
-							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Type:</label>
-							<select id="sel_type" name="idType" class="form-control" data-error="Please enter type." required>
-								<option value="select"></option>
-							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Subtype:</label>
-							<input type="text" name="subtype" class="form-control" data-error="Please enter subtype." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
 						<div class="form-group">
 							<label class="control-label" for="title">Discriminant:</label>
-							<input type="text" name="discriminant" class="form-control" data-error="Please enter discriminant." required />
+							<select id="sel_discriminant" name="discriminant" class="form-control" onchange="updateDivDiscriminantDescription();" data-error="Please enter parameter." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Domain:</label>
-							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required />
-							<div class="help-block with-errors"></div>
-						</div>
--->
+
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
 							<input type="text" name="name" class="form-control" data-error="Please enter name." />
@@ -391,8 +295,57 @@ if ($basePacket_kind == 0) {
 
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description." required ></textarea>
+							<textarea id="descr_textarea" name="desc" class="form-control" data-error="Please enter description." required ></textarea>
 							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
+						</div>
+
+		      		</form>
+
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Edit Detail Modal -->
+		<div class="modal fade" id="edit-detail" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Edit Detail</h4>
+		      </div>
+
+		      <div class="modal-body">
+					<form data-toggle="validator" action="api/update_view-packet-derived-detail.php" method="put">
+
+                <div class="form-group">
+                    for packet <b><?php echo $basePacket_name; ?></b> (<?php echo $idParent; ?>)
+                </div>
+
+		      			<input type="hidden" name="id" class="edit-id">
+
+						<div class="form-group">
+							<label class="control-label" for="title">Discriminant:</label>
+                            <input type="text" name="discriminant" class="form-control-min" data-error="Please enter type." readonly />
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Name:</label>
+                            <input type="text" name="name" class="form-control-min" data-error="Please enter type." readonly />
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Short Desc.:</label>
+                            <input type="text" name="shortDesc" class="form-control-min" data-error="Please enter type." readonly />
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Description:</label>
+                            <input type="text" name="desc" class="form-control-min" data-error="Please enter type." readonly />
 						</div>
 
 						<div class="form-group">
@@ -412,15 +365,9 @@ if ($basePacket_kind == 0) {
 							<input type="text" name="code" class="form-control" data-error="Please enter code." />
 							<div class="help-block with-errors"></div>
 						</div>
-<!--
+
 						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting."></textarea>
-							<div class="help-block with-errors"></div>
-						</div>
--->
-						<div class="form-group">
-							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
+							<button type="submit" class="btn btn-success crud-submit-edit-detail">Submit</button>
 						</div>
 
 		      		</form>

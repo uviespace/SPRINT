@@ -5,13 +5,13 @@ require 'db_config.php';
 $num_rec_per_page = 5;
 
 /*if (isset($_GET["page"])) { $page = $_GET["page"]; } else { $page=1; };*/
-if (isset($_GET["idType"])) { $idType = $_GET["idType"]; } else { $idType=1; };
+if (isset($_GET["idType"])) { $idType = $_GET["idType"]; } else { $idType=0; };
 
 /*$start_from = ($page-1) * $num_rec_per_page;*/
 
 if ($idType==0) {
 /*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `enumeration` ORDER BY `id` ASC"; 
+$sql = "SELECT * FROM `enumeration` ORDER BY `idType`, `value` ASC"; 
 } else {
 /*$sqlTotal = "SELECT * FROM `service`";*/
 $sql = "SELECT * FROM `enumeration` WHERE `idType` = ".$idType." ORDER BY `value` ASC"; 

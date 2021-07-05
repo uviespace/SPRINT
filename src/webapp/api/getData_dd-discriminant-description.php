@@ -5,7 +5,7 @@ require 'db_config.php';
 $num_rec_per_page = 5;
 
 /*if (isset($_GET["page"])) { $page = $_GET["page"]; } else { $page=1; };*/
-if (isset($_GET["id"])) { $id = $_GET["id"]; } else { $id=1; };
+if (isset($_GET["id"])) { $id = $_GET["id"]; } else { $id=0; };
 
 /*$start_from = ($page-1) * $num_rec_per_page;*/
 
@@ -14,7 +14,7 @@ if ($id==0) {
 $sql = "SELECT * FROM `enumeration` ORDER BY `id` ASC"; 
 } else {
 /*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `enumeration` WHERE `id` = ".$id." ORDER BY `value` ASC"; 
+$sql = "SELECT desc FROM `enumeration` WHERE `id` = ".$id." ORDER BY `value` ASC"; 
 }
 
 $result = $mysqli->query($sql);

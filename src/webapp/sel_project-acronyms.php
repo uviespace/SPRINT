@@ -29,7 +29,7 @@ if ($result->num_rows > 0) {
         $project_name = $row["name"];
     }
 } else {
-    echo "0 results for projects";
+    //echo "0 results for projects";
 }
 
 //Abfrage der Nutzer ID vom Login

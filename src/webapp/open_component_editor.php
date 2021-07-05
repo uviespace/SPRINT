@@ -31,7 +31,7 @@ if ($result->num_rows > 0) {
         $component_name = $row["name"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 $sql = "SELECT * FROM `project` WHERE `id` = ".$idProject;
@@ -47,7 +47,7 @@ if ($result->num_rows > 0) {
         $project_name = $row["name"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 $sql = "SELECT * FROM `application` WHERE `id`=".$idApplication;
@@ -64,7 +64,7 @@ if ($result->num_rows > 0) {
         $application_desc = $row["desc"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 //Abfrage der Nutzer ID vom Login

@@ -32,7 +32,7 @@ if ($result->num_rows > 0) {
         $project_name = $row["name"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 $sql = "SELECT * FROM `standard` WHERE `id`=".$idStandard;
@@ -49,7 +49,7 @@ if ($result->num_rows > 0) {
         $standard_desc = $row["desc"];
     }
 } else {
-    echo "0 results";
+    //echo "0 results";
 }
 
 //Abfrage der Nutzer ID vom Login

@@ -564,7 +564,7 @@ def gen_app_types(path, app):
         if type_["size"] != None and (type_["nativeType"].strip() !=""):
             tname = type_["name"]
             ntname = type_["nativeType"]
-            writeln(f, "Definition of type \"{0}\".".format(tname))
+            writeln(f, "/* Definition of type \"{0}\". */".format(tname))
             writeln(f, "typedef {0} {1};".format(ntname, tname))
             if len(type_["enums"]) > 0:        
                 writeln(f, "enum {")

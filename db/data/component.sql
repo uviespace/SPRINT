@@ -32,7 +32,8 @@ INSERT INTO `component` (`id`, `shortName`, `name`, `desc`, `setting`) VALUES
 (3, 'spec', 'Specification', 'Generates *.tex files which can be used to build a specification of the application.', NULL),
 (4, 'mib', 'MIB Generator', 'Generates MIB files according to SCOS-2000.', NULL),
 (5, 'pck', 'Packet access functions', 'Generates marshalling/unmarshalling functions for the packets', NULL),
-(6, 'cfw', 'CordetFw', 'Generates all files for CordetFw instantiation', NULL);
+(6, 'cfw', 'CordetFw', 'Generates all files for CordetFw instantiation', NULL),
+(7, 'dp2', 'Datapool v2', 'Generates C code which can be used together with the Datapool SW component (version 2).', NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

@@ -301,11 +301,11 @@ def gen_datapool_c(path, domain_dict, params_list, vars_list):
 
 
             # type mapping
-            if tname == "uint8_t" or tname == "int8_t":
+            if tname == "uint8_t" or tname == "int8_t" or tname == "unsigned char" or tname == "signed char":
                 tname = "DP_TYPE_INT8"
-            if tname == "uint16_t" or tname == "int16_t":
+            if tname == "uint16_t" or tname == "int16_t" or tname == "unsigned short" or tname == "signed short":
                 tname = "DP_TYPE_INT16"
-            if tname == "uint32_t" or tname == "int32_t":
+            if tname == "uint32_t" or tname == "int32_t" or tname == "unsigned int" or tname == "signed int":
                 tname = "DP_TYPE_INT32"
             if tname == "float":
                 tname = "DP_TYPE_FLOAT"
@@ -470,7 +470,6 @@ def gen_app_types(path, app):
             ntname = type_["nativeType"]
             writeln(f, "/* Definition of type \"{0}\". */".format(tname))
             writeln(f, "typedef {0} {1};".format(ntname, tname))
-
 # XXX: this doesn't work, dunno what the intent was...
 #            if len(type_["enums"]) > 0:
 #                writeln(f, "enum {")

@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-
 <?php
-
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
 require 'api/db_config.php';
 
 $target_dir = "uploads/";
@@ -155,8 +160,20 @@ if ($uploadOk == 0) {
   }
 }
 
-?>
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
 
+$userName = $row["name"];
+$userEmail = $row["email"];
+
+?>
+<!DOCTYPE html>
+<html>
 <head>
 	<title>CORDET Editor - Datapool Import</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->

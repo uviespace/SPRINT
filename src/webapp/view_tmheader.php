@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-
 <?php
-
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
 require 'api/db_config.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
@@ -44,8 +49,20 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
-?>
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
 
+$userName = $row["name"];
+$userEmail = $row["email"];
+
+?>
+<!DOCTYPE html>
+<html>
 <head>
 	<title>CORDET Editor - TM Header</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
@@ -276,6 +293,11 @@ if ($result->num_rows > 0) {
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
 					<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
+					<br/><br/>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
 					<br/><br/>
 					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
 					<br/>

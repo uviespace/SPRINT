@@ -9,13 +9,9 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
-require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
-if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
 $project_name = "";
-$standard_name = "";
-$standard_desc = "";
 
 $sql = "SELECT * FROM `project` WHERE `id` = ".$idProject;
 
@@ -33,42 +29,6 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
-$sql = "SELECT * FROM `standard` WHERE `id` = ".$idStandard;
-
-$result = $mysqli->query($sql);
-
-$num_rows = mysqli_num_rows($result);
-
-if ($result->num_rows > 0) {
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
-        $standard_name = $row["name"];
-        $standard_desc = $row["desc"];
-    }
-} else {
-    //echo "0 results";
-}
-
-if (isset($_GET["idType"])) { $idType  = $_GET["idType"]; } else { $idType=0; };
-
-$sql = "SELECT * FROM `type` WHERE `id` = ".$idType;
-
-$result = $mysqli->query($sql);
-
-$num_rows = mysqli_num_rows($result);
-
-if ($result->num_rows > 0) {
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
-        $type_name = $row["name"];
-        $type_desc = $row["desc"];
-    }
-} else {
-    echo "0 results";
-}
-
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
  
@@ -80,12 +40,13 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
-$max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
+$idUser = $userid;
+
 ?>
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CORDET Editor - Enumerations for Type <?php echo $type_name; ?></title>
+	<title>CORDET Editor - Contributors</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -107,8 +68,7 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 		var url = "http://localhost/dbeditor/";
 	</script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
-    <script type="text/javascript" src="int/global_functions.js"></script>
-	<script type="text/javascript" src="js/item-ajax_view-type-enumeration.js"></script>
+	<script type="text/javascript" src="js/item-ajax_view-project-contributor.js"></script>
 </head>
 <body>
 
@@ -116,16 +76,14 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
-		            <h2>Enumerations for Type <?php echo $type_name; ?></h2>
+					<h4>Project <?php echo $project_name;?></h4>
+		            <h2>Contributors</h2>
 		        </div>
-                <?php if ($max_access_level == "1" OR $max_access_level == "2" OR $max_access_level == "3") { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
 				</button>
 		        </div>
-                <?php } ?>
 		    </div>
 		</div>
 
@@ -142,13 +100,14 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 			<input id="liveSearch" type="search" placeholder="Search...">
 		</div>
 
-		<table name="mytable" id="mytable" class="table table-bordered">
+		<br/>
+
+		<table class="table table-bordered">
 			<thead>
 			    <tr>
 				<th>ID</th>
-				<th id="thID">Name</th>
-				<th id="thValue">Value</th>
-				<th id="thDesc">Description</th>
+				<th>Email</th>
+				<th>Role</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
@@ -168,37 +127,27 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_view-type-enumeration.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_view-project-contributor.php" method="POST">
 
-                <div class="form-group">
-                    for data type <b><?php echo $type_name; ?></b> (<?php echo $idType; ?>)
-                </div>
+                        <input type="hidden" name="idProject" value="<?php echo $idProject ?>" />
 
-						<div class="form-group">
-							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
-						</div>
+                        <input type="hidden" name="idUser" value="<?php echo $idUser ?>" />
 
 						<div class="form-group">
-							<!--<label class="control-label" for="title">Data Type:</label>-->
-							<input type="hidden" name="idType" value="<?php echo $idType; ?>" />
-							<!--<div class="help-block with-errors"></div>-->
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<label class="control-label" for="title">Email:</label>
+							<!--<input type="text" name="name" class="form-control" data-error="Please enter email." required />-->
+							<select id="sel_owner_create" name="email" class="form-control" data-error="Please enter email." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Value:</label>
-							<input type="text" name="value" class="form-control" data-error="Please enter value." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description." ></textarea>
+							<label class="control-label" for="title">Role:</label>
+							<!--<input type="text" name="idRole" class="form-control" data-error="Please enter role." required />-->
+							<select id="sel_role_create" name="idRole" class="form-control" data-error="Please enter role." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -224,25 +173,23 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-type-enumeration.php" method="put">
+					<form data-toggle="validator" action="api/update_view-project-contributor.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
 						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<label class="control-label" for="title">Email:</label>
+							<select id="sel_owner" name="email" class="form-control" data-error="Please enter email." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Value:</label>
-							<input type="text" name="value" class="form-control" data-error="Please enter value." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description." ></textarea>
+							<label class="control-label" for="title">Role:</label>
+							<select id="sel_role" name="idRole" class="form-control" data-error="Please enter role." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -267,7 +214,7 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
-					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
+					<a class="a_btn" href="open_project.php?id=<?php echo $idProject; ?>" target="_self">>> BACK <<</a>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

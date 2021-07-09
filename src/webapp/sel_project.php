@@ -80,10 +80,11 @@ if ($userid == 1 || $userid == 1001) {
            "LEFT JOIN `userproject` up ".
            "ON p.id = up.idProject ".
            "WHERE p.isPublic = 1 ".
+           "OR up.idRole = 1 ".
            "OR (up.idUser = ".$userid." ".
            "AND up.idRole = 2) ".
            "OR (up.email = '".$userEmail."' ".
-           "AND up.idRole = 3) ".
+           "AND (up.idRole = 3 OR up.idRole = 4)) ".
            "ORDER BY p.id";
 }
 

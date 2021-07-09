@@ -5,19 +5,20 @@ var current_page = 1;
 var total_page = 0;
 var is_ajax_fire = 0;
 
+var idUser = "";
+var idProject = getUrlVars()["idProject"];
 var idStandard = getUrlVars()["idStandard"];
 var idType = getUrlVars()["idType"];
 
-manageData();
+var max_access_level = "5";
+get_role(''+idProject, function(value) {
+    var items = eval(value); //Converted to actual JSON data
+    for (var item in items) {
+        max_access_level = items[item]['idRole'];
+    }
+});
 
-/* get variables from URL */
-function getUrlVars() {
-    var vars = {};
-    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
-        vars[key] = value;
-    });
-    return vars;
-}
+manageData();
 
 /* manage data list */
 function manageData() {
@@ -104,8 +105,12 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.value+'</td>';
 	  	rows = rows + '<td>'+value.desc+'</td>';
 	  	rows = rows + '<td data-id="'+value.id+'">';
-        rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
-        rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        if (max_access_level == "1" || max_access_level == "2" || max_access_level == "3") {
+            rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
+        }
+        if (max_access_level == "1" || max_access_level == "2") {
+            rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        }
         rows = rows + '</td>';
 	  	rows = rows + '</tr>';
 	});

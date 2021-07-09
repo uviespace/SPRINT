@@ -1,3 +1,30 @@
+<?php
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
+require 'api/db_config.php';
+
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+//echo "Hallo User: ".$userid;
+
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+
+$result = $mysqli->query($sql);
+
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+
+?>
 <!DOCTYPE html>
 <html>
 <head>
@@ -144,6 +171,11 @@
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
 					<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
+					<br/><br/>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
 					<br/><br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

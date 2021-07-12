@@ -367,6 +367,11 @@ if(!empty($sel_service_type)) {
 	echo "<b>no standard selected, please select standard first!</b>";
 }
 
+/**
+ * #############################
+ * ### Import selected items ###
+ * #############################
+ */
 if (isset($_POST["import"])) {
     echo "Submit Button clicked...<br/>";
 
@@ -378,6 +383,7 @@ if (isset($_POST["import"])) {
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             echo "<b>TC parameter:</b> (".$row['pid'].",".$row['idStandard'].",".$row['idType'].",".$row['kind'].",".$row['domain'].",".$row['name'].",".$row['shortDesc'].",".$row['pdesc'].",".$row['pvalue'].",".$row['size'].",".$row['unit'].",".$row['multiplicity'].",".$row['psetting'].",".$row['prole'].")<br/>";
+
             echo "<b>TC parametersequence:</b> (".$row['psid'].",".$row['idStandard'].",".$row['idParameter'].",".$row['idPacket'].",".$row['type'].",".$row['role'].",".$row['order'].",".$row['group'].",".$row['repetition'].",".$row['value'].",".$row['desc'].",".$row['setting'].")<br/>";
 
             $sql_type = "SELECT * FROM `type` WHERE id = ".$row['idType'];
@@ -392,12 +398,56 @@ if (isset($_POST["import"])) {
                 $num_rows_type_check = $result_type_check->num_rows;
                 echo "<font color=blue>=> ".$num_rows_type_check."</font><br/>";
                 if ($num_rows_type_check == 0) {
-                    echo "<font color=blue><b>TC type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/><br/>";
+                    echo "<font color=blue><b>TC type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/>";
+                    
+                    // INSERT 'type'
+                    $sql_insert_type = "INSERT INTO `type` ".
+                    "(`idStandard`, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, `setting`, `schema`) ".
+                    "VALUES ".
+                    "(".$idStandard.", '".$row_type['domain']."', '".$row_type['name']."', '".$row_type['nativeType']."', '".$row_type['desc']."', ".$row_type['size'].", '".$row_type['value']."', '".$row_type['setting']."', '".$row_type['schema']."')";
+                    echo "<font color=red>".$sql_insert_type."</font><br/>";
+                    $result_insert_type = $mysqli->query($sql_insert_type);
+                    // get type id
+                    $idType = $mysqli->insert_id;
+                    echo "<font color=red>".$idType."</font><br/>";
+                    
                } else {
                    $row_type_check = $result_type_check->fetch_assoc();
-                   echo "<font color=blue>TC type exists already with id = ".$row_type_check['id'].".</font><br/><br/>";
+                   echo "<font color=blue>TC type exists already with id = ".$row_type_check['id'].".</font><br/>";
+                   // get existing type id
+                   $idType = $row_type_check['id'];
+                   echo "<font color=red>".$idType."</font><br/>";
                }
             }
+
+            // INSERT `parameter`
+            $desc_corr = $row['pdesc'];
+            if ($desc_corr == "null") {
+                $desc_corr = "";
+            }
+            $size_corr = $row['size'];
+            if ($size_corr == "") {
+                $size_corr = "NULL";
+            }
+            $sql_insert_parameter = "INSERT INTO `parameter` ".
+            "(`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, `size`, `unit`, `multiplicity`, `setting`, `role`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idType.", ".$row['kind'].", '".$row['domain']."', '".$row['name']."', '".$row['shortDesc']."', '".$desc_corr."', '".$row['pvalue']."', ".$size_corr.", '".$row['unit']."', '".$row['multiplicity']."', '".$row['psetting']."', ".$row['prole'].")";
+            echo "<font color=red>".$sql_insert_parameter."</font><br/>";
+            $result_insert_parameter = $mysqli->query($sql_insert_parameter);
+            // get parameter id
+            $idParameter = $mysqli->insert_id;
+            echo "<font color=red>".$idParameter."</font><br/>";
+
+            // INSERT `parametersequence`
+            $sql_insert_parametersequence = "INSERT INTO `parametersequence` ".
+            "(`idStandard`, `idParameter`, `type`, `role`, `order`, `group`, `repetition`, `value`, `desc`, `setting`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idParameter.", ".$row['type'].", ".$row['role'].", ".$row['order'].", ".$row['group'].", ".$row['repetition'].", '".$row['value']."', '".$row['desc']."', '".$row['setting']."')";
+            echo "<font color=red>".$sql_insert_parametersequence."</font><br/>";
+            $result_insert_parametersequence = $mysqli->query($sql_insert_parametersequence);
+
+            echo "<br/>";
 
         }
     } else {
@@ -413,6 +463,7 @@ if (isset($_POST["import"])) {
     if ($result->num_rows > 0) {
         while($row = $result->fetch_assoc()) {
             echo "<b>TM parameter:</b> (".$row['pid'].",".$row['idStandard'].",".$row['idType'].",".$row['kind'].",".$row['domain'].",".$row['name'].",".$row['shortDesc'].",".$row['pdesc'].",".$row['pvalue'].",".$row['size'].",".$row['unit'].",".$row['multiplicity'].",".$row['psetting'].",".$row['prole'].")<br/>";
+            
             echo "<b>TM parametersequence:</b> (".$row['psid'].",".$row['idStandard'].",".$row['idParameter'].",".$row['idPacket'].",".$row['type'].",".$row['role'].",".$row['order'].",".$row['group'].",".$row['repetition'].",".$row['value'].",".$row['desc'].",".$row['setting'].")<br/>";
 
             $sql_type = "SELECT * FROM `type` WHERE id = ".$row['idType'];
@@ -427,12 +478,58 @@ if (isset($_POST["import"])) {
                 $num_rows_type_check = $result_type_check->num_rows;
                 echo "<font color=blue>=> ".$num_rows_type_check."</font><br/>";
                 if ($num_rows_type_check == 0) {
-                    echo "<font color=blue><b>TM type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/><br/>";
+                    echo "<font color=blue><b>TM type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/>";
+                    
+                    // INSERT 'type'
+                    $sql_insert_type = "INSERT INTO `type` ".
+                    "(`idStandard`, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, `setting`, `schema`) ".
+                    "VALUES ".
+                    "(".$idStandard.", '".$row_type['domain']."', '".$row_type['name']."', '".$row_type['nativeType']."', '".$row_type['desc']."', ".$row_type['size'].", '".$row_type['value']."', '".$row_type['setting']."', '".$row_type['schema']."')";
+                    echo "<font color=red>".$sql_insert_type."</font><br/>";
+                    $result_insert_type = $mysqli->query($sql_insert_type);
+                    // get type id
+                    $idType = $mysqli->insert_id;
+                    //$idType = 3;
+                    echo "<font color=red>".$idType."</font><br/>";
+                    
                } else {
                    $row_type_check = $result_type_check->fetch_assoc();
-                   echo "<font color=blue>TM type exists already with id = ".$row_type_check['id'].".</font><br/><br/>";
+                   echo "<font color=blue>TM type exists already with id = ".$row_type_check['id'].".</font><br/>";
+                   // get existing type id
+                   $idType = $row_type_check['id'];
+                   echo "<font color=red>".$idType."</font><br/>";
                }
             }
+
+            // INSERT `parameter`
+            $desc_corr = $row['pdesc'];
+            if ($desc_corr == "null") {
+                $desc_corr = "";
+            }
+            $size_corr = $row['size'];
+            if ($size_corr == "") {
+                $size_corr = "NULL";
+            }
+            $sql_insert_parameter = "INSERT INTO `parameter` ".
+            "(`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, `size`, `unit`, `multiplicity`, `setting`, `role`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idType.", ".$row['kind'].", '".$row['domain']."', '".$row['name']."', '".$row['shortDesc']."', '".$desc_corr."', '".$row['pvalue']."', ".$size_corr.", '".$row['unit']."', '".$row['multiplicity']."', '".$row['psetting']."', ".$row['prole'].")";
+            echo "<font color=red>".$sql_insert_parameter."</font><br/>";
+            $result_insert_parameter = $mysqli->query($sql_insert_parameter);
+            // get parameter id
+            $idParameter = $mysqli->insert_id;
+            //$idParameter = 123456;
+            echo "<font color=red>".$idParameter."</font><br/>";
+
+            // INSERT `parametersequence`
+            $sql_insert_parametersequence = "INSERT INTO `parametersequence` ".
+            "(`idStandard`, `idParameter`, `type`, `role`, `order`, `group`, `repetition`, `value`, `desc`, `setting`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idParameter.", ".$row['type'].", ".$row['role'].", ".$row['order'].", ".$row['group'].", ".$row['repetition'].", '".$row['value']."', '".$row['desc']."', '".$row['setting']."')";
+            echo "<font color=red>".$sql_insert_parametersequence."</font><br/>";
+            $result_insert_parametersequence = $mysqli->query($sql_insert_parametersequence);
+
+            echo "<br/>";
 
         }
     } else {
@@ -441,6 +538,7 @@ if (isset($_POST["import"])) {
     }
     
     if(!empty($sel_service_type)) {
+    // Import Services
         foreach($sel_service_type as $check) {
             echo "Service: id = ".$check." <br/>";
             
@@ -455,14 +553,32 @@ if (isset($_POST["import"])) {
                 $num_rows_serv_check = $result_serv_check->num_rows;
                 echo "<font color=blue>=> ".$num_rows_serv_check."</font><br/>";
                 if ($num_rows_serv_check == 0) {
-                    echo "<font color=blue><b>Service</b></font> (".$row_serv['id'].",".$row_serv['idStandard'].",".$row_serv['name'].",".$row_serv['desc'].",".$row_serv['type'].",".$row_serv['setting'].")<br/><br/>";
+                    echo "<font color=blue><b>Service</b></font> (".$row_serv['id'].",".$row_serv['idStandard'].",".$row_serv['name'].",".$row_serv['desc'].",".$row_serv['type'].",".$row_serv['setting'].")<br/>";
+                    
+                    // INSERT `service`
+                    $sql_insert_service = "INSERT INTO `service` ".
+                    "(`idStandard`, `name`, `desc` , `type`) ".
+                    "VALUES ".
+                    "(".$idStandard.", '".$row_serv['name']."', '".$row_serv['desc']."', ".$row_serv['type'].")";
+                    echo "<font color=red>".$sql_insert_service."</font><br/>";
+                    $result_insert_service = $mysqli->query($sql_insert_service);
+                    // get service id
+                    $idService = $mysqli->insert_id;
+                    //$idService = 12;
+                    echo "<font color=red>".$idService."</font><br/>";
+                    
                 } else {
                    $row_serv_check = $result_serv_check->fetch_assoc();
-                   echo "<font color=blue>Service exists already with id = ".$row_serv_check['id'].".</font><br/><br/>";
+                   echo "<font color=blue>Service exists already with id = ".$row_serv_check['id'].".</font><br/>";
+                   // get existing service id
+                   $idService = $row_serv_check['id'];
+                   echo "<font color=red>".$idService."</font><br/>";
                 }
             } else {
                 echo "<b>NO SERVICE FOUND (id = ".$check.")</b><br/><br/>";
             }
+            
+            echo "<br/>"; 
             
             // Sub-Services
             if(!empty($sel_service_subtypes[$check])) {
@@ -472,6 +588,7 @@ if (isset($_POST["import"])) {
             }
             echo "<br/>";
             if(!empty($sel_service_subtype[$check])) {
+            // Import Sub-Services
                 foreach($sel_service_subtype[$check] as $subtype) {
                    echo "Sub-Service: id = ".$subtype." <br/>";
                    
@@ -489,7 +606,29 @@ if (isset($_POST["import"])) {
                         if ($num_rows_subserv_check == 0) {
                             echo "<font color=blue><b>Sub-Service</b></font> (".$row_subserv['id'].",".$row_subserv['idStandard'].",".$row_subserv['type'].",".$row_subserv['name'].",".$row_subserv['desc'].",".$row_subserv['setting'].")<br/><br/>";
                         
-                            // get packet parameters
+                            // INSERT `packet` (sub-service)
+                            $sql_insert_packet = "INSERT INTO `packet` ".
+                            "(`idStandard`, `kind`, `type`, `subtype`, `discriminant`, `domain`, `name`, `shortDesc`, `desc`, `descParam`, `descDest`, `code`) ".
+                            "VALUES ".
+                            "(".$idStandard.", ".$row_subserv['kind'].", ".$row_subserv['type'].", ".$row_subserv['subtype'].", '".$row_subserv['discriminant']."', '".$row_subserv['domain']."', '".$row_subserv['name']."', '".$row_subserv['shortDesc']."', '".$row_subserv['desc']."', '".$row_subserv['descParam']."', '".$row_subserv['descDest']."', '".$row_subserv['code']."')";
+                            echo "<font color=red>".$sql_insert_packet."</font><br/>";
+                            $result_insert_packet = $mysqli->query($sql_insert_packet);
+                            // get packet id (sub-service)
+                            $idSubService = $mysqli->insert_id;
+                            //$idSubService = 123;
+                            echo "<font color=red>".$idSubService."</font><br/>";
+                        
+                        } else {
+                            $row_subserv_check = $result_subserv_check->fetch_assoc();
+                            echo "<font color=blue>Sub-servivce exists already with id = ".$row_subserv_check['id'].".</font><br/>";
+                            // get existing type id
+                            $idSubService = $row_subserv_check['id'];
+                            echo "<font color=red>".$idSubService."</font><br/>";
+                        }
+                        
+                        echo "<br/>"; 
+                        
+                        // get packet parameters
                             $sql_pckt_param = "SELECT * FROM `parametersequence` WHERE `idPacket` = ".$row_subserv['id'];
                             $result_pckt_param = $mysqli->query($sql_pckt_param);
                             $num_rows_pckt_param = mysqli_num_rows($result_pckt_param);
@@ -513,16 +652,83 @@ if (isset($_POST["import"])) {
                                         $num_rows_param_check = $result_param_check->num_rows;
                                         echo "<font color=blue>=> ".$num_rows_param_check."</font><br/>";
                                         if ($num_rows_param_check == 0) {
-                                            echo "<b>Parameter:</b> (".$row_param['id'].", ".$row_param['name'].")<br/><br/>";
+                                            echo "<b>Parameter:</b> (".$row_param['id'].", ".$row_param['name'].")<br/>";
                                             
                                             // check type !!!
+                                            
+                                            
+            $sql_type = "SELECT * FROM `type` WHERE id = ".$row_param['idType'];
+            $result_type = $mysqli->query($sql_type);
+            $row_type = $result_type->fetch_assoc();
+            if (empty($row_type['idStandard'])) {
+                echo "<font color=red><b>TM type:</b> (".$row_type['id'].")</font><br/><br/>";
+            } else {
+                // check if type already inserted: $idStandard / $row['idStandard']
+                $sql_type_check = "SELECT id FROM `type` WHERE `idStandard` = '".$idStandard."' AND `domain` = '".$row_type['domain']."' AND `name` = '".$row_type['name']."' AND `nativeType` = '".$row_type['nativeType']."' AND `desc` = '".$row_type['desc']."' AND `size` = '".$row_type['size']."' AND `value` = '".$row_type['value']."' AND `setting` = '".$row_type['setting']."' AND `schema` = '".$row_type['schema']."'";
+                $result_type_check = $mysqli->query($sql_type_check);
+                $num_rows_type_check = $result_type_check->num_rows;
+                echo "<font color=blue>=> ".$num_rows_type_check."</font><br/>";
+                if ($num_rows_type_check == 0) {
+                    echo "<font color=blue><b>TM type:</b></font> (".$row_type['id'].",".$row_type['idStandard'].",".$row_type['domain'].",".$row_type['name'].",".$row_type['nativeType'].",".$row_type['desc'].",".$row_type['size'].",".$row_type['value'].",".$row_type['setting'].",".$row_type['schema'].")<br/>";
+                    
+                    // INSERT 'type'
+                    $sql_insert_type = "INSERT INTO `type` ".
+                    "(`idStandard`, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, `setting`, `schema`) ".
+                    "VALUES ".
+                    "(".$idStandard.", '".$row_type['domain']."', '".$row_type['name']."', '".$row_type['nativeType']."', '".$row_type['desc']."', ".$row_type['size'].", '".$row_type['value']."', '".$row_type['setting']."', '".$row_type['schema']."')";
+                    echo "<font color=red>".$sql_insert_type."</font><br/>";
+                    $result_insert_type = $mysqli->query($sql_insert_type);
+                    // get type id
+                    $idType = $mysqli->insert_id;
+                    //$idType = 3;
+                    echo "<font color=red>".$idType."</font><br/>";
+                    
+               } else {
+                   $row_type_check = $result_type_check->fetch_assoc();
+                   echo "<font color=blue>TM type exists already with id = ".$row_type_check['id'].".</font><br/>";
+                   // get existing type id
+                   $idType = $row_type_check['id'];
+                   echo "<font color=red>".$idType."</font><br/>";
+               }
+            }
+                                            
+            // INSERT `parameter`
+            $desc_corr = $row_param['desc'];
+            if ($desc_corr == "null") {
+                $desc_corr = "";
+            }
+            $size_corr = $row_param['size'];
+            if ($size_corr == "") {
+                $size_corr = "NULL";
+            }
+            $sql_insert_parameter = "INSERT INTO `parameter` ".
+            "(`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, `size`, `unit`, `multiplicity`, `setting`, `role`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idType.", ".$row_param['kind'].", '".$row_param['domain']."', '".$row_param['name']."', '".$row_param['shortDesc']."', '".$desc_corr."', '".$row_param['value']."', ".$size_corr.", '".$row_param['unit']."', '".$row_param['multiplicity']."', '".$row_param['setting']."', ".$row_param['role'].")";
+            echo "<font color=red>".$sql_insert_parameter."</font><br/>";
+            $result_insert_parameter = $mysqli->query($sql_insert_parameter);
+            // get parameter id
+            $idParameter = $mysqli->insert_id;
+            //$idParameter = 123456;
+            echo "<font color=red>".$idParameter."</font><br/>";
+
+            // INSERT `parametersequence`
+            $sql_insert_parametersequence = "INSERT INTO `parametersequence` ".
+            "(`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, `repetition`, `value`, `desc`, `setting`) ".
+            "VALUES ".
+            "(".$idStandard.", ".$idParameter.", ".$idSubService.", ".$row_pckt_param['type'].", ".$row_pckt_param['role'].", ".$row_pckt_param['order'].", ".$row_pckt_param['group'].", ".$row_pckt_param['repetition'].", '".$row_pckt_param['value']."', '".$row_pckt_param['desc']."', '".$row_pckt_param['setting']."')";
+            echo "<font color=red>".$sql_insert_parametersequence."</font><br/>";
+            $result_insert_parametersequence = $mysqli->query($sql_insert_parametersequence);
+                                            
                                             
                                             
                                             
                                             
                                         } else {
-                                            echo "<font color=red><b>Parameter exists already!</b></font><br/><br/>";
+                                            echo "<font color=red><b>Parameter exists already!</b></font><br/>";
                                         }
+                                        
+                                        echo "<br/>";
                                     
                                     }
                                 
@@ -531,9 +737,9 @@ if (isset($_POST["import"])) {
                                 echo "No parameters found!<br/><br/>";
                             }
                         
-                        } else {
-                            echo "EXISTS<br/><br/>";
-                        }
+                        
+                        
+                        
                         
                    }
                    

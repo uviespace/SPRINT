@@ -55,7 +55,7 @@ $userName = $row["name"];
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>My Projects</h2>
+		            <h2><img src="img/projects_64x64.png" width="64" height="64">&nbsp;&nbsp;My Projects</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">

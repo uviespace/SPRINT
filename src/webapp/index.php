@@ -28,7 +28,7 @@ $userName = $row["name"];
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CORDET FW Editor</title>
+	<title>SRINT Editor</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -48,6 +48,19 @@ $userName = $row["name"];
 		var url = "http://localhost/dbeditor/";
 	</script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
+<style type="text/css">
+.sprint-logo {
+  padding-top: 5px;
+  padding-right: 10px;
+  margin-bottom: 15px;
+  color: #6f7787;
+  background-color: #d1e0ff; /* #fff799; */
+}
+.aho:hover {
+    background-color: red;
+    
+}
+	</style>
 <!--
 <style type="text/css">
  .topcorner{
@@ -84,7 +97,7 @@ $userName = $row["name"];
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>CORDET FW Editor</h2>
+		            <h2>Space Project Ressource Integration Network Toolbox</h2>
 		        </div>
 				
 				<!--
@@ -96,6 +109,27 @@ $userName = $row["name"];
 				-->
 		    </div>
 		</div>
+
+        <div>
+            The Space Project Ressource Integration Network Tool integrates following standards, resources and processes:
+            <ul>
+                <li>ECSS (European Co-operation for Space Standardisation) Software Engineering standardization and processes:
+                    <a href="https://ecss.nl/" target="_blank">ECSS</a>,
+                    <a href="https://www.esa.int/esapub/bulletin/bullet111/chapter21_bul111.pdf" target="_blank">Introducing ECSS Software-Engineering Standards within ESA (ESA bulletin 111 — august 2002)</a>,
+                </li>
+                <li>SCOS2000 Mission Control System (e.g. run-time database): 
+                    <a href="https://www.esa.int/Enabling_Support/Operations/Ground_Systems_Engineering/SCOS-2000" target="_blank">ESA - SCOS-2000</a>, 
+                    <a href="https://issues.cosmos.esa.int/solarorbiterwiki/download/attachments/23757668/MOC-applicable%20MIB%20egos-mcs-s2k-icd-0001-version7.0-FINAL.pdf?version=1&modificationDate=1522940882000&api=v2" target="_blank">MOC-applicable MIB egos-mcs-s2k-icd-0001-version7.0-FINAL.pdf</a>
+                </li>
+                <li>EGS-CC (European Ground Systems Common Core) - common infrastructure to support space systems monitoring and control in pre- and post-launch phases for all mission types:
+                    <a href="http://www.egscc.esa.int/" target="_blank">ESA - EGS-CC</a>
+                <li>CORDET Framework from PnP Software including code generation functionality (see below)</li>
+            </ul>
+        </div>
+
+        <div>
+            <h3><img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="120" style="background-color: darkblue; padding: 5px;"> CORDET FW Editor</h3>
+        </div>
 
 		<div>
 			The CORDET FW Editor is a web-based tool to support the specification of a PUS-based system communication 
@@ -126,9 +160,9 @@ $userName = $row["name"];
 <?php
 if ($userid == 1 || $userid == 1001) {
 ?>
-			<a href="mng_user.php" style="width:180px;" target="_self">
-				<button style="width:200px;text-align:left;">
-					<img src="img/users_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage users...
+			<a href="mng_user.php" target="_self">
+				<button style="width:220px;text-align:left;">
+					<img src="img/users_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage Users...
 				</button>
 			</a>
 			<br/>
@@ -136,33 +170,51 @@ if ($userid == 1 || $userid == 1001) {
 <?php
 }
 ?>
+			<a href="mng_acronym.php" target="_self">
+				<button style="width:220px;text-align:left;">
+					<img src="img/acronym_1_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage Acronyms...
+				</button>
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+			<a href="mng_reference.php" target="_self">
+				<button style="width:220px;text-align:left;">
+					<img src="img/reference_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage References...
+				</button>
+			</a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+			<a href="mng_organisation.php" target="_self">
+				<button style="width:220px;text-align:left;">
+					<img src="img/org_1_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage Organisations...
+				</button>
+			</a>
+			<br/>
+			<hr>
 			<a href="mng_project.php" target="_self">
-				<button style="width:200px;text-align:left;">
-					<img src="img/projects_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage my projects...
+				<button style="width:220px;text-align:left;">
+					<img src="img/projects_64x64.png" width="32" height="32">&nbsp;&nbsp;Manage My Projects...
 				</button>
 			</a>
 			<br/>
 			<br/>
 			<a href="sel_project.php" target="_self">
-				<button style="width:200px;text-align:left;">
-					&nbsp;&nbsp;<img src="img/open_64x64.png" width="16" height="16">&nbsp;&nbsp;Open projects...
+				<button style="width:220px;text-align:left;">
+					&nbsp;&nbsp;<img src="img/open_64x64.png" width="16" height="16">&nbsp;&nbsp;Open Projects...
 				</button>
 			</a>
 			<br/>
 			<hr>
-			<br/>
-			<br/>
-			<br/>
-			<br/>
-			<br/>
-			<hr>
-			<div style="text-align:right;">(c) 2019, University of Vienna</div>
+			<div style="float:left;">(c) 2019-2021, University of Vienna</div>
+            <div style="float:right;"><a href="">Impressum</a></div>
+            <div style="float:right;"><a class="aho" href="mng_media.php" style="color:white;">&nbsp;M&nbsp;</a>&nbsp;&nbsp;</div>
+            <br/>
 			<hr>
 			<br/>
 		</div>
 
 		<div class="topcorner_left">
-			<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
+            <div class="sprint-logo">
+                <img src="img/sprint_1_64x64.png" alt="Logo SPRINT" width="45"><b><font style="font-family: Helvetica, sans-serif; font-size: 200%;">SPRINT</font></b>
+            </div>
 			<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
 			<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
 			<br/><br/>

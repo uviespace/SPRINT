@@ -11,6 +11,7 @@ if(!isset($_SESSION['userid'])) {
 require 'api/db_config.php';
 
 if (isset($_GET["id"])) { $id  = $_GET["id"]; } else { $id=0; };
+if (isset($_GET["action"])) { $action  = $_GET["action"]; } else { $action=""; };
 $project_name = "Noname";
 $idProject = $id;
 
@@ -28,6 +29,135 @@ if ($result->num_rows > 0) {
     }
 } else {
     //echo "0 results";
+}
+
+if ($action == "exp_acr") {
+    //echo "Export List of Acronyms ...<br/>";
+    
+    $path_tmp = "documentation/out/"; // could also be tmp/
+    $filename = "acr_".$project_name.".csv";
+    $file = $path_tmp . $filename;
+    
+    // get file content
+    $result = getAcronyms($mysqli, $idProject);
+    
+    $newcontent = "";
+    $delimiter = ";";
+    $shortList = false;
+    while ($row = $result->fetch_assoc()) {
+        if ($shortList) {
+            $newcontent .= $row['name'].$delimiter.$row['shortDesc']."\n"; 
+        } else {
+            $newcontent .= $row['name'].$delimiter.$row['shortDesc'].$delimiter.$row['desc']."\n"; 
+        }
+    }
+    
+    // open, write and close file
+    $myfile = fopen($file, "w");
+    fwrite($myfile, $newcontent);
+    fclose($myfile);
+
+    // open/download file in browser
+    
+    // Header content type
+    header('Content-type: 	text/csv');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    header('Content-Transfer-Encoding: binary');
+    header('Accept-Ranges: bytes');
+    
+    // Read the file
+    @readfile($file);
+    
+    // delete file
+    unlink($file);
+    
+    // end page
+    die('');
+
+} else if ($action == "exp_ref") {
+    //echo "Export List of References ...<br/>";
+    
+    $path_tmp = "documentation/out/"; // could also be tmp/
+    $filename = "ref_".$project_name.".csv";
+    $file = $path_tmp . $filename;
+    
+    // get file content
+    $result = getReferences($mysqli, $idProject);
+    
+    $newcontent = "";
+    $delimiter = ";";
+    $shortList = false;
+    while ($row = $result->fetch_assoc()) {
+        if ($shortList) {
+            $newcontent .= $row['name'].$delimiter.$row['shortName']."\n"; 
+        } else {
+            $newcontent .= $row['name'].$delimiter.$row['shortName'].$delimiter.$row['number'].$delimiter.$row['identifier'].$delimiter.$row['version'].$delimiter.$row['date']."\n"; 
+        }
+    }
+    
+    // open, write and close file
+    $myfile = fopen($file, "w");
+    fwrite($myfile, $newcontent);
+    fclose($myfile);
+
+    // open/download file in browser
+    
+    // Header content type
+    header('Content-type: 	text/csv');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    header('Content-Transfer-Encoding: binary');
+    header('Accept-Ranges: bytes');
+    
+    // Read the file
+    @readfile($file);
+    
+    // delete file
+    unlink($file);
+    
+    // end page
+    die('');
+}
+
+function getAcronyms($mysqli, $idProject) {
+    $sql = "SELECT ".
+      "pa.id AS id, a.id AS idAcronym, a.name, a.shortDesc, a.desc ".
+      "FROM ".
+      "`projectacronym` AS pa, `acronym` AS a ".
+      "WHERE ".
+      "pa.idAcronym = a.id AND ".
+      "pa.idProject = ".$idProject." ".
+      "ORDER BY ".
+      "a.name ".
+      "ASC";
+    
+    return $mysqli->query($sql);
+}
+
+function getReferences($mysqli, $idProject) {
+    /*$sql = "SELECT ".
+      "pd.id AS id, d.id AS idDocument, d.name, d.shortName, d.number ".
+      "FROM ".
+      "`projectdocument` AS pd, `document` AS d ".
+      "WHERE ".
+      "pd.idDocument = d.id AND ".
+      "pd.idProject = ".$idProject." ".
+      "ORDER BY ".
+      "d.name ".
+      "ASC";*/
+    
+    $sql = "SELECT ".
+      "pd.id AS id, d.id AS idDocument, d.name, d.shortName, d.number, dv.* ".
+      "FROM ".
+      "`projectdocument` AS pd, `document` AS d, `docversion` AS dv ".
+      "WHERE ".
+      "dv.idDocument = d.id AND ".
+      "pd.idDocument = d.id AND ".
+      "pd.idProject = ".$idProject." ".
+      "ORDER BY ".
+      "d.name ".
+      "ASC";
+    
+    return $mysqli->query($sql);
 }
 
 //Abfrage der Nutzer ID vom Login
@@ -66,6 +196,16 @@ $userEmail = $row["email"];
 	</script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
 	<style type="text/css">
+
+        .badge {
+            position: relative;
+            top: -11px;
+            left: -10px;
+            border: 0px solid black;
+            border-radius: 75%;
+            background-color: green;
+            font-size: 7px;
+        }
 
 	</style>
 </head>
@@ -151,9 +291,19 @@ if ($result->num_rows > 0) {
 
 <h3>Document Management</h3>
 
-<a href="sel_project-documentation.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Documents ...</button></a>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<a href="sel_project-documentation.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Documents ...</button></a>
 
-<a href="sel_project-acronyms.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Acronyms ...</button></a>
+<br/><br/>
+
+<a href="view_project-acronyms.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Acronyms ...</button></a>
+<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_acr"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php echo mysqli_num_rows(getAcronyms($mysqli, $idProject)); ?></span></span></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="view_project-references.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage References ...</button></a>
+<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php echo mysqli_num_rows(getReferences($mysqli, $idProject)); ?></span></span></a>
+&nbsp;&nbsp;&nbsp;
+
+<a href="view_project-organisations.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Organisations ...</button></a>
 
 <br/><br/>
 

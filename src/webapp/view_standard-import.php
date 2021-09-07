@@ -143,6 +143,7 @@ $userEmail = $row["email"];
 		<form action="view_standard-import.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" method="post">
 			<b>Select Project:</b>
 <?php
+// TODO: select only project's the current user should have access (not available for guests!)
 $sql = "SELECT * FROM `project` WHERE `id` <> ".$idProject;
 
 $result = $mysqli->query($sql);

@@ -28,7 +28,7 @@ $userName = $row["name"];
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CORDET Editor - Users</title>
+	<title>CORDET Editor - Organisations</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -46,8 +46,16 @@ $userName = $row["name"];
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
 	<script type="text/javascript">
 		var url = "http://localhost/dbeditor/";
+        function auto_grow(element) {
+            element.style.height = "5px";
+            element.style.height = (element.scrollHeight)+"px";
+        }
+        function adjust_height(id){
+            var el = document.getElementById(id) 
+            el.style.height = (el.scrollHeight > el.clientHeight) ? (el.scrollHeight)+"px" : "60px";
+        }
 	</script>
-	<script type="text/javascript" src="js/item-ajax_mng-users.js"></script>
+	<script type="text/javascript" src="js/item-ajax_mng-organisations.js"></script>
 </head>
 <body>
 
@@ -55,7 +63,7 @@ $userName = $row["name"];
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2><img src="img/users_64x64.png" width="64" height="64">&nbsp;&nbsp;Users</h2>
+		            <h2><img src="img/org_1_64x64.png" width="64" height="64">&nbsp;&nbsp;Organisations</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
@@ -70,8 +78,9 @@ $userName = $row["name"];
 			    <tr>
 				<th>ID</th>
 				<th>Name</th>
-				<th>Email</th>
-				<th>Setting</th>
+				<th>Short Description</th>
+				<th>Country</th>
+				<th>Description</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
@@ -91,7 +100,7 @@ $userName = $row["name"];
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_mng-user.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_mng-organisation.php" method="POST">
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
@@ -100,14 +109,28 @@ $userName = $row["name"];
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Email:</label>
-							<input name="email" class="form-control" data-error="Please enter email." required />
+							<label class="control-label" for="title">Short Description:</label>
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<!--<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<input type="text" name="idCountry" class="form-control" data-error="Please enter country." required />
+							<div class="help-block with-errors"></div>
+						</div>-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<select id="sel_country_create" name="idCountry" class="form-control" data-error="Please enter country." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting." readonly></textarea>
+							<label class="control-label" for="title">Description:</label>
+							<textarea name="desc" class="form-control" style="overflow: hidden;" onInput="auto_grow(this)" data-error="Please enter description." ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -133,7 +156,7 @@ $userName = $row["name"];
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_mng-user.php" method="put">
+					<form data-toggle="validator" action="api/update_mng-organisation.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
@@ -144,14 +167,28 @@ $userName = $row["name"];
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Email:</label>
-							<input type="text" name="email" class="form-control" data-error="Please enter email." required />
+							<label class="control-label" for="title">Short Description:</label>
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<!--<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<input type="text" name="idCountry" class="form-control" data-error="Please enter country." required />
+							<div class="help-block with-errors"></div>
+						</div>-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<select id="sel_country" name="idCountry" class="form-control" data-error="Please enter country." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting." readonly></textarea>
+							<label class="control-label" for="title">Description:</label>
+							<textarea name="desc" class="form-control" style="min-height:75px;" onInput="auto_grow(this)" data-error="Please enter description." ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 

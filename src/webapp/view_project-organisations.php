@@ -1,3 +1,6 @@
+<!DOCTYPE html>
+<html>
+
 <?php
 session_start();
 if(!isset($_SESSION['userid'])) {
@@ -10,25 +13,40 @@ if(!isset($_SESSION['userid'])) {
 }
 require 'api/db_config.php';
 
-//Abfrage der Nutzer ID vom Login
-$userid = $_SESSION['userid'];
- 
-//echo "Hallo User: ".$userid;
+if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
+$project_name = "";
 
-// get user name from database
-$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$sql = "SELECT * FROM `project` WHERE `id` = ".$idProject;
 
 $result = $mysqli->query($sql);
 
+$num_rows = mysqli_num_rows($result);
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        $project_name = $row["name"];
+    }
+} else {
+    //echo "0 results for projects";
+}
+
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
 $row = $result->fetch_assoc();
 
 $userName = $row["name"];
+$userEmail = $row["email"];
 
 ?>
-<!DOCTYPE html>
-<html>
+
 <head>
-	<title>CORDET Editor - Users</title>
+	<title>Project - Document Management - Organisations</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -42,20 +60,25 @@ $userName = $row["name"];
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js -->
 	<script type="text/javascript" src="ext/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
-	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"> 
+	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
 	<script type="text/javascript">
 		var url = "http://localhost/dbeditor/";
 	</script>
-	<script type="text/javascript" src="js/item-ajax_mng-users.js"></script>
+	<script type="text/javascript" src="js/item-ajax_view-project-organisation.js"></script>
+	<style type="text/css">
+
+	</style>
 </head>
 <body>
 
 	<div class="container">
+
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2><img src="img/users_64x64.png" width="64" height="64">&nbsp;&nbsp;Users</h2>
+					<h4>Project <?php echo $project_name;?></h4>
+		            <h2>Document Management - Organisations</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
@@ -65,17 +88,34 @@ $userName = $row["name"];
 		    </div>
 		</div>
 
+		<ul id="pagination" class="pagination-sm"></ul>
+
+		<div class="result_nmb_rows">
+			<input id="result_nmb" class="result_nmb" type="text" readonly />
+		</div>
+
+		<div class="search">
+			<button type="submit" class="btn crud-submit-show" data-toggle="modal" data-target="#show-all">
+			  Show all
+			</button>
+			<input id="liveSearch" type="search" placeholder="Search...">
+		</div>
+
+		<br/>
+
 		<table class="table table-bordered">
 			<thead>
 			    <tr>
 				<th>ID</th>
+                <th>ID ORG</th>
 				<th>Name</th>
-				<th>Email</th>
-				<th>Setting</th>
+				<th>Short Description</th>
+				<th>Country</th>
+				<th>Description</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
-			<tbody>
+			<tbody id="myTable">
 			</tbody>
 		</table>
 
@@ -91,23 +131,49 @@ $userName = $row["name"];
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_mng-user.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_view-project-organisation.php" method="POST">
+
+						<div class="form-group">
+							<input type="hidden" name="idProject" value="<?php echo $idProject; ?>" />
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Organisation:</label>
+							<select id="sel_organisation_create" name="idOrg_create" class="form-control" onchange="updateDivOrganisationCreate();" data-error="Please enter organisation." required>
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<input id="name_create" type="text" name="name" class="form-control" data-error="Please enter name." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Email:</label>
-							<input name="email" class="form-control" data-error="Please enter email." required />
+							<label class="control-label" for="title">Short Description:</label>
+							<input id="shortDesc_create" type="text" name="shortDesc" class="form-control" data-error="Please enter short description." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting." readonly></textarea>
+							<label class="control-label" for="title">Country:</label>
+							<input id="idCountry_create" type="text" name="idCountry" class="form-control" data-error="Please enter country." readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<!--<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<select id="sel_country_create" name="idCountry" class="form-control" data-error="Please enter country." readonly>
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Description:</label>
+							<textarea id="desc_create" name="desc" class="form-control" style="overflow: hidden;" onInput="auto_grow(this)" data-error="Please enter description." readonly></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -133,25 +199,47 @@ $userName = $row["name"];
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_mng-user.php" method="put">
+					<form data-toggle="validator" action="api/update_view-project-organisation.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
 						<div class="form-group">
+							<label class="control-label" for="title">Organisation:</label>
+							<select id="sel_organisation" name="idOrg" class="form-control" onchange="updateDivOrganisation();" data-error="Please enter organisation." required>
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<input id="name" type="text" name="name" class="form-control" data-error="Please enter name." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Email:</label>
-							<input type="text" name="email" class="form-control" data-error="Please enter email." required />
+							<label class="control-label" for="title">Short Description:</label>
+							<input id="shortDesc" type="text" name="shortDesc" class="form-control" data-error="Please enter short description." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Setting:</label>
-							<textarea name="setting" class="form-control" data-error="Please enter setting." readonly></textarea>
+							<label class="control-label" for="title">Country:</label>
+							<input id="idCountry" type="text" name="idCountry" class="form-control" data-error="Please enter country." readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<!--<div class="form-group">
+							<label class="control-label" for="title">Country:</label>
+							<select id="idCountry" id="sel_country" name="idCountry" class="form-control" data-error="Please enter country." readonly>
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Description:</label>
+							<textarea id="desc" name="desc" class="form-control" style="min-height:75px;" onInput="auto_grow(this)" data-error="Please enter description." readonly></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -167,6 +255,7 @@ $userName = $row["name"];
 		  
 		</div>
 
+
 				<div class="topcorner_left">
 					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
 					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
@@ -177,6 +266,8 @@ $userName = $row["name"];
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
+					<a class="a_btn" href="open_project.php?id=<?php echo $idProject; ?>" target="_self">>> BACK <<</a>
+					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>
 

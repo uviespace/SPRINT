@@ -1,6 +1,6 @@
 # Space Project Ressource Integration Network Toolbox
 
-The Space Project Ressource Integration Network Tool integrates following standards, resources and processes:
+The Space Project Ressource Integration Network Toolbox integrates following standards, resources and processes:
 
 * ECSS (European Co-operation for Space Standardisation) Software Engineering standardization and processes: ECSS (https://ecss.nl/), Introducing ECSS Software-Engineering Standards within ESA (ESA bulletin 111 — august 2002) (https://www.esa.int/esapub/bulletin/bullet111/chapter21_bul111.pdf),
 * SCOS2000 Mission Control System (e.g. run-time database): ESA - SCOS-2000 (https://www.esa.int/Enabling_Support/Operations/Ground_Systems_Engineering/SCOS-2000), MOC-applicable MIB egos-mcs-s2k-icd-0001-version7.0-FINAL.pdf (https://issues.cosmos.esa.int/solarorbiterwiki/download/attachments/23757668/MOC-applicable%20MIB%20egos-mcs-s2k-icd-0001-version7.0-FINAL.pdf?version=1&modificationDate=1522940882000&api=v2)

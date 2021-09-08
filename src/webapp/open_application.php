@@ -113,6 +113,10 @@ $userEmail = $row["email"];
 		}
 	}
 
+	if(isset($_POST['importAcrList'])){
+		$messageAcrImport = "The Import Acronym List function is called.\n\n";
+	}
+
 	if(isset($_POST['buildDpList'])){
 		$messageDpList = "The build Data Pool CSV function is called.\n\n";
 		
@@ -157,9 +161,8 @@ $userEmail = $row["email"];
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
-		
 		function buildProject(idProject, idApplication) {
 			toastr.success('Debug: Project: '+idProject+', Application: '+idApplication, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: START ...', 'Success Alert', {timeOut: 5000}); 
@@ -244,6 +247,41 @@ $userEmail = $row["email"];
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
                     <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist"> &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
                 </form>
+
+                <br/><br/>
+
+				<form id="formAcrGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
+
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          CSV delimiter
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="csvDelimiter" class="form-control" data-error="Please enter DP domain." required />
+                      </div>
+                  </div>
+                  </div>
+
+                </form>
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_acronym-import.php?'+Array.prototype.slice.call(formAcrGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Select Acronym List to Upload
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
+                      </div>
+                  </div>
+                  </div>
+					
+					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+					<input type="submit" name="importAcrList" value="Import Acronym List" class="btn btn-success crud-submit-import-acrlist"><br/><br/>
+					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageAcrImport)){ echo $messageAcrImport;}?></textarea>
+				</form>
 
                 <br/><br/>
 

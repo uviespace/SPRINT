@@ -178,9 +178,7 @@ function get_header_len($mysqli, $standard_id, $header_type) {
 	<!-- https://github.com/knownasilya/jquery-highlight -->
 	<script type="text/javascript" src="ext/jquery.highlite.js"></script>
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
-	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
-	</script>
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
 	<script type="text/javascript" src="js/item-ajax_view-packet-params-derived.js"></script>
 </head>

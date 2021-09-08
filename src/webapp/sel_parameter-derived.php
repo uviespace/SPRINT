@@ -80,10 +80,7 @@ $userEmail = $row["email"];
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"> 
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
-	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
-		
-	</script>
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
 	<style type="text/css">
 

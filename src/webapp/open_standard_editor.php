@@ -102,9 +102,8 @@ $userEmail = $row["email"];
     
     
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
-		
 		function buildProject(idProject, idApplication) {
 			toastr.success('Debug: Project: '+idProject+', Application: '+idApplication, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: START ...', 'Success Alert', {timeOut: 5000}); 

@@ -84,9 +84,7 @@ $userEmail = $row["email"];
 	
 
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
-	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
-	</script>
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
 	<script type="text/javascript" src="js/item-ajax_view-packet.js"></script>
 </head>

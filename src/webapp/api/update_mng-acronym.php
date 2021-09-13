@@ -14,6 +14,11 @@
 
   $result = $mysqli->query($sql);
 
+  if ($post['idClassification']!='undefined') {
+      $sql = "UPDATE `acronymclassification` SET `idClassification` = ".$post['idClassification']." WHERE `idAcronym` = ".$id;
+      $result = $mysqli->query($sql);
+  }
+
 
   $sql = "SELECT * FROM `acronym` WHERE `id` = '".$id."'"; 
 

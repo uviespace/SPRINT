@@ -265,7 +265,7 @@ $userEmail = $row["email"];
 
                 </form>
 				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
-				onsubmit="this.action='view_acronym-import.php?'+Array.prototype.slice.call(formAcrGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+				onsubmit="this.action='view_acronym-import.php?idProject=<?php echo $idProject; ?>&'+Array.prototype.slice.call(formAcrGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
                   <div class="table">
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">

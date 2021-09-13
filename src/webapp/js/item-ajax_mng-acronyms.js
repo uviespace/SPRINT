@@ -6,13 +6,62 @@ var total_page = 0;
 var is_ajax_fire = 0;
 var dropdown = "";
 
+var classification = getUrlVars()["classification"];
+//toastr.success('Classification = '+classification, 'Success Alert', {timeOut: 5000});
+if (classification==undefined) { classification=-1; }
+
+    getDropdownDataClassificationCreate();
+
 manageData();
+
+/* get variables from URL */
+function getUrlVars() {
+    var vars = {};
+    var parts = window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi, function(m,key,value) {
+        vars[key] = value;
+    });
+    return vars;
+}
 
 /* manage data list */
 function manageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_mng-acronyms.php',
+		url: url+'api/getData_mng-acronyms.php?classification='+classification,
+		data: {page:page}
+	}).done(function(data){
+		total_page = Math.ceil(data.total/5);
+		current_page = page;
+		if (data.total == 0) {
+			total_page = 1;
+			current_page = 1;
+		}
+
+		$('#pagination').twbsPagination({
+			totalPages: total_page,
+			visiblePages: current_page,
+			onPageClick: function (event, pageL) {
+				page = pageL;
+				if(is_ajax_fire != 0){
+					getPageData();
+				}
+			}
+		});
+
+		$("#result_nmb").val(data.total);
+
+		manageRow(data.data);
+		is_ajax_fire = 1;
+
+	});
+
+}
+
+/* manage data list */
+function manageDataAll() {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_mng-acronyms.php?classification='+classification+'&showAll=1',
 		data: {page:page}
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
@@ -36,11 +85,57 @@ function manageData() {
 
 }
 
+/* Get Dropdown Data for Acronym Classification */
+function getDropdownDataClassification(idClassification) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-classification.php',
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionClassification(data.data, idClassification);
+	});
+}
+
+/* Add new option to select */
+function manageOptionClassification(data, idClassification) {
+	$("#sel_classification").empty();
+    if (idClassification=='undefined') {
+        $("#sel_classification").append('<option value="" selected>undefined</option>');
+    } 
+	$.each( data, function( key, value ) {
+		if (idClassification==value.id) {
+			$("#sel_classification").append('<option value="'+value.id+'" selected>'+value.name+' ('+value.id+')</option>');
+		} else {
+			$("#sel_classification").append('<option value="'+value.id+'">'+value.name+' ('+value.id+')</option>');
+		}
+	});
+}
+
+/* Get Dropdown Data for Acronym Classification */
+function getDropdownDataClassificationCreate() {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-classification.php',
+		data: {dropdown:dropdown}
+	}).done(function(data){
+		manageOptionClassificationCreate(data.data);
+	});
+}
+
+/* Add new option to select */
+function manageOptionClassificationCreate(data) {
+	$("#sel_classification_create").empty();
+	$("#sel_classification_create").append('<option value="" selected>--- Please select ---</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_classification_create").append('<option value="'+value.id+'">'+value.name+' ('+value.id+')</option>');
+	});
+}
+
 /* Get Page Data*/
 function getPageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_mng-acronyms.php',
+		url: url+'api/getData_mng-acronyms.php?classification='+classification,
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);
@@ -59,6 +154,7 @@ function manageRow(data) {
         rows = rows + '<td>'+value.name+'</td>';
         rows = rows + '<td>'+value.shortDesc+'</td>';
         rows = rows + '<td>'+value.desc+'</td>';
+        rows = rows + '<td>'+value.idClassification+'</td>';
         rows = rows + '<td data-id="'+value.id+'">';
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
         rows = rows + '<button class="btn btn-success change-status">Chg</button> ';
@@ -69,6 +165,11 @@ function manageRow(data) {
 
     $("tbody").html(rows);
 }
+
+/* Show all Items */
+$(".crud-submit-show").click(function(e){
+    manageDataAll();
+});
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
@@ -134,9 +235,12 @@ $("body").on("click",".remove-item",function(){
 $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").text();
-    var desc = $(this).parent("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var desc = $(this).parent("td").prev("td").prev("td").text();
+    var idClassification = $(this).parent("td").prev("td").text();
+
+    getDropdownDataClassification(idClassification);
 
     $("#edit-item").find("input[name='name']").val(name);
     $("#edit-item").find("input[name='shortDesc']").val(shortDesc);
@@ -153,6 +257,7 @@ $(".crud-submit-edit").click(function(e){
     var name = $("#edit-item").find("input[name='name']").val();
     var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
     var desc = $("#edit-item").find("textarea[name='desc']").val();
+    var idClassification = $("#edit-item").find("select[name='idClassification']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
     if(id != '' && name != '' && shortDesc != ''){
@@ -160,7 +265,7 @@ $(".crud-submit-edit").click(function(e){
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, name:name, shortDesc:shortDesc, desc:desc}
+            data:{id:id, name:name, shortDesc:shortDesc, desc:desc, idClassification:idClassification}
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');

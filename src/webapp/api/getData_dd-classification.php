@@ -10,11 +10,9 @@ if (isset($_GET["id"])) { $id = $_GET["id"]; } else { $id=0; };
 /*$start_from = ($page-1) * $num_rec_per_page;*/
 
 if ($id==0) {
-/*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `acronym` ORDER BY `name` ASC"; 
+    $sql = "SELECT * FROM `classification` ORDER BY `id` ASC"; 
 } else {
-/*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `acronym` WHERE `id` = ".$id." ORDER BY `name` ASC"; 
+    $sql = "SELECT * FROM `classification` WHERE `id` = ".$id." ORDER BY `name` ASC"; 
 }
 
 $result = $mysqli->query($sql);

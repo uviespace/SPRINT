@@ -10,6 +10,9 @@ if(!isset($_SESSION['userid'])) {
 }
 require 'api/db_config.php';
 
+if (isset($_GET["classification"])) { $classification  = $_GET["classification"]; } else { $classification=-1; };
+//echo "classification = ".$classification;
+
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
  
@@ -43,8 +46,11 @@ $userName = $row["name"];
 	<script type="text/javascript" src="ext/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"> 
+	<!-- https://github.com/knownasilya/jquery-highlight -->
+	<script type="text/javascript" src="ext/jquery.highlite.js"></script>
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
+	<script type="text/javascript" src="int/livesearch.js"></script>
 	<script type="text/javascript">
         function auto_grow(element) {
             element.style.height = "5px";
@@ -73,6 +79,52 @@ $userName = $row["name"];
 		    </div>
 		</div>
 
+        <div>
+            <form data-toggle="validator" action="mng_acronym.php" method="POST">
+                <div class="form-group">
+                    <label class="control-label" for="title">Classification:</label>
+                    <select class="form-control" style="width:300px;" name="classification" onChange="window.location='mng_acronym.php?classification='+this.value">
+<?php
+if ($classification==-1) {
+    echo "<option value='-1' selected>ALL</option>";
+} else {
+    echo "<option value='-1'>ALL</option>";
+}
+if ($classification==0) {
+    echo "<option value='0' selected>NO CLASSIFICATION</option>";
+} else {
+    echo "<option value='0'>NO CLASSIFICATION</option>";
+}
+$sql = "SELECT * FROM `classification`";
+$result = $mysqli->query($sql);
+while($row = $result->fetch_assoc()) {
+    if ($classification==$row['id']) {
+        echo "<option value='".$row['id']."' selected>".$row['name']." (".$row['id'].")</option>";
+    } else {
+        echo "<option value='".$row['id']."'>".$row['name']." (".$row['id'].")</option>";
+    }
+}
+?>
+                    </select>
+                </div>
+            </form>
+        </div>
+
+		<ul id="pagination" class="pagination-sm"></ul>
+
+		<div class="result_nmb_rows" style="top:182px;">
+			<input id="result_nmb" class="result_nmb" type="text" readonly />
+		</div>
+
+		<div class="search" style="top:167px;">
+			<button type="submit" class="btn crud-submit-show" data-toggle="modal" data-target="#show-all">
+			  Show all
+			</button>
+			<input id="liveSearch" type="search" placeholder="Search...">
+		</div>
+
+		<br/>
+
 		<table class="table table-bordered">
 			<thead>
 			    <tr>
@@ -80,14 +132,15 @@ $userName = $row["name"];
 				<th>Name</th>
 				<th>Short Description</th>
 				<th width="450px">Description</th>
+				<th>Classification</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
-			<tbody>
+			<tbody id="myTable">
 			</tbody>
 		</table>
 
-		<ul id="pagination" class="pagination-sm"></ul>
+		<!--<ul id="pagination" class="pagination-sm"></ul>-->
 
 		<!-- Create Item Modal -->
 		<div class="modal fade" id="create-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -116,6 +169,14 @@ $userName = $row["name"];
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
 							<textarea name="desc" class="form-control" style="overflow: hidden;" onInput="auto_grow(this)" data-error="Please enter description." ></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Classification:</label>
+							<select id="sel_classification_create" name="classification" class="form-control" data-error="Please enter classification." >
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -160,6 +221,14 @@ $userName = $row["name"];
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
 							<textarea name="desc" class="form-control" style="min-height:75px;" onInput="auto_grow(this)" data-error="Please enter description." ></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Classification:</label>
+							<select id="sel_classification" name="classification" class="form-control" data-error="Please enter classification." >
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 

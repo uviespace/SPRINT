@@ -61,8 +61,11 @@ $userEmail = $row["email"];
 	<script type="text/javascript" src="ext/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
+	<!-- https://github.com/knownasilya/jquery-highlight -->
+	<script type="text/javascript" src="ext/jquery.highlite.js"></script>
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
+	<script type="text/javascript" src="int/livesearch.js"></script>
 	<script type="text/javascript" src="js/item-ajax_view-project-acronym.js"></script>
 	<style type="text/css">
 

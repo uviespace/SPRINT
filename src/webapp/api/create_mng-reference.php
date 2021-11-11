@@ -35,7 +35,7 @@ $post = $_POST;
  // check, if identifier already exists. 
  // if yes, get document ID
  // if no, add new document to `document` and get document ID of newly inserted document
- $sql = "SELECT d.id as docId, d.*, dv.* FROM `document` AS d, `docversion` AS dv WHERE dv.idDocument = d.id AND dv.identifier = ".$post['identifier'];
+ $sql = "SELECT d.id as docId, d.*, dv.* FROM `document` AS d, `docversion` AS dv WHERE dv.idDocument = d.id AND dv.identifier = '".$post['identifier']."'";
  
  $result = $mysqli->query($sql);
  

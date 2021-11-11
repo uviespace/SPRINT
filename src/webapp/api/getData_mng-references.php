@@ -16,7 +16,7 @@ $sql = "SELECT ".
   "WHERE ".
   "dv.idDocument = d.id AND ".
   "d.idOrg = o.id ".
-  "ORDER BY date ASC LIMIT $start_from, $num_rec_per_page";
+  "ORDER BY str_to_date(date,'%d.%m.%Y') ASC LIMIT $start_from, $num_rec_per_page";
 
 /*$sql = "SELECT project.id, project.name, project.desc, user.name AS owner, project.isPublic, project.setting FROM `user`, `userproject`, `project` WHERE userproject.idProject = project.id AND userproject.idUser = user.id AND userproject.idRole = 2 ORDER BY project.id DESC LIMIT $start_from, $num_rec_per_page";*/
 

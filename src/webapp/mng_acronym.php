@@ -27,6 +27,14 @@ $row = $result->fetch_assoc();
 
 $userName = $row["name"];
 
+function doesTableExists($mysqli, $table) {
+    $res = mysqli_query($mysqli,"SHOW TABLES LIKE '$table'");
+    
+    if(isset($res->num_rows)) {
+        return $res->num_rows > 0 ? true : false;
+    } else return false;
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -61,7 +69,13 @@ $userName = $row["name"];
             el.style.height = (el.scrollHeight > el.clientHeight) ? (el.scrollHeight)+"px" : "60px";
         }
 	</script>
+<?php
+if (doesTableExists($mysqli, "classification")) {
+?>
 	<script type="text/javascript" src="js/item-ajax_mng-acronyms.js"></script>
+<?php
+}
+?>
 </head>
 <body>
 
@@ -95,6 +109,7 @@ if ($classification==0) {
 } else {
     echo "<option value='0'>NO CLASSIFICATION</option>";
 }
+if (doesTableExists($mysqli, "classification")) {
 $sql = "SELECT * FROM `classification`";
 $result = $mysqli->query($sql);
 while($row = $result->fetch_assoc()) {
@@ -103,6 +118,7 @@ while($row = $result->fetch_assoc()) {
     } else {
         echo "<option value='".$row['id']."'>".$row['name']." (".$row['id'].")</option>";
     }
+}
 }
 ?>
                     </select>

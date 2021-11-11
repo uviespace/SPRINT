@@ -31,6 +31,9 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
+echo doesTableExists($mysqli, "projectacronym");
+echo doesTableExists($mysqli, "acronym");
+
 if ($action == "exp_acr") {
     //echo "Export List of Acronyms ...<br/>";
     
@@ -158,6 +161,14 @@ function getReferences($mysqli, $idProject) {
       "ASC";
     
     return $mysqli->query($sql);
+}
+
+function doesTableExists($mysqli, $table) {
+    $res = mysqli_query($mysqli,"SHOW TABLES LIKE '$table'");
+    
+    if(isset($res->num_rows)) {
+        return $res->num_rows > 0 ? true : false;
+    } else return false;
 }
 
 //Abfrage der Nutzer ID vom Login
@@ -294,14 +305,35 @@ if ($result->num_rows > 0) {
 <br/><br/>
 
 <a href="view_project-acronyms.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Acronyms ...</button></a>
-<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_acr"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php echo mysqli_num_rows(getAcronyms($mysqli, $idProject)); ?></span></span></a>
+<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_acr"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectacronym") AND doesTableExists($mysqli, "acronym")) { echo mysqli_num_rows(getAcronyms($mysqli, $idProject)); } else { echo "--"; } ?></span></span></a>
 &nbsp;&nbsp;&nbsp;
 
 <a href="view_project-references.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage References ...</button></a>
-<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php echo mysqli_num_rows(getReferences($mysqli, $idProject)); ?></span></span></a>
+<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectacronym") AND doesTableExists($mysqli, "acronym")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "--"; } ?></span></span></a>
 &nbsp;&nbsp;&nbsp;
 
 <a href="view_project-organisations.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Organisations ...</button></a>
+
+<br/><br/>
+
+<h3>Requirement Management</h3>
+
+<a href="sel_project-requirement.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Tailoring and Traceability</button></a>
+
+<br/><br/>
+
+<a href="view_project-requirements-external.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Ext. Requ.S ...</button></a>
+<!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_acr"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectacronym") AND doesTableExists($mysqli, "acronym")) { echo mysqli_num_rows(getAcronyms($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="view_project-requirements-internal.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Int. Requ.S ...</button></a>
+<!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
+&nbsp;&nbsp;&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+
+<a href="view_project-requirements-internal-requ.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Int. Requ.R ...</button></a>
+<!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
 
 <br/><br/>
 

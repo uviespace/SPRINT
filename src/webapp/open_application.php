@@ -117,6 +117,10 @@ $userEmail = $row["email"];
 		$messageAcrImport = "The Import Acronym List function is called.\n\n";
 	}
 
+	if(isset($_POST['importReqList'])){
+		$messageReqImport = "The Import Requirement List function is called.\n\n";
+	}
+
 	if(isset($_POST['buildDpList'])){
 		$messageDpList = "The build Data Pool CSV function is called.\n\n";
 		
@@ -247,6 +251,90 @@ $userEmail = $row["email"];
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
                     <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist"> &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
                 </form>
+
+                <br/><br/>
+
+				<form id="formReqGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
+
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          CSV delimiter
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="csvDelimiter" class="form-control" data-error="Please enter DP domain." required />
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Standard
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <select id="sel_reqlist" name="idReqList" class="form-control" data-error="Please enter requirement list." required>
+                              <option value='1'>ECSS E40 Tailoring</option>
+                              <option value='2'>ECSS E40 Documents</option>
+                              <option value='3'>ECSS Q80 Tailoring</option>
+                              <option value='4'>other ...</option>
+                              <option value='5'>ONCE: ECSS-E-ST-70-11C(31July2008) [OPER]</option>
+                              <option value='6'>ONCE: ECSS-E-ST-40C(6March2009) [E40 Std.]</option>
+                              <option value='7'>ONCE: ECSS-Q-ST-80C(6March2009) [Q80 Std.]</option>
+                              <option value='8'>ONCE: ECSS-E-70-41A(30Jan2003) [PUS-A]</option>
+                              <option value='9'>ONCE: ECSS-E-ST-70-41C(15April2016) [PUS-C]</option>
+                              <option value='10'>Functional Tailoring [OIRD]</option>
+                              <option value='11'>PUS-C Tailoring [OIRD]</option>
+                              <option value='12'>Project Requirements for SRS</option>
+                              <option value='13'>Project TM/TC Commands</option>
+                              <option value='14'>Project TM/TC Reports</option>
+                          </select>
+                      </div>
+                  </div>
+                  <!--<div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          First Row is Header
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                        <fieldset name="firstRow">-->
+                          <!--<input type="checkbox" name="firstRow" class="form-control" data-error="Please enter if first row is header." />-->
+                          <!--<input type="radio" id="fry" name="firstRowY">
+                          <label for="fry">Yes</label>&nbsp;
+                          <input type="radio" id="frn" name="firstRowN" checked>
+                          <label for="frn">No</label>
+                        </fieldset>
+                      </div>
+                  </div>-->
+                  </div>
+
+                </form>
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_requirement-import.php?idProject=<?php echo $idProject; ?>&'+Array.prototype.slice.call(formReqGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          First Row is Header
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="checkbox" name="firstRow" class="form-control" data-error="Please enter if first row is header." />-->
+                          <input type="radio" id="fry" name="firstRow" value="on">
+                          <label for="fry">Yes</label>&nbsp;
+                          <input type="radio" id="frn" name="firstRow" value="" checked>
+                          <label for="frn">No</label>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Select Requirements List to Upload
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
+                      </div>
+                  </div>
+                  </div>
+					
+					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+					<input type="submit" name="importReqList" value="Import Requirement List" class="btn btn-success crud-submit-import-reqlist"><br/><br/>
+					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageReqImport)){ echo $messageReqImport;}?></textarea>
+				</form>
 
                 <br/><br/>
 

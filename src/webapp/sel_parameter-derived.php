@@ -190,7 +190,7 @@ if ($result->num_rows > 0) {
 ?>
 
 <div>
-<h2>Base Packets with no Discriminats defined</h2>
+<h2>Base Packets with no Discriminants defined</h2>
 </div>
 
 <?php

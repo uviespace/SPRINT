@@ -223,8 +223,8 @@ $(".crud-submit").click(function(e){
     //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var id = $("#create-item").find("input[name='id']").val();
-    var idStandard = $("#create-item").input("input[name='idStandard']").val();
-    var idPacket = $("#create-item").input("input[name='idPacket']").val();
+    var idStandard = $("#create-item").find("input[name='idStandard']").val();
+    var idPacket = $("#create-item").find("input[name='idPacket']").val();
     var parameter = $("#create-item").find("select[name='parameter']").val();
     var order = $("#create-item").find("input[name='order']").val();
     var role = $("#create-item").find("select[name='role']").val();

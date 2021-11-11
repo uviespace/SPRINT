@@ -62,4 +62,34 @@ $(function () {
 });
 
 
+$(document).ready(function(){
+  $("#liveSearch").on("search change keyup", function() {
+    var value = $(this).val().toLowerCase();
+    $("#myTableImport tr").filter(function() {
+      $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+    });
 
+    /* highlighting results */
+/*
+    $(".results").removeClass("results");
+    $(".noresults").removeClass("noresults");
+    $("#myTableImport tr").each(function () {
+      if (value != "" && $(this).text().search(new RegExp(value,'gi')) != -1) {
+        $(this).addClass("results");
+      } else if (value != "" && $(this).text().search(value) != 1) {
+        $(this).addClass("noresults");
+      }
+    });
+*/
+  });
+});
+
+/* highlite text */
+$(function () {
+    $("#liveSearch").on("search change keyup", function () {
+        var text = this.value;
+        $("#myTableImport").highlite({
+            text: text
+        });
+    });
+});

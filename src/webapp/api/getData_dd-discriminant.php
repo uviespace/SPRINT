@@ -11,10 +11,10 @@ if (isset($_GET["idType"])) { $idType = $_GET["idType"]; } else { $idType=0; };
 
 if ($idType==0) {
 /*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `enumeration` ORDER BY `idType`, `value` ASC"; 
+$sql = "SELECT * FROM `enumeration` ORDER BY `idType`, `name` ASC"; 
 } else {
 /*$sqlTotal = "SELECT * FROM `service`";*/
-$sql = "SELECT * FROM `enumeration` WHERE `idType` = ".$idType." ORDER BY `value` ASC"; 
+$sql = "SELECT * FROM `enumeration` WHERE `idType` = ".$idType." ORDER BY `name` ASC"; 
 }
 
 $result = $mysqli->query($sql);

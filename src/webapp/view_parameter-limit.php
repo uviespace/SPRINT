@@ -278,7 +278,7 @@ $userEmail = $row["email"];
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
-					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
+					<a class="a_btn" href="sel_parameter-limit.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

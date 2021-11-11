@@ -265,7 +265,7 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
-					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
+					<a class="a_btn" href="sel_type-enumeration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

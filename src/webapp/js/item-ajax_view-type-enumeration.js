@@ -125,7 +125,7 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    e.preventDefault();
+    //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var idType = $("#create-item").find("input[name='idType']").val();
     var name = $("#create-item").find("input[name='name']").val();

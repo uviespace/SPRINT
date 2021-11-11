@@ -135,6 +135,8 @@ function manageData() {
 			}
 		});
 
+		$("#result_nmb").val(data.total);
+
 		manageRow(data.data);
 		is_ajax_fire = 1;
 

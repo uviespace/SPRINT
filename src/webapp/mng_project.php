@@ -99,7 +99,7 @@ $userName = $row["name"];
 							<div class="help-block with-errors"></div>
 						</div>-->
 
-						<input type="hidden" name="userid" value="<?php echo $userid; ?>" />
+						<input id="user_id" type="hidden" name="userid" value="<?php echo $userid; ?>" />
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>

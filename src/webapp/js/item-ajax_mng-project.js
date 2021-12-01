@@ -6,6 +6,9 @@ var total_page = 0;
 var is_ajax_fire = 0;
 var dropdown = "";
 
+var userid = document.getElementById("user_id");
+toastr.success('User ID = '+userid.value, 'Success Alert', {timeOut: 5000});
+
 manageData();
 getDropdownDataPublicCreate();
 getDropdownDataOwnerCreate();
@@ -100,7 +103,7 @@ function manageOptionPublicCreate(data) {
 function manageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_mng-project.php',
+		url: url+'api/getData_mng-project.php?userid='+userid.value,
 		data: {page:page}
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
@@ -128,7 +131,7 @@ function manageData() {
 function getPageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_mng-project.php',
+		url: url+'api/getData_mng-project.php?userid='+userid.value,
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);

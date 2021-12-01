@@ -62,6 +62,15 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -209,9 +218,15 @@ if ($result->num_rows > 0) {
 
 ?>
 
+<?php if ($idRole < 3) { ?>
 				<div>
 					<a href="view_standard-import.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>"><button style="width:180px;">Import to Standard ...</button></a>
 				</div>
+<?php } else { ?>
+				<div>
+					<button style="width:180px;color:gray;" disabled>Import to Standard ...</button>
+				</div>
+<?php } ?>
 
 				<br/>
 

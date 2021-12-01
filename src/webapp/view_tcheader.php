@@ -51,7 +51,7 @@ if ($result->num_rows > 0) {
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
- 
+
 // get user name from database
 $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
 $result = $mysqli->query($sql);
@@ -59,6 +59,15 @@ $row = $result->fetch_assoc();
 
 $userName = $row["name"];
 $userEmail = $row["email"];
+
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
 
 ?>
 <!DOCTYPE html>
@@ -95,11 +104,13 @@ $userEmail = $row["email"];
 					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
 		            <h2>TC Header</h2>
 		        </div>
+                <?php if ($idRole < 4) { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
 				</button>
 		        </div>
+                <?php } ?>
 		    </div>
 		</div>
 
@@ -148,6 +159,8 @@ $userEmail = $row["email"];
 
 				<div class="modal-body">
 					<form data-toggle="validator" action-data="api/create_view-tcheader.php" method="POST">
+
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
 
 						<div class="form-group">
 							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />

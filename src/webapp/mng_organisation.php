@@ -44,8 +44,8 @@ $userName = $row["name"];
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet"> 
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
+    <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
-		var url = "http://localhost/dbeditor/";
         function auto_grow(element) {
             element.style.height = "5px";
             element.style.height = (element.scrollHeight)+"px";

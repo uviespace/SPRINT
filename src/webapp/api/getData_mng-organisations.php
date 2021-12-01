@@ -5,13 +5,26 @@ require 'db_config.php';
 $num_rec_per_page = 5;
 
 if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
+if (isset($_GET["showAll"])) { $showAll  = $_GET["showAll"]; } else { $showAll=0; };
+
+if ($showAll == 1) {
+    $num_rec_per_page = 1000;
+    $page=1;
+}
 
 $start_from = ($page-1) * $num_rec_per_page;
 
-$sqlTotal = "SELECT * FROM `organisation`";
-$sql = "SELECT * FROM `organisation` ORDER BY `id` ASC LIMIT $start_from, $num_rec_per_page";
-
-/*$sql = "SELECT project.id, project.name, project.desc, user.name AS owner, project.isPublic, project.setting FROM `user`, `userproject`, `project` WHERE userproject.idProject = project.id AND userproject.idUser = user.id AND userproject.idRole = 2 ORDER BY project.id DESC LIMIT $start_from, $num_rec_per_page";*/
+    $sqlTotal = 
+      "SELECT ".
+      "id, `name`, `shortDesc`, `idCountry`, `desc` ".
+      "FROM ".
+      "`organisation` ";
+    $sql = 
+      "SELECT ".
+      "id, `name`, `shortDesc`, `idCountry`, `desc` ".
+      "FROM ".
+      "`organisation` ".
+      "ORDER BY `id` ASC LIMIT $start_from, $num_rec_per_page";
 
 $result = $mysqli->query($sql);
 

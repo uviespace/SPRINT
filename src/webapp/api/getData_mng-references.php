@@ -10,13 +10,13 @@ $start_from = ($page-1) * $num_rec_per_page;
 
 $sqlTotal = "SELECT * FROM `document`";
 $sql = "SELECT ".
-  "d.*, dv.*, o.name AS oname ".
+  "o.name AS oname, d.idDocType, d.name, dv.id, dv.identifier, dv.version, dv.date, dv.filename ".
   "FROM ".
-  "`document` AS d, `docVersion` AS dv, `organisation` AS o ".
+  "`organisation` AS o, `document` AS d, `docversion` AS dv ".
   "WHERE ".
   "dv.idDocument = d.id AND ".
   "d.idOrg = o.id ".
-  "ORDER BY str_to_date(date,'%d.%m.%Y') ASC LIMIT $start_from, $num_rec_per_page";
+  "ORDER BY str_to_date(dv.date,'%d.%m.%Y') ASC LIMIT $start_from, $num_rec_per_page";
 
 /*$sql = "SELECT project.id, project.name, project.desc, user.name AS owner, project.isPublic, project.setting FROM `user`, `userproject`, `project` WHERE userproject.idProject = project.id AND userproject.idUser = user.id AND userproject.idRole = 2 ORDER BY project.id DESC LIMIT $start_from, $num_rec_per_page";*/
 

@@ -15,6 +15,8 @@ if ($showAll == 1) {
 
 $start_from = ($page-1) * $num_rec_per_page;
 
+$old_version = true;
+
 if ($idStandard==0) {
 $sqlTotal = "SELECT * FROM `type`";
 $sql = "SELECT * FROM `type` ORDER BY domain, name DESC LIMIT $start_from, $num_rec_per_page"; 
@@ -23,8 +25,30 @@ $sqlTotal =
   "SELECT * ".
   "FROM `type` ".
   "WHERE idStandard = ".$idStandard;
+if ($old_version) {
+// for MariaDB older than the version 10.2.3
+//  SELECT regexp_substr(setting, '[^[{"PUS": {"type":"]]*[^"]*') FROM type WHERE id = 1500; -----> 14_3_12
+//   "    regexp_substr(setting, '[^[{\"PUS\": {\"type\":\"]]*[^\"]*') as `pusdatatype` ".
+// "type": "(.*)",      ||       (?<=\"type\": \").+?(?=")      using negative lookahead / lookbehind 
+// "ptc": (.*),      ||       (?<=\"ptc\": ).+?(?=,)      using negative lookahead / lookbehind 
+// "pfc": (.*)\}\}      ||       (?<=\"pfc\": ).+?(?=\})      using negative lookahead / lookbehind 
 $sql = 
-//  "SELECT * ".
+  "SELECT ".
+  "    `id`, ".
+  "    `domain`, ".
+  "    `name`, ".
+  "    `nativeType`, ".
+  "    `desc`, ".
+  "    `size`, ".
+  "    `value`, ".
+  "    concat('PTC/PFC: ', regexp_substr(setting, '(?<=\"ptc\": ).+?(?=,)'), '/', regexp_substr(setting, '(?<=\"pfc\": ).+?(?=\})')) AS `pusparamtype`, ".
+  "    regexp_substr(setting, '(?<=\"type\": \").+?(?=\")') as `pusdatatype` ".
+  "FROM `type` ".
+  "WHERE idStandard = ".$idStandard." ".
+  "ORDER BY domain, name ASC LIMIT $start_from, $num_rec_per_page"; 
+} else {
+// for MariaDB starting from the version 10.2.3
+$sql = 
   "SELECT ".
   "    `id`, ".
   "    `domain`, ".
@@ -38,6 +62,7 @@ $sql =
   "FROM `type` ".
   "WHERE idStandard = ".$idStandard." ".
   "ORDER BY domain, name ASC LIMIT $start_from, $num_rec_per_page"; 
+}
 }
 
 $result = $mysqli->query($sql);

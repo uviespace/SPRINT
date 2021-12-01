@@ -61,6 +61,10 @@ function manageData() {
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
 		current_page = page;
+		if (data.total == 0) {
+			total_page = 1;
+			current_page = 1;
+		}
 
 		$('#pagination').twbsPagination({
 			totalPages: total_page,
@@ -72,6 +76,8 @@ function manageData() {
 				}
 			}
 		});
+
+		$("#result_nmb").val(data.total);
 
 		manageRow(data.data);
 		is_ajax_fire = 1;

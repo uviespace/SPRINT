@@ -8,7 +8,7 @@ if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 
 $start_from = ($page-1) * $num_rec_per_page;
 
-$sql = "SELECT DISTINCT id, name FROM `country` ORDER BY name ASC";
+$sql = "SELECT * FROM `country` ORDER BY name ASC";
 
 $result = $mysqli->query($sql);
 

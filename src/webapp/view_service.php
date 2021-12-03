@@ -222,9 +222,7 @@ $userEmail = $row["email"];
 		</div>
 
 				<div class="topcorner_left">
-					<img src="img/grp__NM__menu_img__NM__logo.png" alt="Logo P&P Software" width="150" style="background-color: darkblue; padding: 5px;"><br/>
-					<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
-					<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
+<?php include 'logos.php'; ?>
 					<br/><br/>
 					You are logged in as: <br/>
 					<?php 

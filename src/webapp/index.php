@@ -47,13 +47,6 @@ $userName = $row["name"];
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
 <style type="text/css">
-.sprint-logo {
-  padding-top: 5px;
-  padding-right: 10px;
-  margin-bottom: 15px;
-  color: #6f7787;
-  background-color: #d1e0ff; /* #fff799; */
-}
 .aho:hover {
     background-color: red;
     
@@ -210,11 +203,7 @@ if ($userid == 1 || $userid == 1001) {
 		</div>
 
 		<div class="topcorner_left">
-            <div class="sprint-logo">
-                <img src="img/sprint_1_64x64.png" alt="Logo SPRINT" width="45"><b><font style="font-family: Helvetica, sans-serif; font-size: 200%;">SPRINT</font></b>
-            </div>
-			<img src="img/uni_logo_220.jpg" alt="Logo University of Vienna" width="150" style="padding: 5px;"><br/>
-			<img src="img/csm_uni_logo_schwarz_0ca81bfdea.jpg" alt="Logo Institute for Astrophysics" width="150" style="padding: 5px;">
+<?php include 'logos.php'; ?>
 			<br/><br/>
 			You are logged in as: <br/>
 			<?php 

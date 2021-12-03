@@ -25,6 +25,14 @@
     height: 500px;
 }
 
+.sprint-logo {
+  padding-top: 5px;
+  padding-right: 10px;
+  margin-bottom: 15px;
+  color: #6f7787;
+  background-color: #d1e0ff; /* #fff799; */
+}
+
 /*
 .a_btn{
     padding: 6px 12px;

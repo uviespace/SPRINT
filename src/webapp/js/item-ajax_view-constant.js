@@ -5,6 +5,8 @@ var current_page = 1;
 var total_page = 0;
 var is_ajax_fire = 0;
 
+var userrole = document.getElementById("user_role");
+
 var idStandard = getUrlVars()["idStandard"];
 
 manageData();
@@ -104,8 +106,12 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.value+'</td>';
 	  	rows = rows + '<td>'+value.desc+'</td>';
 	  	rows = rows + '<td data-id="'+value.id+'">';
+        if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
+        if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        }
+        }
         rows = rows + '</td>';
 	  	rows = rows + '</tr>';
 	});

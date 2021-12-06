@@ -49,17 +49,6 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
-//Abfrage der Nutzer ID vom Login
-$userid = $_SESSION['userid'];
- 
-// get user name from database
-$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
-$result = $mysqli->query($sql);
-$row = $result->fetch_assoc();
-
-$userName = $row["name"];
-$userEmail = $row["email"];
-
 	if(isset($_POST['insert'])){
 		$message= "The insert function is called.";
 	}
@@ -145,6 +134,27 @@ $userEmail = $row["email"];
 	if(isset($_POST['importDpList'])){
 		$messageDpImport = "The Import Data Pool List function is called.\n\n";
 	}
+
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+$userEmail = $row["email"];
+
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -241,7 +251,12 @@ $userEmail = $row["email"];
                 <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 5px 15px;" onsubmit="this.action='sel_application-standard.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
                     <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-                    <input type="submit" name="openRelationList" value="Relations" class="btn btn-success crud-submit-open-rellist"> &nbsp;&nbsp;&nbsp; Relations of Application to Standard(s) (service user or service provider)
+                    <?php if ($idRole < 4) { ?>
+                    <input type="submit" name="openRelationList" value="Relations" class="btn btn-success crud-submit-open-rellist"> 
+                    <?php } else { ?>
+                    <input type="submit" name="openRelationList" value="Relations" class="btn btn-success crud-submit-open-rellist" disabled> 
+                    <?php } ?>
+                    &nbsp;&nbsp;&nbsp; Relations of Application to Standard(s) (service user or service provider)
                 </form>
 
                 <!--<br/>-->
@@ -249,7 +264,12 @@ $userEmail = $row["email"];
                 <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 5px 15px 15px 15px;" onsubmit="this.action='sel_application-component.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
                     <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist"> &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
+                    <?php if ($idRole < 4) { ?>
+                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist"> 
+                    <?php } else { ?>
+                    <input type="submit" name="openComponentList" value="Components" class="btn btn-success crud-submit-open-cmplist" disabled> 
+                    <?php } ?>
+                    &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
                 </form>
 
                 <br/><br/>
@@ -332,7 +352,12 @@ $userEmail = $row["email"];
 					
 					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
 					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-					<input type="submit" name="importReqList" value="Import Requirement List" class="btn btn-success crud-submit-import-reqlist"><br/><br/>
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="importReqList" value="Import Requirement List" class="btn btn-success crud-submit-import-reqlist">
+                    <?php } else { ?>
+                    <input type="submit" name="importReqList" value="Import Requirement List" class="btn btn-success crud-submit-import-reqlist" disabled>
+                    <?php } ?>
+                    <br/><br/>
 					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageReqImport)){ echo $messageReqImport;}?></textarea>
 				</form>
 
@@ -367,7 +392,12 @@ $userEmail = $row["email"];
 					
 					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
 					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-					<input type="submit" name="importAcrList" value="Import Acronym List" class="btn btn-success crud-submit-import-acrlist"><br/><br/>
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="importAcrList" value="Import Acronym List" class="btn btn-success crud-submit-import-acrlist">
+                    <?php } else { ?>
+                    <input type="submit" name="importAcrList" value="Import Acronym List" class="btn btn-success crud-submit-import-acrlist" disabled>
+                    <?php } ?>
+                    <br/><br/>
 					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageAcrImport)){ echo $messageAcrImport;}?></textarea>
 				</form>
 
@@ -451,14 +481,24 @@ if ($result->num_rows > 0) {
 					
 					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
 					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
-					<input type="submit" name="importDpList" value="Import Data Pool List" class="btn btn-success crud-submit-import-dplist"><br/><br/>
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="importDpList" value="Import Data Pool List" class="btn btn-success crud-submit-import-dplist">
+                    <?php } else { ?>
+                    <input type="submit" name="importDpList" value="Import Data Pool List" class="btn btn-success crud-submit-import-dplist" disabled>
+                    <?php } ?>
+                    <br/><br/>
 					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpImport)){ echo $messageDpImport;}?></textarea>
 				</form>
 
 				<br/><br/>
 
 				<form  method="post" style="background-color: #d1d1d1; padding: 15px;">
-					<input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist"><br/><br/>
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist">
+                    <?php } else { ?>
+                    <input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist" disabled>
+                    <?php } ?>
+                    <br/><br/>
 					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpList)){ echo $messageDpList;}?></textarea>
 				</form>
 
@@ -469,7 +509,12 @@ if ($result->num_rows > 0) {
 					<!--<input type="text" name="txt" value="<?php if(isset($message)){ echo $message;}?>" >
 					<!--<input type="submit" name="insert" value="insert">
 					<input type="submit" name="select" value="select" >-->
-					<input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build"><br/><br/>
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build">
+                    <?php } else { ?>
+                    <input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build" disabled>
+                    <?php } ?>
+                    <br/><br/>
 					<textarea rows="25" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($message)){ echo $message;}?></textarea>
 				</form>
 				

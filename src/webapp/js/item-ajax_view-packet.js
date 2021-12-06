@@ -6,6 +6,8 @@ var total_page = 0;
 var is_ajax_fire = 0;
 var dropdown = "";
 
+var userrole = document.getElementById("user_role");
+
 var idProject = getUrlVars()["idProject"];
 var idStandard = getUrlVars()["idStandard"];
 
@@ -259,9 +261,13 @@ function manageRow(data) {
 	  	rows = rows + '<td class="hide">'+value.code+'</td>';      /* Detail */
 		rows = rows + '<td class="hide">'+value.setting+'</td>';
 	  	rows = rows + '<td class="td-fix" data-id="'+value.id+'">';
+        if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
         rows = rows + '<button data-toggle="modal" data-target="#edit-detail" class="btn btn-primary edit-detail">Detail</button> ';
+        if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        }
+        }
         rows = rows + '</td>';
 	  	rows = rows + '</tr>';
 	});

@@ -6,6 +6,8 @@ var total_page = 0;
 var is_ajax_fire = 0;
 var dropdown = ""; // needed for dropdown menus for initialization
 
+var userrole = document.getElementById("user_role");
+
 var idStandard = getUrlVars()["idStandard"];
 var idParent = getUrlVars()["idParent"];
 
@@ -162,10 +164,14 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.code+'</td>';         // DETAILS
 	  	//rows = rows + '<td>'+value.setting+'</td>';
 	  	rows = rows + '<td data-id="'+value.id+'">';
+        if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
         rows = rows + '<button data-toggle="modal" data-target="#edit-detail" class="btn btn-primary edit-detail">Detail</button> ';
+        }
         rows = rows + '<button data-toggle="modal" data-target="#open-body" class="btn btn-primary open-body">Body</button> ';
+        if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        }
         rows = rows + '</td>';
 	  	rows = rows + '</tr>';
 	});

@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-
 <?php
 session_start();
 if(!isset($_SESSION['userid'])) {
@@ -12,6 +9,7 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/global_functions.php';
 
 if (isset($_GET["id"])) { $idComponent  = $_GET["id"]; } else { $idComponent=0; };
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
@@ -63,8 +61,10 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
+$idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 ?>
-
+<!DOCTYPE html>
+<html>
 <head>
 	<title>Component <?php echo $component_name;?> </title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
@@ -168,7 +168,11 @@ if ($result->num_rows == 1) {
 
     <div class='row' style='padding-bottom: 15px;'>
         <div class='col-md-12'>
+            <?php if ($idRole < 4) { ?>
             <button id='save' class='btn btn-success'>Save</button>
+            <?php } else { ?>
+            <button id='save' class='btn btn-success' disabled>Save</button>
+            <?php } ?>
             <button id='submit' class='btn btn-info'>Submit (console.log)</button>
             <button id='restore' class='btn btn-info'>Restore to Default</button>
             <button id='enable_disable' class='btn btn-info'>Disable/Enable Form</button>

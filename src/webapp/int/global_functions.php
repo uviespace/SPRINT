@@ -3,6 +3,17 @@
  * GLOBAL FUNCTIONS
  */
 
+/*
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
+*/
+
 function get_max_access_level($mysqli, $projectid, $userid, $userEmail) {
    // get access level 
    $sql = "SELECT * FROM `userproject` WHERE ".

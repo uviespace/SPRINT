@@ -7,7 +7,7 @@ var is_ajax_fire = 0;
 var dropdown = "";
 
 var userid = document.getElementById("user_id");
-toastr.success('User ID = '+userid.value, 'Success Alert', {timeOut: 5000});
+//toastr.success('User ID = '+userid.value, 'Success Alert', {timeOut: 5000});
 
 manageData();
 getDropdownDataPublicCreate();

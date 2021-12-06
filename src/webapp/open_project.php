@@ -31,8 +31,8 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
-echo doesTableExists($mysqli, "projectacronym");
-echo doesTableExists($mysqli, "acronym");
+//echo doesTableExists($mysqli, "projectacronym");
+//echo doesTableExists($mysqli, "acronym");
 
 if ($action == "exp_acr") {
     //echo "Export List of Acronyms ...<br/>";
@@ -182,6 +182,15 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -264,7 +273,11 @@ if ($result->num_rows > 0) {
 
 ?>
 
+<?php if ($idRole < 4) { ?>
 <a href="view_project-application.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Applications ...</button></a>
+<?php } else { ?>
+<button style="width:180px;color:gray;" disabled>Manage Applications ...</button>
+<?php } ?>
 
 <br/>
 
@@ -294,10 +307,15 @@ if ($result->num_rows > 0) {
 
 ?>
 
+<?php if ($idRole < 4) { ?>
 <a href="view_project-standard.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Standards ...</button></a>
+<?php } else { ?>
+<button style="width:180px;color:gray;" disabled>Manage Standards ...</button>
+<?php } ?>
 
 <br/><br/>
 
+<?php if ($idRole < 4) { ?>
 <h3>Document Management</h3>
 
 <a href="sel_project-documentation.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Documents ...</button></a>
@@ -336,6 +354,9 @@ if ($result->num_rows > 0) {
 <!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
 
 <br/><br/>
+<?php } ?>
+
+<h3>Contributors / Users</h3>
 
 <?php
 
@@ -345,7 +366,6 @@ $result = $mysqli->query($sql);
 
 $num_rows = mysqli_num_rows($result);
 
-echo "<h3>Contributors / Users</h3>";
 //echo $num_rows hits<br/><br/>";
 
 if ($result->num_rows > 0) {
@@ -367,7 +387,11 @@ if ($result->num_rows > 0) {
 
 ?>
 
+<?php if ($idRole < 4) { ?>
 <a href="view_project-contributor.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Contributors ...</button></a>
+<?php } else { ?>
+<button style="width:180px;color:gray;" disabled>Manage Contributors ...</button>
+<?php } ?>
 
 <br/><br/>
 

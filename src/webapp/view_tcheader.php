@@ -9,6 +9,7 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
@@ -60,15 +61,7 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
-//Abfrage der Rolle des Users
-$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
-$result = $mysqli->query($sql);
-$idRole = 5;
-while ($row = $result->fetch_assoc()) {
-    $idRoleRead = $row["idRole"];
-    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
-}
-
+$idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 ?>
 <!DOCTYPE html>
 <html>

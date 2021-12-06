@@ -9,6 +9,7 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
@@ -79,6 +80,7 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
+$idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 ?>
 <!DOCTYPE html>
 <html>
@@ -114,11 +116,13 @@ $userEmail = $row["email"];
 					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
 		            <h2>Limits for Parameter <?php echo $parameter_name; ?></h2>
 		        </div>
+                <?php if ($idRole < 4) { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
 				</button>
 		        </div>
+                <?php } ?>
 		    </div>
 		</div>
 
@@ -163,6 +167,8 @@ $userEmail = $row["email"];
 
 				<div class="modal-body">
 					<form data-toggle="validator" action-data="api/create_view-parameter-limit.php" method="POST">
+
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
 
 						<!--<div class="form-group">
 							<label class="control-label" for="title">ID:</label>

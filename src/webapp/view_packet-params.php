@@ -1,9 +1,15 @@
-<!DOCTYPE html>
-<html>
-
 <?php
-
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
 require 'api/db_config.php';
+require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
@@ -74,8 +80,21 @@ if ($basePacket_kind == 0) {
     $basePacket_kind_str = "n/a";
 }
 
-?>
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
 
+$userName = $row["name"];
+$userEmail = $row["email"];
+
+$idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
+?>
+<!DOCTYPE html>
+<html>
 <head>
 	<title>CORDET Editor - Packet Parameters</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
@@ -108,11 +127,13 @@ if ($basePacket_kind == 0) {
 					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
 		            <h2>Packet Parameters for Packet <?php echo $basePacket_kind_str ."(".$basePacket_type."/".$basePacket_subt.") " . $basePacket_name; ?></h2>
 		        </div>
+                <?php if ($idRole < 4) { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
 				</button>
 		        </div>
+                <?php } ?>
 		    </div>
 		</div>
 
@@ -160,6 +181,8 @@ if ($basePacket_kind == 0) {
 
 				<div class="modal-body">
 					<form data-toggle="validator" action-data="api/create_view-packet-params.php" method="POST">
+
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
 
 						<div class="form-group">
 							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
@@ -310,6 +333,11 @@ if ($basePacket_kind == 0) {
 
 				<div class="topcorner_left">
 <?php include 'logos.php'; ?>
+					<br/><br/>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
 					<br/><br/>
 					<a class="a_btn" href="sel_packet-params.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
 					<br/>

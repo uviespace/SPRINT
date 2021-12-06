@@ -1,8 +1,13 @@
-<!DOCTYPE html>
-<html>
-
 <?php
-
+session_start();
+if(!isset($_SESSION['userid'])) {
+    //die('Please <a href="login.php">login</a> first!');
+    echo "Please <a href='login.php'>login</a> first!";
+    echo "<br/><br/>";
+    echo "<img src='img/loading.gif' />";
+    header( "refresh:8;url=login.php" );
+    die('');
+}
 require 'api/db_config.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
@@ -156,9 +161,29 @@ function get_header_len($mysqli, $standard_id, $header_type) {
     return $calc_size/8;
 }
 
+//Abfrage der Nutzer ID vom Login
+$userid = $_SESSION['userid'];
+ 
+// get user name from database
+$sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
+$result = $mysqli->query($sql);
+$row = $result->fetch_assoc();
+
+$userName = $row["name"];
+$userEmail = $row["email"];
+
+//Abfrage der Rolle des Users
+$sql = "SELECT * FROM userproject WHERE idProject = ".$idProject." AND (idUser = ".$userid." OR email = '".$userEmail."')";
+$result = $mysqli->query($sql);
+$idRole = 5;
+while ($row = $result->fetch_assoc()) {
+    $idRoleRead = $row["idRole"];
+    if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
+}
 
 ?>
-
+<!DOCTYPE html>
+<html>
 <head>
 	<title>CORDET Editor - Packet Inspector</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
@@ -464,6 +489,11 @@ echo "<br/><br/>";
 
 				<div class="topcorner_left">
 <?php include 'logos.php'; ?>
+					<br/><br/>
+					You are logged in as: <br/>
+					<?php 
+						echo "<b>".$userName."</b><br/>";
+					?>
 					<br/><br/>
 					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
 					<!-- sel_parameter-derived.php -->

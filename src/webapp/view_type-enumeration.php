@@ -80,7 +80,7 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
-$max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
+$idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 ?>
 <!DOCTYPE html>
 <html>
@@ -117,7 +117,7 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
 					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
 		            <h2>Enumerations for Type <?php echo $type_name; ?></h2>
 		        </div>
-                <?php if ($max_access_level == "1" OR $max_access_level == "2" OR $max_access_level == "3") { ?>
+                <?php if ($idRole < 4) { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
 					  Create Item
@@ -171,6 +171,8 @@ $max_access_level = get_max_access_level($mysqli, $idProject, $userid, $userEmai
                 <div class="form-group">
                     for data type <b><?php echo $type_name; ?></b> (<?php echo $idType; ?>)
                 </div>
+
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
 
 						<div class="form-group">
 							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />

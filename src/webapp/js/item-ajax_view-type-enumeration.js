@@ -5,11 +5,14 @@ var current_page = 1;
 var total_page = 0;
 var is_ajax_fire = 0;
 
+var userrole = document.getElementById("user_role");
+
 var idUser = "";
 var idProject = getUrlVars()["idProject"];
 var idStandard = getUrlVars()["idStandard"];
 var idType = getUrlVars()["idType"];
 
+/*
 var max_access_level = "5";
 get_role(''+idProject, function(value) {
     var items = eval(value); //Converted to actual JSON data
@@ -17,6 +20,7 @@ get_role(''+idProject, function(value) {
         max_access_level = items[item]['idRole'];
     }
 });
+*/
 
 manageData();
 
@@ -105,11 +109,11 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.value+'</td>';
 	  	rows = rows + '<td>'+value.desc+'</td>';
 	  	rows = rows + '<td data-id="'+value.id+'">';
-        if (max_access_level == "1" || max_access_level == "2" || max_access_level == "3") {
+        if (userrole.value < 4) {
             rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
-        }
-        if (max_access_level == "1" || max_access_level == "2") {
+        if (userrole.value < 3) {
             rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
+        }
         }
         rows = rows + '</td>';
 	  	rows = rows + '</tr>';

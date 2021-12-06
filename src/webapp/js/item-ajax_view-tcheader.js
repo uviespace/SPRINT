@@ -7,7 +7,6 @@ var is_ajax_fire = 0;
 var dropdown = "";
 
 var userrole = document.getElementById("user_role");
-toastr.success('User Role = '+userrole.value, 'Success Alert', {timeOut: 5000});
 
 var idStandard = getUrlVars()["idStandard"];
 

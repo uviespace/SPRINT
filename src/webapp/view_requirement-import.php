@@ -306,6 +306,25 @@ $userEmail = $row["email"];
 				<th width="4%">Top Level Req</th>
 				<th width="11%">Action</th>
 <?php
+          } else if ($idReqList==15) {   // Mission/Instrument Level Requirements
+?>
+				<th width="4%">ID</th>
+				<th width="12%">Req. ID</th>
+				<th width="15%">Short Text</th>
+				<th width="30%">Text</th>
+				<th width="28%">Comment</th>
+				<th width="11%">Action</th>
+<?php
+          } else if ($idReqList==16) {   // Subsystem Level Requirements
+?>
+				<th width="4%">ID</th>
+				<th width="12%">Req. ID</th>
+				<th width="15%">Short Text</th>
+				<th width="30%">Text</th>
+				<th width="16%">Comment</th>
+				<th width="12%">Top Level Req</th>
+				<th width="11%">Action</th>
+<?php
           } else {
 ?>
 				<th width="4%">ID</th>
@@ -406,6 +425,25 @@ $userEmail = $row["email"];
 				<th width="8%">Test</th>
 				<th width="10%">Code Trace</th>
 				<th width="4%">Top Level Req</th>
+				<th width="11%">Action</th>
+<?php
+          } else if ($idReqList==15) {   // Mission/Instrument Level Requirements
+?>
+				<th width="4%">ID</th>
+				<th width="12%">Req. ID</th>
+				<th width="15%">Short Text</th>
+				<th width="30%">Text</th>
+				<th width="28%">Comment</th>
+				<th width="11%">Action</th>
+<?php
+          } else if ($idReqList==16) {   // Subsystem Level Requirements
+?>
+				<th width="4%">ID</th>
+				<th width="12%">Req. ID</th>
+				<th width="15%">Short Text</th>
+				<th width="30%">Text</th>
+				<th width="16%">Comment</th>
+				<th width="12%">Top Level Req</th>
 				<th width="11%">Action</th>
 <?php
           }
@@ -1282,6 +1320,125 @@ file_put_contents( $target_file, $contents );
 	echo "</td>";
 	echo "</tr>";
         
+        
+    } else if ($idReqList==15) {
+        
+        $reqId = $data[0];
+        $reqShortText = $data[1];
+        $reqText = $data[2];
+        $comment = $data[3];
+
+	  // check if name exists already in Data Pool
+	  $foundName = false;
+      $foundShortDesc = false;
+      if ($reqId!="") {
+	  foreach ($extReqNames as $acrName) {
+        //echo "Value: ".$acrName."<br/>";
+	    if(explode("|", $acrName)[0] == $reqId) {
+			//echo "Value: ".$acrName."<br/><br/>";
+			$foundName = true;
+            /*$pos = strpos(explode("|", $acrName)[1], $col02);
+            if ($pos === false) {
+            } else {*/
+            //if (strpos(explode("|", $acrName)[1], $col02)) {
+            //if (strpos($col02, explode("|", $acrName)[1])) {
+            if (explode("|", $acrName)[1] == $reqText) {
+                $foundShortDesc = true;
+            }
+			break;
+		}
+	  }
+      }
+
+	echo "<tr>";
+	echo "<td style=\"color: #fff;\"></td>";
+	echo "<td>".$reqId."</td>"; // ReqId
+    echo "<td>".$reqShortText."</td>"; // ReqShortText
+	echo "<td>".$reqText."</td>"; // ReqText
+    echo "<td>".$comment."</td>"; // Comment
+    echo "<td data-id=\"'+value.id+'\">";
+    if ($foundName) {
+        if ($foundShortDesc) {
+            // check if requirement already linked to this project
+            if (linkedToProject($mysqli, $idProject, $data)) {
+                echo "<p style='font-size:x-small;word-break:normal;color:blue;'>Item already found in Database and is also linked to this project!</p>";
+            } else {
+                echo "<p style='font-size:x-small;word-break:normal;color:red;'>Item already found in Database!</p>";
+                //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+                echo "<button class=\"btn btn-primary link-item\">Link</button>";
+            }
+        } else {
+            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Requirement already found in Database, but short description differs!</p>";
+            //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+            echo "<button class=\"btn btn-success add-item15\">Add</button>";
+        }
+	} else {
+		//echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+		echo "<button class=\"btn btn-success add-item15\">Add</button>";
+	}
+	echo "</td>";
+	echo "</tr>";
+    
+    } else if ($idReqList==16) {
+        
+        $reqId = $data[0];
+        $shortText = $data[1];
+        $text = $data[2];
+        $comment = $data[3];
+        $topLevelReq = $data[4];
+
+	  // check if name exists already in Data Pool
+	  $foundName = false;
+      $foundShortDesc = false;
+      if ($reqId!="") {
+	  foreach ($extReqNames as $acrName) {
+        //echo "Value: ".$acrName."<br/>";
+	    if(explode("|", $acrName)[0] == $reqId) {
+			//echo "Value: ".$acrName."<br/><br/>";
+			$foundName = true;
+            /*$pos = strpos(explode("|", $acrName)[1], $col02);
+            if ($pos === false) {
+            } else {*/
+            //if (strpos(explode("|", $acrName)[1], $col02)) {
+            //if (strpos($col02, explode("|", $acrName)[1])) {
+            if (explode("|", $acrName)[1] == $reqText) {
+                $foundShortDesc = true;
+            }
+			break;
+		}
+	  }
+      }
+
+	echo "<tr>";
+	echo "<td style=\"color: #fff;\"></td>";
+	echo "<td>".$reqId."</td>"; // ReqId
+    echo "<td>".$shortText."</td>"; // ShortText
+	echo "<td>".$text."</td>"; // Text
+    echo "<td>".$comment."</td>"; // Comment
+    echo "<td>".$topLevelReq."</td>"; // Top Level Requ.
+    echo "<td data-id=\"'+value.id+'\">";
+    if ($foundName) {
+        if ($foundShortDesc) {
+            // check if acronym already linked to this project
+            if (linkedToProject($mysqli, $idProject, $data)) {
+                echo "<p style='font-size:x-small;word-break:normal;color:blue;'>Item already found in Database and is also linked to this project!</p>";
+            } else {
+                echo "<p style='font-size:x-small;word-break:normal;color:red;'>Item already found in Database!</p>";
+                //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+                echo "<button class=\"btn btn-primary link-item\">Link</button>";
+            }
+        } else {
+            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Acronym already found in Database, but short description differs!</p>";
+            //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+            echo "<button class=\"btn btn-success add-item10\">Add</button>";
+        }
+	} else {
+		//echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+		echo "<button class=\"btn btn-success add-item10\">Add</button>";
+	}
+	echo "</td>";
+	echo "</tr>";
+
     } else {
         echo "<p>NO, Requirement List is not supported! ['".$idReqList."']</p>";
         
@@ -1414,26 +1571,33 @@ file_put_contents( $target_file, $contents );
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-acronym.php" method="put">
+					<form data-toggle="validator" action="api/update_view-requirement-import.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
 						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<label class="control-label" for="title">Requirement ID:</label>
+							<input type="text" name="requirementId" class="form-control" data-error="Please enter requirement ID." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Short Description:</label>
-							<textarea name="shortDesc" class="form-control" style="min-height: 200px;" data-error="Please enter short description." required ></textarea>
+							<textarea name="shortDesc" class="form-control" data-error="Please enter short description." required ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
 							<!--<input type="text" name="shortDesc" class="form-control" data-error="Please enter description." />-->
-                            <textarea name="desc" class="form-control" data-error="Please enter description." ></textarea>
+                            <textarea name="desc" class="form-control" style="min-height: 200px;" data-error="Please enter description." ></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Notes:</label>
+							<!--<input type="text" name="shortDesc" class="form-control" data-error="Please enter description." />-->
+                            <textarea name="notes" class="form-control" data-error="Please enter notes." ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 

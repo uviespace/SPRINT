@@ -12,8 +12,17 @@ if ($post['idReqCat'] != '') {
     $reqCatName = $row_reqCat['category'];
 } else {
     $reqCatName = $post['newCat'];
-    // TODO: check, if category is already in database
-    // TODO: if not in database, add it
+    // check, if category is already in database
+    $sql_newCat = "SELECT * FROM `projectrequirementcategory` WHERE `idProject` = ".$post['idProject']." AND `category` = '".$reqCatName."'";
+    $result_newCat = $mysqli->query($sql_newCat);
+    $num_rows = mysqli_num_rows($result_newCat);
+    if ($num_rows==0) {
+        // if not in database, add it
+        $sql_addCat = "INSERT INTO `projectrequirementcategory` ".
+            "(`idProject`, `idSwComponent`, `category`, `shortDesc`) VALUES ".
+            "(".$post['idProject'].", 2, '".$reqCatName."', 'inserted new category')";
+        $result_addCat = $mysqli->query($sql_addCat);
+    }
 }
 
 echo "reqCatName = $reqCatName";
@@ -30,33 +39,56 @@ echo "reqId = $reqId";
     $sql = 
       "INSERT INTO ".
       "`projectrequirement` ".
-      "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`) ".
+      "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`, `notes`) ".
       "VALUES ".
-      "('".$post['idProject']."', 1, '".$reqId."', '".$post['shortDesc']."', '".$post['desc']."')";
+      "('".$post['idProject']."', 1, '".$reqId."', '".$post['shortDesc']."', '".$post['desc']."', '".$post['notes']."')";
 
     $result = $mysqli->query($sql);
 
     // get id
     $insert_id = $mysqli->insert_id;
     
-    if ($post['idTLReqId'] != '') {
+    if ($post['newTLReqId'] != '') {
+        
+        // check, if top-level requirement is already in database
+        $sql_newTLReq = "SELECT * FROM `projectrequirement` WHERE `idDocRelation` = 2 AND `requirementId` = '".$post['newTLReqId']."'";
+        $result_newTLReq = $mysqli->query($sql_newTLReq);
+        $num_rows = mysqli_num_rows($result_newTLReq);
+        if ($num_rows==0) {
+            // insert new Top-level requirement
+            $sql_addTLReq = "";
+            $result_addTLReq = $mysqli->query($sql_addTLReq);
+
+            // get id
+            $insert_newTLReqId = $mysqli->insert_id;
+        } else {
+            $row_newTLReq = $result_newTLReq->fetch_assoc();
+            $insert_newTLReqId = $row_newTLReq['id'];
+        }
         
         // insert relation
-        $sql = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$post['idTLReqId'].", ".$insert_id.")";
-        
+        $sql = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$insert_newTLReqId.", ".$insert_id.")";
         $result = $mysqli->query($sql);
         
-    } else if ($post['newTLReqId'] != '') {
-        
-        // insert new Top-level requirement
-        
-        // get id
-        
-        // insert relation
-        
+    } else {
+    
+        if ($post['idTLReqId'] != '') {
+            // insert relation
+            $sql = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$post['idTLReqId'].", ".$insert_id.")";
+            $result = $mysqli->query($sql);
+        }
+        if ($post['idTLReqId2'] != '') {
+            // insert relation
+            $sql = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$post['idTLReqId2'].", ".$insert_id.")";
+            $result = $mysqli->query($sql);
+        }
+        if ($post['idTLReqId3'] != '') {
+            // insert relation
+            $sql = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$post['idTLReqId3'].", ".$insert_id.")";
+            $result = $mysqli->query($sql);
+        }
+
     }
-
-
 
 // check if requirement id exists already
 /*

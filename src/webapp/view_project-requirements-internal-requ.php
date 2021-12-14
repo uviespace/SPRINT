@@ -110,7 +110,7 @@ $userEmail = $row["email"];
 				<th>ID</th>
                 <!--<th>ID ACR</th>-->
 				<th>Requ. ID</th>
-                <th>Clause</th>
+                <th>Top-Level Req.</th>
 				<!--<th>Short Description</th>-->
 				<th>Description</th>
 				<th>Notes</th>
@@ -193,8 +193,8 @@ $userEmail = $row["email"];
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Comment:</label>
-							<input id="comment_create" type="text" name="comment" class="form-control" data-error="Please enter comment." />
+							<label class="control-label" for="title">Notes:</label>
+							<input id="notes_create" type="text" name="notes" class="form-control" data-error="Please enter notes." />
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -219,16 +219,16 @@ $userEmail = $row["email"];
 <div><hr></div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Top-Level Requirement:</label>
+							<label class="control-label" for="title">Top-Level Requirement(s):</label>
 							<select id="sel_tlreqid_create" name="idTLReqId_create" class="form-control" data-error="Please enter top-level requirement id." >
 								<option value="select"></option>
 							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">New Top-Level Requirement ID:</label>
-                            <input id="newTLReqId_create" type="text" name="newTLReqId" class="form-control" data-error="Please enter new top-level requirement id." />
+							<select id="sel_tlreqid2_create" name="idTLReqId2_create" class="form-control" data-error="Please enter top-level requirement id nr. 2." >
+								<option value="select"></option>
+							</select>
+							<select id="sel_tlreqid3_create" name="idTLReqId3_create" class="form-control" data-error="Please enter top-level requirement id nr. 3." >
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -263,6 +263,12 @@ $userEmail = $row["email"];
 					<form data-toggle="validator" action="api/update_view-project-requirement-internal.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
+
+<div class="form-group">
+							<label class="control-label" for="title">Short Description:</label>
+							<input id="shortDesc" name="shortDesc" class="form-control" data-error="Please enter short description." required />
+							<div class="help-block with-errors"></div>
+						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
@@ -305,6 +311,48 @@ $userEmail = $row["email"];
 		      		</form>
 
 		      </div>
+
+		    </div>
+		  </div>
+		  
+		</div>
+
+		<!-- Change Status Modal -->
+		<div class="modal fade" id="change-status" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Change Status</h4>
+		      </div>
+
+		      <div class="modal-body">
+					<form data-toggle="validator" action="api/update-change_view-project-requirement-internal.php" method="put">
+
+		      			<input type="hidden" name="id" class="change-id">
+
+						<div class="form-group">
+							<label class="control-label" for="title">Top-Level Requirement(s):</label>
+							<select id="sel_tlreqid_change" name="idTLReqId_change" class="form-control" data-error="Please enter top-level requirement id." required >
+								<option value="select"></option>
+							</select>
+							<select id="sel_tlreqid2_change" name="idTLReqId2_change" class="form-control" data-error="Please enter top-level requirement id nr. 2." >
+								<option value="select"></option>
+							</select>
+							<select id="sel_tlreqid3_change" name="idTLReqId3_change" class="form-control" data-error="Please enter top-level requirement id nr. 3." >
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-success crud-submit-change">Submit</button>
+						</div>
+
+		      		</form>
+
+		      </div>
+
 		    </div>
 		  </div>
 		  

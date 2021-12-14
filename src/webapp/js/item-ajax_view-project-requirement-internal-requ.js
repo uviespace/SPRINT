@@ -126,6 +126,8 @@ function getDropdownDataTopLevReqCreate() {
 		data: {dropdown:dropdown}
 	}).done(function(data){
 		manageOptionTopLevReqCreate(data.data);
+        manageOptionTopLevReq2Create(data.data);
+        manageOptionTopLevReq3Create(data.data);
 	});
 }
 
@@ -136,6 +138,100 @@ function manageOptionTopLevReqCreate(data) {
 	$.each( data, function( key, value ) {
 		$("#sel_tlreqid_create").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
 	});
+}
+
+/* Add new option to select */
+function manageOptionTopLevReq2Create(data) {
+	$("#sel_tlreqid2_create").empty();
+	$("#sel_tlreqid2_create").append('<option value="" selected>Please select ...</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_tlreqid2_create").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+	});
+}
+
+/* Add new option to select */
+function manageOptionTopLevReq3Create(data) {
+	$("#sel_tlreqid3_create").empty();
+	$("#sel_tlreqid3_create").append('<option value="" selected>Please select ...</option>');
+	$.each( data, function( key, value ) {
+		$("#sel_tlreqid3_create").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+	});
+}
+
+/* Get Dropdown Data for Top-Level Requirement */
+function getDropdownDataTopLevReqChange(idReq) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_dd-requirement-top-level.php?idProject='+idProject,
+		data: {dropdown:dropdown}
+	}).done(function(data){
+        $.ajax({
+            dataType: 'json',
+            url: url+'api/getData_dd-requirement-top-level.php?idProject='+idProject+'&idReq='+idReq
+        }).done(function(result){
+            manageOptionTopLevReqChange(data.data, result.data, idReq, 0);
+            manageOptionTopLevReq2Change(data.data, result.data, idReq, 1);
+            manageOptionTopLevReq3Change(data.data, result.data, idReq, 2);
+        });
+	});
+}
+
+/* Add new option to select */
+function manageOptionTopLevReqChange(data, result, idReq, pos) {
+    console.log("### "+idReq+" | "+result.length+' ### '+result[pos].requirementId+' ###');
+    $("#sel_tlreqid_change").empty();
+    $("#sel_tlreqid_change").append('<option value="" selected>Please select ...</option>');
+    $.each( data, function( key, value ) {
+        if (result[pos].requirementId==value.requirementId) {
+            $("#sel_tlreqid_change").append('<option value="'+value.id+'" selected>'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        } else {
+            $("#sel_tlreqid_change").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        }
+    });
+}
+
+/* Add new option to select */
+function manageOptionTopLevReq2Change(data, result, idReq, pos) {
+    if (result.length>pos) {
+        console.log("### "+idReq+" | "+result.length+' ### '+result[pos].requirementId+' ###');
+    } else {
+        console.log("### "+idReq+" | "+result.length+' ### - ###');
+    }
+    $("#sel_tlreqid2_change").empty();
+    $("#sel_tlreqid2_change").append('<option value="" selected>Please select ...</option>');
+    $.each( data, function( key, value ) {
+        if (result.length>pos) {
+        if (result[pos].requirementId==value.requirementId) {
+            $("#sel_tlreqid2_change").append('<option value="'+value.id+'" selected>'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        } else {
+            $("#sel_tlreqid2_change").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        };
+        } else {
+            $("#sel_tlreqid2_change").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        }
+    });
+}
+
+/* Add new option to select */
+function manageOptionTopLevReq3Change(data, result, idReq, pos) {
+    if (result.length>pos) {
+        console.log("### "+idReq+" | "+result.length+' ### '+result[pos].requirementId+' ###');
+    } else {
+        console.log("### "+idReq+" | "+result.length+' ### - ###');
+    }
+    $("#sel_tlreqid3_change").empty();
+    $("#sel_tlreqid3_change").append('<option value="" selected>Please select ...</option>');
+    $.each( data, function( key, value ) {
+        if (result.length>pos) {
+        if (result[pos].requirementId==value.requirementId) {
+            $("#sel_tlreqid3_change").append('<option value="'+value.id+'" selected>'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        } else {
+            $("#sel_tlreqid3_change").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        };
+        } else {
+            $("#sel_tlreqid3_change").append('<option value="'+value.id+'">'+value.requirementId+' ('+value.desc.substr(0,60)+'...)</option>');
+        }
+    });
 }
 
 /* Get Dropdown Data for ReqStd */
@@ -192,7 +288,6 @@ function manageOptionApplicableToPL(data, applicableToPL) {
 
 /* manage data list */
 function manageData() {
-    console.log("2# "+url+'api/getData_view-project-acronym.php?idProject='+idProject);
 	$.ajax({
 		dataType: 'json',
 		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject,
@@ -225,6 +320,36 @@ function manageData() {
 
 }
 
+/* manage data list for all items */
+function manageDataAll() {
+	is_ajax_fire = 0;
+
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject+'&showAll=1',
+		data: {page:page}
+	}).done(function(data){
+		total_page = 1;
+		current_page = page;
+
+		$('#pagination').twbsPagination({
+			totalPages: total_page,
+			visiblePages: current_page,
+			onPageClick: function (event, pageL) {
+				page = pageL;
+				if(is_ajax_fire != 0){
+					getPageData();
+				}
+			}
+		});
+
+		manageRow(data.data);
+		is_ajax_fire = 1;
+
+	});
+
+}
+
 /* Get Page Data*/
 function getPageData() {
 	$.ajax({
@@ -245,10 +370,9 @@ function manageRow(data) {
         }
         rows = rows + '<tr>';
         rows = rows + '<td>'+value.id+'</td>';
-        //rows = rows + '<td>'+value.idAcronym+'</td>';
         rows = rows + '<td>'+value.requirementId+'</td>';
         rows = rows + '<td>'+value.clause+'</td>';
-        //rows = rows + '<td>'+value.shortDesc+'</td>';
+        rows = rows + '<td class=\'hidden\'>'+value.shortDesc+'</td>';
         rows = rows + '<td>'+value.desc+'</td>';
         rows = rows + '<td>'+value.notes+'</td>';
         rows = rows + '<td>'+value.justification+'</td>';
@@ -256,7 +380,7 @@ function manageRow(data) {
         rows = rows + '<td>'+value.applicableToPayloads+'</td>';
         rows = rows + '<td data-id="'+value.id+'">';
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
-        rows = rows + '<button class="btn btn-success change-status">Chg</button> ';
+        rows = rows + '<button data-toggle="modal" data-target="#change-status" class="btn btn-success change-status">Chg</button> ';
         rows = rows + '<button class="btn btn-danger remove-item">Del</button>';
         rows = rows + '</td>';
         rows = rows + '</tr>';
@@ -265,9 +389,14 @@ function manageRow(data) {
     $("tbody").html(rows);
 }
 
+/* Show all Items */
+$(".crud-submit-show").click(function(e){
+    manageDataAll();
+});
+
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    e.preventDefault();
+    //e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var idProject = $("#create-item").find("input[name='idProject']").val();
     
@@ -279,12 +408,14 @@ $(".crud-submit").click(function(e){
     
     var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
-    var comment = $("#create-item").find("input[name='comment']").val();
+    var notes = $("#create-item").find("input[name='notes']").val();
     var closeOut = $("#create-item").find("input[name='closeOut']").val();
     var test = $("#create-item").find("input[name='test']").val();
     var codeTrace = $("#create-item").find("input[name='codeTrace']").val();
     
     var idTLReqId = $("#create-item").find("select[name='idTLReqId_create']").val();
+    var idTLReqId2 = $("#create-item").find("select[name='idTLReqId2_create']").val();
+    var idTLReqId3 = $("#create-item").find("select[name='idTLReqId3_create']").val();
     var newTLReqId = $("#create-item").find("input[name='newTLReqId']").val();
     var newTLReqShortDesc = $("#create-item").find("textarea[name='newTLReqShortDesc']").val();
     
@@ -298,12 +429,14 @@ $(".crud-submit").click(function(e){
     
     console.log("shortDesc "+shortDesc);
     console.log("desc "+desc);
-    console.log("comment "+comment);
+    console.log("notes "+notes);
     console.log("closeOut "+closeOut);
     console.log("test "+test);
     console.log("codeTrace "+codeTrace);
     
     console.log("idTLReqId "+idTLReqId);
+    console.log("idTLReqId2 "+idTLReqId2);
+    console.log("idTLReqId3 "+idTLReqId3);
     console.log("newTLReqId "+newTLReqId);
     console.log("newTLReqShortDesc "+newTLReqShortDesc);
 
@@ -315,11 +448,12 @@ $(".crud-submit").click(function(e){
             url: url + form_action,
             data:{idProject:idProject, idReqCat:idReqCat, newCat:newCat, requirementNr:requirementNr, 
                     idReqType:idReqType, idReqVerif:idReqVerif, shortDesc:shortDesc, desc:desc, 
-                    comment:comment, closeOut:closeOut, test:test, codeTrace:codeTrace, 
-                    idTLReqId:idTLReqId, newTLReqId:newTLReqId, newTLReqShortDesc:newTLReqShortDesc}
+                    notes:notes, closeOut:closeOut, test:test, codeTrace:codeTrace, 
+                    idTLReqId:idTLReqId, idTLReqId2:idTLReqId2, idTLReqId3:idTLReqId3, newTLReqId:newTLReqId, 
+                    newTLReqShortDesc:newTLReqShortDesc}
         }).done(function(data){
             $("#create-item").find("input[name='idProject']").val('');
-            $("#create-item").find("select[name='idAcronym_create']").val('');
+            $("#create-item").find("select[name='idReqCat']").val('');
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
@@ -358,10 +492,50 @@ $("body").on("click",".remove-item",function(){
 
 });
 
+/* Change Status */
+$("body").on("click",".change-status",function(){
+
+    var id = $(this).parent("td").data('id');
+
+    getDropdownDataTopLevReqChange(id);
+
+    $("#change-status").find(".change-id").val(id);
+
+});
+
+/* Change Status */
+$(".crud-submit-change").click(function(e){
+
+    e.preventDefault();
+    var form_action = $("#change-status").find("form").attr("action");
+    var idTLReqId_change = $("#change-status").find("select[name='idTLReqId_change']").val();
+    var idTLReqId2_change = $("#change-status").find("select[name='idTLReqId2_change']").val();
+    var idTLReqId3_change = $("#change-status").find("select[name='idTLReqId3_change']").val();
+    var id = $("#change-status").find(".change-id").val();
+
+    if(id != ''){
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + form_action,
+            data:{id:id, idTLReqId_change:idTLReqId_change, idTLReqId2_change:idTLReqId2_change, 
+            idTLReqId3_change:idTLReqId3_change}
+        }).done(function(data){
+            getPageData();
+            $(".modal").modal('hide');
+            toastr.success('Status Changed Successfully.', 'Success Alert', {timeOut: 5000});
+        });
+    }else{
+        alert('You are missing the description.')
+    }
+
+});
+
 /* Edit Item */
 $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var desc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var notes = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
     var justification = $(this).parent("td").prev("td").prev("td").prev("td").text();
@@ -371,6 +545,7 @@ $("body").on("click",".edit-item",function(){
     getDropdownDataApplicability(applicability);
     getDropdownDataApplicableToPL(applicableToPL);
 
+    $("#edit-item").find("input[name='shortDesc']").val(shortDesc);
     $("#edit-item").find("textarea[name='desc']").val(desc);
     $("#edit-item").find("textarea[name='notes']").val(notes);
     $("#edit-item").find("textarea[name='justification']").val(justification);

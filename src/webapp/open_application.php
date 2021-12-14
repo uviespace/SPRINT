@@ -305,6 +305,8 @@ while ($row = $result->fetch_assoc()) {
                               <option value='12'>Project Requirements for SRS</option>
                               <option value='13'>Project TM/TC Commands</option>
                               <option value='14'>Project TM/TC Reports</option>
+                              <option value='15'>Mission/Instrument Level Requirements</option>
+                              <option value='16'>Subsystem Level Requirements</option>
                           </select>
                       </div>
                   </div>

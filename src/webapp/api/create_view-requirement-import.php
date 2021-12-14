@@ -44,6 +44,12 @@ if ($action == 'link') {
           "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`, `notes`, `justification`, `applicability`, `applicableToPayloads`) ".
           "VALUES ".
           "('".$idProject."', 2, '".$post['reqId']."', '', '".$post['reqText']."', '".$post['notes']."', '".$post['justification']."', '".$post['applicability']."', '".$post['applicableToPL']."')";
+    } else if ($idReqList==15) {
+        $sql = 
+          "INSERT INTO `projectrequirement` ".
+          "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`, `notes`, `justification`, `applicability`, `applicableToPayloads`) ".
+          "VALUES ".
+          "('".$idProject."', 2, '".$post['reqId']."', '".$post['reqShortText']."', '".$post['reqText']."', '".$post['comment']."', '', '', '')";
     } else {
         $sql = "SELECT * FROM `projectrequirement`";
     }
@@ -79,6 +85,7 @@ if ($action == 'link') {
 
 /*
 $sql = "SELECT * FROM `parameter` WHERE idStandard = ".$post['idStandard']." AND domain = '".$post['domain']."' ORDER BY id DESC LIMIT 1"; 
+$sql = "SELECT * FROM `projectrequirement`";
 
 $result = $mysqli->query($sql);
 

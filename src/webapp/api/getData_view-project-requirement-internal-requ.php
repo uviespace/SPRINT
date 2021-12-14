@@ -27,7 +27,7 @@ $result = $mysqli->query($sql_reqCat);
 $row = $result->fetch_assoc();
 $reqCatName = $row['category'];
 
-$sqlTotal = "SELECT ".
+$sqlTotal = "SELECT DISTINCT ".
   "pr.id AS id, pr.*, (SELECT GROUP_CONCAT(spr.requirementId) FROM `projectrequirement` AS spr, `requirementrequirement` AS srr WHERE spr.id = srr.idProjectRequirementExternal AND srr.idProjectRequirementInternal = pr.id AND spr.idDocRelation = 2) AS clause ".
   "FROM ".
   "`projectrequirement` AS pr, `requirementrequirement` AS rr ".
@@ -36,7 +36,7 @@ $sqlTotal = "SELECT ".
   "pr.idDocRelation = 1 AND ".
   "rr.idProjectRequirementInternal = pr.id AND ".
   "pr.idProject = ".$idProject." ";
-$sql = "SELECT ".
+$sql = "SELECT DISTINCT ".
   "pr.id AS id, pr.*, (SELECT GROUP_CONCAT(spr.requirementId) FROM `projectrequirement` AS spr, `requirementrequirement` AS srr WHERE spr.id = srr.idProjectRequirementExternal AND srr.idProjectRequirementInternal = pr.id AND spr.idDocRelation = 2) AS clause ".
   "FROM ".
   "`projectrequirement` AS pr, `requirementrequirement` AS rr ".
@@ -65,7 +65,7 @@ $sql = "SELECT ".
   "pr.idProject = ".$idProject." ".
   "ORDER BY pr.requirementId ASC LIMIT $start_from, $num_rec_per_page";*/
 } else {
-$sqlTotal = "SELECT ".
+$sqlTotal = "SELECT DISTINCT ".
   "pr.id AS id, pr.*, (SELECT GROUP_CONCAT(spr.requirementId) FROM `projectrequirement` AS spr, `requirementrequirement` AS srr WHERE spr.id = srr.idProjectRequirementExternal AND srr.idProjectRequirementInternal = pr.id AND spr.idDocRelation = 2) AS clause ".
   "FROM ".
   "`projectrequirement` AS pr, `requirementrequirement` AS rr ".
@@ -73,7 +73,7 @@ $sqlTotal = "SELECT ".
   "pr.idDocRelation = 1 AND ".
   "rr.idProjectRequirementInternal = pr.id AND ".
   "pr.idProject = ".$idProject." ";
-$sql = "SELECT ".
+$sql = "SELECT DISTINCT ".
   "pr.id AS id, pr.*, (SELECT GROUP_CONCAT(spr.requirementId) FROM `projectrequirement` AS spr, `requirementrequirement` AS srr WHERE spr.id = srr.idProjectRequirementExternal AND srr.idProjectRequirementInternal = pr.id AND spr.idDocRelation = 2) AS clause ".
   "FROM ".
   "`projectrequirement` AS pr, `requirementrequirement` AS rr ".

@@ -211,6 +211,11 @@ function manageRow(data) {
             rows = rows + '<td><p style="word-break:normal;">'+value.justification+'</p></td>';
             rows = rows + '<td>'+value.applicability+'</td>';
             rows = rows + '<td>'+value.applicableToPayloads+'</td>';
+        } else if (idReqList==15) {
+            rows = rows + '<td>'+value.requirementId+'</td>';
+            rows = rows + '<td>'+value.shortDesc+'</td>';
+            rows = rows + '<td><p style="word-break:normal;">'+value.desc+'</p></td>';
+            rows = rows + '<td><p style="word-break:normal;">'+value.notes+'</p></td>';
         } else {
             rows = rows + '<td>'+value.clause+'</td>';
             rows = rows + '<td><p style="word-break:normal;">'+value.desc+'</p></td>';
@@ -391,6 +396,38 @@ $("body").on("click",".add-item10",function(){
 
 });
 
+/* Add Item 15 */
+$("body").on("click",".add-item15",function(){
+	var id = $(this).parent("td").data('id');
+    var reqId = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var reqShortText = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var reqText = $(this).parent("td").prev("td").prev("td").text();
+    var comment = $(this).parent("td").prev("td").text();
+	toastr.success('Item ['+reqId+' / '+reqShortText+' / '+reqText+'] Linked Successfully.', 'Success Alert', {timeOut: 5000});
+    
+    console.log('Item ['+reqId+' / '+reqShortText+' / '+reqText+'] Linked Successfully.');
+    
+	var c_obj = $(this).parents("tr");
+	$.ajax({
+		/*dataType: 'json',*/
+		type:'POST',
+		url: url + 'api/create_view-requirement-import.php?idProject='+idProject+'&idReqList='+idReqList,
+		data:{id:id, reqId:reqId, reqShortText:reqShortText, reqText:reqText, comment:comment},
+		success: function(result) { // we got the response
+			//alert('Successfully called');
+		},
+		error: function(jqxhr, status, exception) {
+			alert(status + ' | '+jqxhr+' | Exception:', exception);
+		}
+	}).done(function(data){
+		c_obj.remove();
+		toastr.success('Item Added Successfully.', 'Success Alert', {timeOut: 5000});
+		getPageData();
+	});
+	toastr.success('B) Item Added Successfully.', 'Success Alert', {timeOut: 5000});
+
+});
+
 /* Link Item */
 $("body").on("click",".link-item",function(){
 	var id = $(this).parent("td").data('id');
@@ -441,16 +478,18 @@ $("body").on("click",".remove-item",function(){
 $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").text();
-    var desc = $(this).parent("td").prev("td").text();
+    var requirementId = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var desc = $(this).parent("td").prev("td").prev("td").text();
+    var notes = $(this).parent("td").prev("td").text();
 
     //getDropdownDataKind(kind, "#sel_kind");
     //getDropdownDataParameterDatatype(idType, "#sel_datatype");
 
-    $("#edit-item").find("input[name='name']").val(name);
+    $("#edit-item").find("input[name='requirementId']").val(requirementId);
     $("#edit-item").find("textarea[name='shortDesc']").val(shortDesc);
     $("#edit-item").find("textarea[name='desc']").val(desc);
+    $("#edit-item").find("textarea[name='notes']").val(notes);
     $("#edit-item").find(".edit-id").val(id);
 
 });
@@ -459,16 +498,18 @@ $("body").on("click",".edit-item",function(){
 $("body").on("click",".show-item",function(){
 
     var id = $(this).parent("td").data('id');
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").text();
-    var desc = $(this).parent("td").prev("td").text();
+    var requirementId = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var desc = $(this).parent("td").prev("td").prev("td").text();
+    var notes = $(this).parent("td").prev("td").text();
 
     //getDropdownDataKind(kind, "#sel_kind_show");
     //getDropdownDataParameterDatatype(idType, "#sel_datatype_show");
 
-    $("#show-item").find("input[name='name']").val(name);
+    $("#show-item").find("input[name='requirementId']").val(requirementId);
     $("#show-item").find("textarea[name='shortDesc']").val(shortDesc);
     $("#show-item").find("textarea[name='desc']").val(desc);
+    $("#show-item").find("textarea[name='notes']").val(notes);
     $("#show-item").find(".show-id").val(id);
 
 });
@@ -478,17 +519,18 @@ $(".crud-submit-edit").click(function(e){
 
     e.preventDefault();
     var form_action = $("#edit-item").find("form").attr("action");
-    var name = $("#edit-item").find("input[name='name']").val();
-    var shortDesc = $("#edit-item").find("input[name='shortDesc']").val();
+    var requirementId = $("#edit-item").find("input[name='requirementId']").val();
+    var shortDesc = $("#edit-item").find("textarea[name='shortDesc']").val();
     var desc = $("#edit-item").find("textarea[name='desc']").val();
+    var notes = $("#edit-item").find("textarea[name='notes']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
-    if(id != '' && name != '' && shortDesc != ''){
+    if(id != '' && requirementId != '' && shortDesc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, name:name, shortDesc:shortDesc, desc:desc}
+            data:{id:id, shortDesc:shortDesc, desc:desc, notes:notes}
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');

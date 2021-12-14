@@ -7,6 +7,7 @@ $num_rec_per_page = 5;
 /*if (isset($_GET["page"])) { $page = $_GET["page"]; } else { $page=1; };*/
 //if (isset($_GET["id"])) { $id = $_GET["id"]; } else { $id=0; };
 if (isset($_GET["idProject"])) { $idProject = $_GET["idProject"]; } else { $idProject=0; };
+if (isset($_GET["idReq"])) { $idReq = $_GET["idReq"]; } else { $idReq=0; };
 
 /*$start_from = ($page-1) * $num_rec_per_page;*/
 
@@ -38,6 +39,27 @@ $sql = "SELECT ".
 /*$sqlTotal = "SELECT * FROM `service`";*/
 //$sql = "SELECT * FROM `projectrequirementcategory` WHERE `idProject` = ".$idProject." AND `id` = ".$id." ORDER BY `category` ASC"; 
 //}
+if ($idReq==0) {
+$sql = "SELECT ".
+  "* ".
+  "FROM ".
+  "`projectrequirement` AS pr ".
+  "WHERE ".
+  "pr.idDocRelation = 2 AND ".
+  "pr.idProject = ".$idProject." ".
+  "ORDER BY pr.requirementId ASC";
+} else {
+$sql = "SELECT ".
+  "pr.* ".
+  "FROM ".
+  "`projectrequirement` AS pr, `requirementrequirement` AS rr ".
+  "WHERE ".
+  "pr.id = rr.idProjectRequirementExternal AND ".
+  "rr.idProjectRequirementInternal = ".$idReq." AND ".
+  "pr.idDocRelation = 2 AND ".
+  "pr.idProject = ".$idProject." ".
+  "ORDER BY pr.requirementId ASC";
+}
 
 $result = $mysqli->query($sql);
 

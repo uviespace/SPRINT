@@ -20,7 +20,8 @@ $sqlTotal = "SELECT * FROM `projectdocument`";
 $sql = "SELECT * FROM `projectdocument` ORDER BY `id` ASC LIMIT $start_from, $num_rec_per_page";
 } else {
 $sqlTotal = "SELECT ".
-  "dv.id AS idReference, d.*, dv.*, o.name AS oname, pd.id AS id ".
+  "* ".
+  //"pd.id AS id, dv.id AS idReference, dv.identifier, d.name, d.idDocType, dv.version, dv.date, o.name AS oname, dv.filename ".
   "FROM ".
   "`document` AS d, `docVersion` AS dv, `organisation` AS o, `projectdocument` AS pd ".
   "WHERE ".
@@ -29,7 +30,8 @@ $sqlTotal = "SELECT ".
   "d.id = pd.idDocument AND ".
   "pd.idProject = ".$idProject." ";
 $sql = "SELECT ".
-  "dv.id AS idReference, d.*, dv.*, o.name AS oname, pd.id AS id ".
+  "* ".
+  //"pd.id AS id, dv.id AS idReference, dv.identifier, d.name, d.idDocType, dv.version, dv.date, o.name AS oname, dv.filename ".
   "FROM ".
   "`document` AS d, `docVersion` AS dv, `organisation` AS o, `projectdocument` AS pd ".
   "WHERE ".

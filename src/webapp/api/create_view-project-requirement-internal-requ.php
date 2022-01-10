@@ -35,6 +35,11 @@ if ($post['idReqVerif'] != '' && $post['idReqVerif'] != '-') {
 
 echo "reqId = $reqId";
 
+  // check if requirement already exists
+  $sql = "SELECT * FROM `projectrequirement` WHERE `idProject` = ".$post['idProject']." AND `requirementId` = '".$reqId."'";
+  $result = $mysqli->query($sql);
+  $num_rows = mysqli_num_rows($result);
+  if ($num_rows==0) {
 
     $sql = 
       "INSERT INTO ".
@@ -55,8 +60,8 @@ echo "reqId = $reqId";
         $result_newTLReq = $mysqli->query($sql_newTLReq);
         $num_rows = mysqli_num_rows($result_newTLReq);
         if ($num_rows==0) {
-            // insert new Top-level requirement
-            $sql_addTLReq = "";
+            // insert new top-level requirement
+            $sql_addTLReq = "INSERT INTO `projectrequirement` (`idProject`, `idDocRelation`, `requirementId`, `desc`) VALUES (".$post['idProject'].", 2, '".$post['newTLReqId']."', '".$post['newTLReqDesc']."') ";
             $result_addTLReq = $mysqli->query($sql_addTLReq);
 
             // get id
@@ -90,45 +95,7 @@ echo "reqId = $reqId";
 
     }
 
-// check if requirement id exists already
-/*
-$sql = 
-  "SELECT ".
-  "* ".
-  "FROM ".
-  "`projectrequirement` ".
-  "WHERE ".
-  "`idProject` = ".$post['idProject']." AND ".
-  "`idDocRelation` = 2 AND ".
-  "`requirementId` = '".$post['requirementId']."' ";
-  
-$result = $mysqli->query($sql);
-  
-if ($result->num_rows == 0) {
-    
-    $sql = 
-      "INSERT INTO ".
-      "`projectrequirement` ".
-      "(`idProject`, `idDocRelation`, `requirementId`) ".
-      "VALUES ".
-      "('".$post['idProject']."',2,'".$post['requirementId']."')";
-
-    $result = $mysqli->query($sql);
-    
-    // get id
-    $insert_id = $mysqli->insert_id;
-    
-    $sql = 
-      "INSERT INTO ".
-      "`requirementstandard` ".
-      "(`idProjectStandard`, `idProjectRequirement`) ".
-      "VALUES ".
-      "('".$post['idRequirement_create']."','".$insert_id."')";
-
-    $result = $mysqli->query($sql);
-
-}
-*/
+  }
 
 $sql = "SELECT * FROM `projectacronym` ORDER BY id DESC LIMIT 1"; 
 

@@ -119,6 +119,74 @@ if ($action == "exp_acr") {
     
     // end page
     die('');
+} else if ($action == "exp_int_req") {
+    //echo "Export List of Internal Requirements ...<br/>";
+    
+    $project_name_cap = ucfirst(strtolower($project_name));
+    
+    $path_tmp = "documentation/out/"; // could also be tmp/
+    $filename = $project_name_cap."IaswReq.csv";
+    $file = $path_tmp . $filename;
+    
+    // get file content
+    $result = getInternalRequirements($mysqli, $idProject);
+    
+    $newcontent = "Cat;N;Type;Ver;ShortText;Text;Comment;CloseOut;Test;CodeTrace;TopLevelReq\n";
+    $delimiter = ";";
+    $shortList = false;
+    while ($row = $result->fetch_assoc()) {
+        $reqId1 = explode("-", $row['requirementId']);
+        $reqId2 = explode("/", $reqId1[1]);
+        $recCat = $reqId1[0];
+        $reqN = $reqId2[0];
+        $reqType = $reqId2[1];
+        if (count($reqId2)>2) {
+            $reqVer = $reqId2[2];
+        } else {
+            $reqVer = "";
+        }
+        
+        // get top-level requirement(s)
+        $topLevelReq = "";
+        $result_TLReq = getTopLevelRequirement($mysqli, $idProject, $row['id']);
+        $num_rows = mysqli_num_rows($result_TLReq);
+        if ($result_TLReq->num_rows > 0) {
+            while ($row_TLReq = $result_TLReq->fetch_assoc()) {
+                $topLevelReq .= $row_TLReq['requirementId'].",";
+            }
+            $topLevelReq = substr($topLevelReq, 0, -1);
+        }
+        
+        //$newcontent .= $row['requirementId'].$delimiter;
+        $newcontent .= $recCat.$delimiter.$reqN.$delimiter.$reqType.$delimiter.$reqVer.$delimiter;
+        if ($shortList) {
+            $newcontent .= $row['shortDesc']."\n"; 
+        } else {
+            $newcontent .= $row['shortDesc'].$delimiter.$row['desc'].$delimiter.$row['notes'].$delimiter.$row['closeOut'].$delimiter.$row['test'].$delimiter.$row['codeTrace'].$delimiter.$topLevelReq."\n"; 
+        }
+    }
+    
+    // open, write and close file
+    $myfile = fopen($file, "w");
+    fwrite($myfile, $newcontent);
+    fclose($myfile);
+    
+    // open/download file in browser
+    
+    // Header content type
+    header('Content-type: 	text/csv');
+    header('Content-Disposition: inline; filename="' . $filename . '"');
+    header('Content-Transfer-Encoding: binary');
+    header('Accept-Ranges: bytes');
+    
+    // Read the file
+    @readfile($file);
+    
+    // delete file
+    unlink($file);
+    
+    // end page
+    die('');
 }
 
 function getAcronyms($mysqli, $idProject) {
@@ -137,17 +205,6 @@ function getAcronyms($mysqli, $idProject) {
 }
 
 function getReferences($mysqli, $idProject) {
-    /*$sql = "SELECT ".
-      "pd.id AS id, d.id AS idDocument, d.name, d.shortName, d.number ".
-      "FROM ".
-      "`projectdocument` AS pd, `document` AS d ".
-      "WHERE ".
-      "pd.idDocument = d.id AND ".
-      "pd.idProject = ".$idProject." ".
-      "ORDER BY ".
-      "d.name ".
-      "ASC";*/
-    
     $sql = "SELECT ".
       "pd.id AS id, d.id AS idDocument, d.name, d.shortName, d.number, dv.* ".
       "FROM ".
@@ -158,6 +215,38 @@ function getReferences($mysqli, $idProject) {
       "pd.idProject = ".$idProject." ".
       "ORDER BY ".
       "d.name ".
+      "ASC";
+    
+    return $mysqli->query($sql);
+}
+
+function getInternalRequirements($mysqli, $idProject) {
+    $sql = "SELECT ".
+      "* ".
+      "FROM ".
+      "`projectrequirement` AS pr ".
+      "WHERE ".
+      "pr.idDocRelation = 1 AND ".
+      "pr.idProject = ".$idProject." ".
+      "ORDER BY ".
+      "pr.requirementId ".
+      "ASC";
+    
+    return $mysqli->query($sql);
+}
+
+function getTopLevelRequirement($mysqli, $idProject, $idReq) {
+    $sql = "SELECT ".
+      "pr.requirementId ".
+      "FROM ".
+      "`projectrequirement` AS pr, `requirementrequirement` AS rr ".
+      "WHERE ".
+      "rr.idProjectRequirementInternal = ".$idReq." AND ".
+      "pr.id = rr.idProjectRequirementExternal AND ".
+      "pr.idDocRelation = 2 AND ".
+      "pr.idProject = ".$idProject." ".
+      "ORDER BY ".
+      "pr.requirementId ".
       "ASC";
     
     return $mysqli->query($sql);
@@ -345,13 +434,18 @@ if ($result->num_rows > 0) {
 &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
+<a href="view_project-requirements-external-requ.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Ext. Requ.R ...</button></a>
+<!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
+
+<br/><br/>
+
 <a href="view_project-requirements-internal.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Int. Requ.S ...</button></a>
 <!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
 &nbsp;&nbsp;&nbsp;
 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
 
 <a href="view_project-requirements-internal-requ.php?idProject=<?php echo $idProject; ?>"><button style="width:180px;">Manage Int. Requ.R ...</button></a>
-<!--<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_ref"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectdocument") AND doesTableExists($mysqli, "document") AND doesTableExists($mysqli, "docversion")) { echo mysqli_num_rows(getReferences($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>-->
+<a href="open_project.php?id=<?php echo $idProject; ?>&action=exp_int_req"><span id="group"><img src="img/download.png" width="25px" /><span class="badge badge-light"><?php if (doesTableExists($mysqli, "projectrequirement") AND doesTableExists($mysqli, "requirementrequirement")) { echo mysqli_num_rows(getInternalRequirements($mysqli, $idProject)); } else { echo "0"; } ?></span></span></a>
 
 <br/><br/>
 <?php } ?>

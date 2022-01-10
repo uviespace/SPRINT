@@ -11,6 +11,7 @@
   
   $sql = 
     "UPDATE `projectrequirement` SET ".
+    "`shortDesc` = '".$post['shortDesc']."', ".
     "`desc` = '".$post['desc']."', ".
     "`notes` = '".$post['notes']."', ".
     "`justification` = '".$post['justification']."', ".

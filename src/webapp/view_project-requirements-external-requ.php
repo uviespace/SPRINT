@@ -46,7 +46,7 @@ $userEmail = $row["email"];
 ?>
 
 <head>
-	<title>Project - Requirement Management - Internal vs. External</title>
+	<title>Project - Requirement Management - External vs. Internal</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -66,7 +66,7 @@ $userEmail = $row["email"];
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
-	<script type="text/javascript" src="js/item-ajax_view-project-requirement-internal-requ.js"></script>
+	<script type="text/javascript" src="js/item-ajax_view-project-requirement-external-requ.js"></script>
 	<style type="text/css">
         .form-control-noborder {
             border: 0;
@@ -91,7 +91,7 @@ $userEmail = $row["email"];
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
 					<h4>Project <?php echo $project_name;?></h4>
-		            <h2>Requirement Management - Internal Requirements vs. Ext. Requ.</h2>
+		            <h2>Requirement Management - External Requirements vs. Int. Requ.</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
@@ -122,9 +122,9 @@ $userEmail = $row["email"];
 				<th>ID</th>
                 <!--<th>ID ACR</th>-->
 				<th>Requ. ID</th>
-                <th>Top-Level Req.</th>
-				<!--<th>Short Description</th>-->
-				<th style="width: 20%;">Description</th>
+                <th>Subsystem Req.</th>
+				<!--<th class=\'hidden\'>Short Description</th>-->
+				<th style="width: 20%">Description</th>
 				<th>Notes</th>
 				<th>Justification</th>
 				<th>App.</th>
@@ -148,13 +148,13 @@ $userEmail = $row["email"];
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_view-project-requirement-internal-requ.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_view-project-requirement-external-requ.php" method="POST">
 
 						<div class="form-group">
 							<input id="project" type="hidden" name="idProject" value="<?php echo $idProject; ?>" />
 						</div>
 
-						<div class="form-group">
+						<!--<div class="form-group">
 							<label class="control-label" for="title">Categorie:</label>
 							<select id="sel_reqcat_create" name="idReqCat_create" class="form-control" onchange="updateDivReqCatCreate();" data-error="Please enter requirement category." >
 								<option value="select"></option>
@@ -188,6 +188,12 @@ $userEmail = $row["email"];
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
+						</div>-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Requirement ID:</label>
+							<input id="reqId_create" type="text" name="reqId" class="form-control" data-error="Please enter requirement ID." required />
+							<div class="help-block with-errors"></div>
 						</div>
 
 <div><hr></div>
@@ -210,7 +216,7 @@ $userEmail = $row["email"];
 							<div class="help-block with-errors"></div>
 						</div>
 
-						<div class="form-group">
+						<!--<div class="form-group">
 							<label class="control-label" for="title">Close Out:</label>
 							<input id="closeOut_create" type="text" name="closeOut" class="form-control" data-error="Please enter close out." />
 							<div class="help-block with-errors"></div>
@@ -226,12 +232,12 @@ $userEmail = $row["email"];
 							<label class="control-label" for="title">Code Trace:</label>
 							<input id="codeTrace_create" type="text" name="codeTrace" class="form-control" data-error="Please enter code trace." />
 							<div class="help-block with-errors"></div>
-						</div>
+						</div>-->
 
 <div><hr></div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Top-Level Requirement(s):</label>
+							<label class="control-label" for="title">Subsystem Requirement(s):</label>
 							<select id="sel_tlreqid_create" name="idTLReqId_create" class="form-control" data-error="Please enter top-level requirement id." >
 								<option value="select"></option>
 							</select>
@@ -245,14 +251,14 @@ $userEmail = $row["email"];
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">New Top-level Requirement ID:</label>
-							<input id="newTLReqId_create" name="newTLReqId" class="form-control" data-error="Please enter new top-level requirement ID." />
+							<label class="control-label" for="title">New Subsystem Requirement ID:</label>
+							<input id="newTLReqId_create" name="newTLReqId" class="form-control" data-error="Please enter new subsystem requirement ID." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">New Top-Level Requirement Description:</label>
-							<textarea id="newTLReqDesc_create" name="newTLReqDesc" class="form-control" style="height:175px;" data-error="Please enter new top-level requirement description." ></textarea>
+							<label class="control-label" for="title">New Subsystem Requirement Description:</label>
+							<textarea id="newTLReqDesc_create" name="newTLReqDesc" class="form-control" style="height:175px;" data-error="Please enter new subsystem requirement description." ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -278,7 +284,7 @@ $userEmail = $row["email"];
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-project-requirement-internal.php" method="put">
+					<form data-toggle="validator" action="api/update_view-project-requirement-external.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
@@ -361,7 +367,7 @@ $userEmail = $row["email"];
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update-change_view-project-requirement-internal.php" method="put">
+					<form data-toggle="validator" action="api/update-change_view-project-requirement-external.php" method="put">
 
 		      			<input type="hidden" name="id" class="change-id">
 
@@ -372,7 +378,7 @@ $userEmail = $row["email"];
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Top-Level Requirement(s):</label>
+							<label class="control-label" for="title">Subsystem Requirement(s):</label>
 							<select id="sel_tlreqid_change" name="idTLReqId_change" class="form-control" data-error="Please enter top-level requirement id." required >
 								<option value="select"></option>
 							</select>

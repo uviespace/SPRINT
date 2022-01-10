@@ -122,7 +122,7 @@ function manageOptionReqVerifCreate(data) {
 function getDropdownDataTopLevReqCreate() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_dd-requirement-top-level.php?idProject='+idProject,
+		url: url+'api/getData_dd-requirement-subsystem.php?idProject='+idProject,
 		data: {dropdown:dropdown}
 	}).done(function(data){
 		manageOptionTopLevReqCreate(data.data);
@@ -162,12 +162,12 @@ function manageOptionTopLevReq3Create(data) {
 function getDropdownDataTopLevReqChange(idReq) {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_dd-requirement-top-level.php?idProject='+idProject,
+		url: url+'api/getData_dd-requirement-subsystem.php?idProject='+idProject,
 		data: {dropdown:dropdown}
 	}).done(function(data){
         $.ajax({
             dataType: 'json',
-            url: url+'api/getData_dd-requirement-top-level.php?idProject='+idProject+'&idReq='+idReq
+            url: url+'api/getData_dd-requirement-subsystem.php?idProject='+idProject+'&idReq='+idReq
         }).done(function(result){
             manageOptionTopLevReqChange(data.data, result.data, idReq, 0);
             manageOptionTopLevReq2Change(data.data, result.data, idReq, 1);
@@ -298,7 +298,7 @@ function manageOptionApplicableToPL(data, applicableToPL) {
 function manageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject,
+		url: url+'api/getData_view-project-requirement-external-requ.php?idProject='+idProject,
 		data: {page:page}
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
@@ -334,7 +334,7 @@ function manageDataAll() {
 
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject+'&showAll=1',
+		url: url+'api/getData_view-project-requirement-external-requ.php?idProject='+idProject+'&showAll=1',
 		data: {page:page}
 	}).done(function(data){
 		total_page = 1;
@@ -362,7 +362,7 @@ function manageDataAll() {
 function getPageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject,
+		url: url+'api/getData_view-project-requirement-external-requ.php?idProject='+idProject,
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);
@@ -415,18 +415,19 @@ $(".crud-submit").click(function(e){
     var form_action = $("#create-item").find("form").attr("action-data");
     var idProject = $("#create-item").find("input[name='idProject']").val();
     
-    var idReqCat = $("#create-item").find("select[name='idReqCat_create']").val();
+    /*var idReqCat = $("#create-item").find("select[name='idReqCat_create']").val();
     var newCat = $("#create-item").find("input[name='newCat']").val();
     var requirementNr = $("#create-item").find("input[name='requirementNr']").val();
     var idReqType = $("#create-item").find("select[name='idReqType_create']").val();
-    var idReqVerif = $("#create-item").find("select[name='idReqVerif_create']").val();
+    var idReqVerif = $("#create-item").find("select[name='idReqVerif_create']").val();*/
+    var reqId = $("#create-item").find("input[name='reqId']").val();
     
     var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
     var desc = $("#create-item").find("textarea[name='desc']").val();
     var notes = $("#create-item").find("input[name='notes']").val();
-    var closeOut = $("#create-item").find("input[name='closeOut']").val();
+    /*var closeOut = $("#create-item").find("input[name='closeOut']").val();
     var test = $("#create-item").find("input[name='test']").val();
-    var codeTrace = $("#create-item").find("input[name='codeTrace']").val();
+    var codeTrace = $("#create-item").find("input[name='codeTrace']").val();*/
     
     var idTLReqId = $("#create-item").find("select[name='idTLReqId_create']").val();
     var idTLReqId2 = $("#create-item").find("select[name='idTLReqId2_create']").val();
@@ -436,18 +437,19 @@ $(".crud-submit").click(function(e){
     
     console.log("idProject "+idProject);
     
-    console.log("idReqCat "+idReqCat);
+    /*console.log("idReqCat "+idReqCat);
     console.log("newCat "+newCat);
     console.log("requirementNr "+requirementNr);
     console.log("idReqType "+idReqType);
-    console.log("idReqVerif "+idReqVerif);
+    console.log("idReqVerif "+idReqVerif);*/
+    console.log("Requirement "+reqId);
     
     console.log("shortDesc "+shortDesc);
     console.log("desc "+desc);
     console.log("notes "+notes);
-    console.log("closeOut "+closeOut);
+    /*console.log("closeOut "+closeOut);
     console.log("test "+test);
-    console.log("codeTrace "+codeTrace);
+    console.log("codeTrace "+codeTrace);*/
     
     console.log("idTLReqId "+idTLReqId);
     console.log("idTLReqId2 "+idTLReqId2);
@@ -455,20 +457,17 @@ $(".crud-submit").click(function(e){
     console.log("newTLReqId "+newTLReqId);
     console.log("newTLReqDesc "+newTLReqDesc);
 
-    if(idProject != '' && (idReqCat != '' || newCat != '') && requirementNr != '' && idReqType != '' && 
-            idReqVerif != '' && desc != ''){
+    if(idProject != '' && reqId != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{idProject:idProject, idReqCat:idReqCat, newCat:newCat, requirementNr:requirementNr, 
-                    idReqType:idReqType, idReqVerif:idReqVerif, shortDesc:shortDesc, desc:desc, 
-                    notes:notes, closeOut:closeOut, test:test, codeTrace:codeTrace, 
+            data:{idProject:idProject, reqId:reqId, shortDesc:shortDesc, desc:desc, notes:notes, 
                     idTLReqId:idTLReqId, idTLReqId2:idTLReqId2, idTLReqId3:idTLReqId3, newTLReqId:newTLReqId, 
                     newTLReqDesc:newTLReqDesc}
         }).done(function(data){
             $("#create-item").find("input[name='idProject']").val('');
-            $("#create-item").find("select[name='idReqCat']").val('');
+            $("#create-item").find("input[name='reqId']").val('');
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
@@ -491,7 +490,7 @@ $("body").on("click",".remove-item",function(){
 	$.ajax({
 		dataType: 'json',
 		type:'POST',
-		url: url + 'api/delete_view-project-requirement-internal-requ.php',
+		url: url + 'api/delete_view-project-requirement-external-requ.php',
 		data:{id:id}
 	}).done(function(data){
         if (data['status'] == 1001) {
@@ -639,7 +638,7 @@ function manageOptionDiscriminantDescriptionCreate(data, disc, idProject) {
     
     $.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-project-requirement-internal-requ.php?idProject='+idProject+'&reqCat='+disc,
+		url: url+'api/getData_view-project-requirement-external-requ.php?idProject='+idProject+'&reqCat='+disc,
 		data: {dropdown:dropdown}
 	}).done(function(data){
 		//manageOptionDiscriminantDescriptionCreate(data.data, disc);

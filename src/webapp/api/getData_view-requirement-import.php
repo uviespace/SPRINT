@@ -64,6 +64,22 @@ $sql = "SELECT ".
       "pr.idDocRelation = 2 AND ".
       "pr.idProject = ".$idProject." ".
       "ORDER BY pr.requirementId ASC LIMIT $start_from, $num_rec_per_page";
+  } else if ($idReqList == 12) {
+    $sqlTotal = "SELECT ".
+      "pr.* ".
+      "FROM ".
+      "`projectrequirement` AS pr ".
+      "WHERE ".
+      "pr.idDocRelation = 1 AND ".
+      "pr.idProject = ".$idProject." ";
+    $sql = "SELECT ".
+      "pr.* ".
+      "FROM ".
+      "`projectrequirement` AS pr ".
+      "WHERE ".
+      "pr.idDocRelation = 1 AND ".
+      "pr.idProject = ".$idProject." ".
+      "ORDER BY pr.requirementId ASC LIMIT $start_from, $num_rec_per_page";
   } else if ($idReqList == 15) {
     $sqlTotal = "SELECT ".
       "pr.* ".

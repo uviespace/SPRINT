@@ -44,6 +44,12 @@ if ($action == 'link') {
           "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`, `notes`, `justification`, `applicability`, `applicableToPayloads`) ".
           "VALUES ".
           "('".$idProject."', 2, '".$post['reqId']."', '', '".$post['reqText']."', '".$post['notes']."', '".$post['justification']."', '".$post['applicability']."', '".$post['applicableToPL']."')";
+    } else if ($idReqList==12) {
+        $sql = 
+          "INSERT INTO `projectrequirement` ".
+          "(`idProject`, `idDocRelation`, `requirementId`, `shortDesc`, `desc`, `notes`, `closeOut`, `test`, `codeTrace`) ".
+          "VALUES ".
+          "('".$idProject."', 1, '".$post['reqId']."', '".$post['reqShortText']."', '".$post['reqText']."', '".$post['notes']."', '".$post['closeOut']."', '".$post['test']."', '".$post['codeTrace']."')";
     } else if ($idReqList==15) {
         $sql = 
           "INSERT INTO `projectrequirement` ".
@@ -77,6 +83,18 @@ if ($action == 'link') {
         if (mysqli_num_rows($result)==1) {
             $row = $result->fetch_assoc();
             $sql_link = "INSERT INTO `requirementstandard` (`idProjectStandard`, `idProjectRequirement`) VALUES (".$row['id'].", ".$reqId.")";
+            $result_link = $mysqli->query($sql_link);
+        }
+    } else if ($idReqList==12) {
+        $reqId = $mysqli->insert_id;
+        
+        // search for Top-level requirement
+        $sql_reqTL = "SELECT * FROM `projectrequirement` WHERE `idDocRelation` = 2 AND `requirementId` = '".$post['reqTL']."'";
+        $result = $mysqli->query($sql_reqTL);
+        
+        if (mysqli_num_rows($result)==1) {
+            $row = $result->fetch_assoc();
+            $sql_link = "INSERT INTO `requirementrequirement` (`idProjectRequirementExternal`, `idProjectRequirementInternal`) VALUES (".$row['id'].", ".$reqId.")";
             $result_link = $mysqli->query($sql_link);
         }
     }

@@ -211,6 +211,28 @@ function manageRow(data) {
             rows = rows + '<td><p style="word-break:normal;">'+value.justification+'</p></td>';
             rows = rows + '<td>'+value.applicability+'</td>';
             rows = rows + '<td>'+value.applicableToPayloads+'</td>';
+        } else if (idReqList==12) {
+            const reqId1 = value.requirementId.split('-');
+            const reqId2 = reqId1[1].split('/');
+            var reqCat = reqId1[0];
+            var reqN = reqId2[0];
+            var reqType = reqId2[1];
+            if (reqId2.length > 2) {
+                var reqVer = reqId2[2];
+            } else {
+                var reqVer = "";
+            }
+            rows = rows + '<td>'+reqCat+'</td>';
+            rows = rows + '<td>'+reqN+'</td>';
+            rows = rows + '<td>'+reqType+'</td>';
+            rows = rows + '<td>'+reqVer+'</td>';
+            rows = rows + '<td>'+value.shortDesc+'</td>';
+            rows = rows + '<td><p style="word-break:normal;">'+value.desc+'</p></td>';
+            rows = rows + '<td><p style="word-break:normal;">'+value.notes+'</p></td>';
+            rows = rows + '<td><p style="word-break:normal;">'+value.closeOut+'</p></td>';
+            rows = rows + '<td>'+value.test+'</td>';
+            rows = rows + '<td>'+value.codeTrace+'</td>';
+            rows = rows + '<td></td>';
         } else if (idReqList==15) {
             rows = rows + '<td>'+value.requirementId+'</td>';
             rows = rows + '<td>'+value.shortDesc+'</td>';
@@ -381,6 +403,55 @@ $("body").on("click",".add-item10",function(){
 		url: url + 'api/create_view-requirement-import.php?idProject='+idProject+'&idReqList='+idReqList,
 		data:{id:id, reqId:reqId, ecssClause:ecssClause, reqText:reqText, notes:notes, justification:justification,
               applicability:applicability, applicableToPL:applicableToPL},
+		success: function(result) { // we got the response
+			//alert('Successfully called');
+		},
+		error: function(jqxhr, status, exception) {
+			alert(status + ' | '+jqxhr+' | Exception:', exception);
+		}
+	}).done(function(data){
+		c_obj.remove();
+		toastr.success('Item Added Successfully.', 'Success Alert', {timeOut: 5000});
+		getPageData();
+	});
+	//toastr.success('B) Item Added Successfully.', 'Success Alert', {timeOut: 5000});
+
+});
+
+/* Add Item 12 */
+$("body").on("click",".add-item12",function(){
+	var id = $(this).parent("td").data('id');
+    
+    var reqCat = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var reqN = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var reqType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var reqVer = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    
+    var reqShortText = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var reqText = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var comment = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    
+    var closeOut = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var test = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var codeTrace = $(this).parent("td").prev("td").prev("td").text();
+    
+    var reqTL = $(this).parent("td").prev("td").text();
+	//toastr.success('Item ['+reqId+' / '+ecssClause+' / '+reqText+'] Linked Successfully.', 'Success Alert', {timeOut: 5000});
+    
+    if (reqVer != '') {
+        reqId = reqCat+'-'+reqN+'/'+reqType+'/'+reqVer;
+    } else {
+        reqId = reqCat+'-'+reqN+'/'+reqType;
+    }
+    console.log('Item ['+reqId+' / '+reqShortText+' / '+reqText+' / '+reqTL+'] Linked Successfully.');
+    
+	var c_obj = $(this).parents("tr");
+	$.ajax({
+		/*dataType: 'json',*/
+		type:'POST',
+		url: url + 'api/create_view-requirement-import.php?idProject='+idProject+'&idReqList='+idReqList,
+		data:{id:id, reqId:reqId, reqShortText:reqShortText, reqText:reqText, comment:comment, closeOut:closeOut,
+              test:test, codeTrace:codeTrace, reqTL:reqTL},
 		success: function(result) { // we got the response
 			//alert('Successfully called');
 		},

@@ -140,6 +140,30 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
+// get all internal requirements in database  
+$intReqNames[] = null;
+$sqlTotal = 
+  "SELECT ".
+  "* ".
+  "FROM ".
+  "`projectrequirement` ".
+  "WHERE ".
+  "idDocRelation = 1 AND ".
+  "idProject = ".$idProject;
+  
+$result = $mysqli->query($sqlTotal);
+
+$num_rows = mysqli_num_rows($result);
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        //echo "found: ".$row["requirementId"]."<br/>";
+        $intReqNames[] = $row["requirementId"]."|".$row["desc"];
+    }
+} else {
+    //echo "0 results";
+}
 
 // Check if image file is a actual image or fake image
 if(isset($_POST["importAcrList"])) {
@@ -1205,29 +1229,35 @@ file_put_contents( $target_file, $contents );
         $test = $data[8];
         $codeTrace = $data[9];
         $topLevelReq = $data[10];
+        
+        if ($ver != "") {
+            $reqId = $cat."-".$n."/".$type."/".$ver;
+        } else {
+            $reqId = $cat."-".$n."/".$type;
+        }
+        $reqText = $text;
 
-/*
 	  // check if name exists already in Data Pool
 	  $foundName = false;
       $foundShortDesc = false;
       if ($reqId!="") {
-	  foreach ($extReqNames as $acrName) {
+	  foreach ($intReqNames as $acrName) {
         //echo "Value: ".$acrName."<br/>";
 	    if(explode("|", $acrName)[0] == $reqId) {
 			//echo "Value: ".$acrName."<br/><br/>";
-			$foundName = true;*/
-            /*$pos = strpos(explode("|", $acrName)[1], $col02);
+			$foundName = true;
+/*            $pos = strpos(explode("|", $acrName)[1], $col02);
             if ($pos === false) {
             } else {*/
             //if (strpos(explode("|", $acrName)[1], $col02)) {
             //if (strpos($col02, explode("|", $acrName)[1])) {
-/*            if (explode("|", $acrName)[1] == $reqText) {
+            if (explode("|", $acrName)[1] == $reqText) {
                 $foundShortDesc = true;
             }
 			break;
 		}
 	  }
-      }*/
+      }
 
 
 /*    if ($ecssClause!="") {
@@ -1297,10 +1327,10 @@ file_put_contents( $target_file, $contents );
     }
 
     echo "<td data-id=\"'+value.id+'\">";
-    echo "<button class=\"btn btn-success add-item12\">Add</button>";
-    /*if ($foundName) {
+    //echo "<button class=\"btn btn-success add-item12\">Add</button>";
+    if ($foundName) {
         if ($foundShortDesc) {
-            // check if acronym already linked to this project
+            // check if requirement already linked to this project
             if (linkedToProject($mysqli, $idProject, $data)) {
                 echo "<p style='font-size:x-small;word-break:normal;color:blue;'>Item already found in Database and is also linked to this project!</p>";
             } else {
@@ -1309,14 +1339,14 @@ file_put_contents( $target_file, $contents );
                 echo "<button class=\"btn btn-primary link-item\">Link</button>";
             }
         } else {
-            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Acronym already found in Database, but short description differs!</p>";
+            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Requirement already found in Database, but short description differs!</p>";
             //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
-            echo "<button class=\"btn btn-success add-item10\">Add</button>";
+            echo "<button class=\"btn btn-success add-item12\">Add</button>";
         }
 	} else {
 		//echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
-		echo "<button class=\"btn btn-success add-item10\">Add</button>";
-	}*/
+		echo "<button class=\"btn btn-success add-item12\">Add</button>";
+	}
 	echo "</td>";
 	echo "</tr>";
         

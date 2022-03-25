@@ -602,10 +602,23 @@ def gen_cpc(app, path):
                     'D' if ptc == 10 else \
                     'R'  # default value
                 # check for parameter limits
+                # TODO: check also for enumerations
+                enum = param['type']['enums']
                 limit = param["_limits"]["hash"]
-                if len(limit) >= 1:
+                enum_cnt = len(enum)
+                limit_cnt = len(limit)
+                #limit = param["_limits"]["hash"]
+                #if len(limit) >= 1:
+                if (enum_cnt > 0):
+                    for id in enum:
+                        #par_limit_id = get_prf_name(id)
+                        par_limit_id = get_prf_name(param["_nr"])
+                        break  # only once
+                elif (limit_cnt > 0):
+                    # TODO:
                     for id in limit:
-                        par_limit_id = get_prf_name(id)
+                        #par_limit_id = get_prf_name(id)
+                        par_limit_id = get_prf_name(param["_nr"])
                         break  # only once
                 else:
                     par_limit_id = ''
@@ -678,9 +691,28 @@ def gen_prf(app, path):
     for relation in app["standards"]:
         if relation["relation"] == 1:
             standard = relation["standard"]
-            for param in standard["params"]["list"]:
+            # only TC parameters should go in here
+            # like in gen_cpc: for param in standard["packets"]["TC"]["params"].values():
+            for param in standard["packets"]["TC"]["params"].values():
+            #for param in standard["params"]["list"]:
+                enum_cnt = len(param['type']['enums'])
                 limit_cnt = len(param["_limits"]["hash"])
-                if (limit_cnt != 0):
+                if (enum_cnt > 0):
+                    #print("ENUMS", param['type']['enums'])
+                    prf_inter = 'E'
+                    prf_dspfmt = 'A'
+                    prf_radix = 'D'
+                    par_limit_id = get_prf_name(param["_nr"])
+                    writeln(f, [
+                        par_limit_id,  # parameter range set identification name.
+                        outp(param["name"], 24),  # textual description of the parameter range set
+                        prf_inter,  # raw representation 'R' or engineering representation 'E'
+                        prf_dspfmt,  # representation type of the values specified for this range set (PRV table)
+                        prf_radix,  # radix used for the range values specified in the corresponding records (PRV table)
+                        str(enum_cnt),  # number of records defined in the PRV table for this range set
+                        ''  # OPTIONAL: engineering unit mnemonic for consistency checking
+                    ])
+                elif (limit_cnt > 0):
                     #print("--> limit_cnt: ", limit_cnt)
                     #print("gen_prf: packet type: ", check_packet_type(app, param))
                     # check if parameter is in TC packet
@@ -690,7 +722,8 @@ def gen_prf(app, path):
                             #print ("id: ", id)
                             lvalue = ''
                             hvalue = ''
-                            par_limit_id = get_prf_name(id)
+                            #par_limit_id = get_prf_name(id)
+                            par_limit_id = get_prf_name(param["_nr"])
                             for y in limit[id]:
                                 #print ("key: ", y, ', value: ', limit[id][y])
 
@@ -719,16 +752,14 @@ def gen_prf(app, path):
                                         'D'  # default value
                             break  # only once
                         writeln(f, [
-                            par_limit_id,                  # parameter range set identification name.
-                            str(setting["prf"]["descr"]),  # textual description of the parameter range set
-                            prf_inter,                     # raw representation 'R' or engineering representation 'E'
-                            prf_dspfmt,                    # representation type of the values specified for this range set (PRV table)
-                            prf_radix,                     # radix used for the range values specified in the corresponding records (PRV table)
-                            str(limit_cnt),                # number of records defined in the PRV table for this range set
-                            ''                             # OPTIONAL: engineering unit mnemonic for consistency checking
+                            par_limit_id,                       # parameter range set identification name.
+                            outp(setting["prf"]["descr"], 24),  # textual description of the parameter range set
+                            prf_inter,                          # raw representation 'R' or engineering representation 'E'
+                            prf_dspfmt,                         # representation type of the values specified for this range set (PRV table)
+                            prf_radix,                          # radix used for the range values specified in the corresponding records (PRV table)
+                            str(limit_cnt),                     # number of records defined in the PRV table for this range set
+                            ''                                  # OPTIONAL: engineering unit mnemonic for consistency checking
                         ])
-                #elif (): # TODO: also if enumerated values are given
-                #    break;
     close_file(f)
 
 def gen_prv(app, path):
@@ -736,9 +767,22 @@ def gen_prv(app, path):
     for relation in app["standards"]:
         if relation["relation"] == 1:
             standard = relation["standard"]
-            for param in standard["params"]["list"]:
+            # only TC parameters should go in here
+            # like in gen_cpc: for param in standard["packets"]["TC"]["params"].values():
+            for param in standard["packets"]["TC"]["params"].values():
+            #for param in standard["params"]["list"]:
+                enum_cnt = len(param['type']['enums'])
                 limit_cnt = len(param["_limits"]["hash"])
-                if (limit_cnt != 0):
+                if (enum_cnt > 0):
+                    par_limit_id = get_prf_name(param["_nr"])
+                    for enum in param['type']['enums']:
+                        #print("ENUM", enum['Name'])
+                        writeln(f, [
+                            par_limit_id,
+                            outp(enum["Name"], 16),
+                            ''
+                        ])
+                elif (limit_cnt > 0):
                     #print("--> limit_cnt: ", limit_cnt)
                     #print("gen_prv: packet type: ", check_packet_type(app, param))
                     # check if parameter is in TC packet
@@ -748,7 +792,8 @@ def gen_prv(app, path):
                         for id in limit:
                             #print ("id: ", id)
                             if limit_set_cnt == 0:
-                                limit_set_id = id
+                                #limit_set_id = id
+                                limit_set_id = param["_nr"]
                                 limit_set_cnt = 1
                             lvalue = ''
                             hvalue = ''
@@ -763,8 +808,6 @@ def gen_prv(app, path):
                                 str(lvalue),
                                 str(hvalue)
                             ])
-                #elif (): # TODO: also if enumerated values are given
-                #    break;
     close_file(f)
 
 def gen_paf(app, path):
@@ -860,7 +903,7 @@ def gen_pcpc(app, path):
                 if param_i["role"] in [1, 2, 4, 5] or param_i["_value"] == None:
                     if offset >= 48:
                         prefix = "DF"
-                    else:
+                    else:  # primary header
                         prefix = "P"
                     pcpc_name = prefix + get_pcpc_name(standard, param_i)
                     writeln(f, [
@@ -889,7 +932,7 @@ def gen_pcdf(app, path):
                     ('S', pcpc_name, '0') if param_i["role"] == 2 else \
                     ('A', pcpc_name, '0') if param_i["role"] == 4 else \
                     ('K', pcpc_name, '0') if param_i["role"] == 5 else \
-                    ('P', pcpc_name, '0') if param_i["_value"] == None else \
+                    ('P', pcpc_name, '0') if param_i["_value"] is None else \
                     ('F', '', param_i["_value"])
                 pcdf_len = param_i["param"]["_size"]
                 pcdf_bit = offset
@@ -1315,6 +1358,7 @@ def gen_mib(path, comp):
     gen_pas(app, path)  # parameter alias set which defines the text (de-)calibration values.
     gen_prf(app, path)  # parameter alias file which defines the text (de-)calibration (for command or sequence parameters).
     gen_prv(app, path)  # parameter range value file which defines the parameter allowed value ranges.
+    # TODO: generate VERSION file
 
 if __name__ == '__main__':
 

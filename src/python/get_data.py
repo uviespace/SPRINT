@@ -285,19 +285,23 @@ def get_standards(db, project):
 
         for param in standard["datapool"]["params"]:
             param["_dpid"] = dpid_p
-            if param["_multi"] == None:
-                dpid_p += 1
-            else:
-                dpid_p += param["_multi"]
-            # print("DP ID: ", dpid_p, " Param: ", param["name"])
+            #print("PAR - DP ID: ", dpid_p, " Param: ", param["name"])
+            dpid_p += 1  # for dp2
+            #if param["_multi"] == None:  # for dp
+            #    dpid_p += 1
+            #else:
+            #    dpid_p += param["_multi"]
+            #print("PAR - DP ID: ", dpid_p, " Param: ", param["name"])
         dpid_v = dpid_p
         for param in standard["datapool"]["vars"]:
             param["_dpid"] = dpid_v
-            if param["_multi"] == None:
-                dpid_v += 1
-            else:
-                dpid_v += param["_multi"]
-            # print("DP ID: ", dpid_v, " Param: ", param["name"])
+            #print("VAR - DP ID: ", dpid_v, " Param: ", param["name"])
+            dpid_v += 1  # for dp2
+            #if param["_multi"] == None:  # for dp
+            #    dpid_v += 1
+            #else:
+            #    dpid_v += param["_multi"]
+            #print("VAR - DP ID: ", dpid_v, " Param: ", param["name"])
 
     for standard in as_list:
         cur = db.cursor()
@@ -329,9 +333,27 @@ def get_standards(db, project):
 #           identifier serving as key
 #
 def get_params(db, standard):
+    global a_dict
     project = standard["project"]
 
-    cur = db.cursor()    
+    cur = db.cursor()
+
+    # get maximal number of parameter identifier from db
+    db_execute(cur, """
+        SELECT MAX(nrParameter) FROM parameteridentifier WHERE idProject={0}""".format(project["id"]))
+    param_max_nr_fetch = cur.fetchall()
+    param_max_nr = param_max_nr_fetch[0][0]
+    if param_max_nr is None: param_max_nr = 0
+    #print("Project ID = ", project["id"], ", Parameter Max Nr = ", param_max_nr)
+
+    # get all tupel (idParameter, nrParameter) from db
+    db_execute(cur, """
+        SELECT idParameter, nrParameter FROM parameteridentifier WHERE idProject={0}""".format(project["id"]))
+    param_db = cur.fetchall()
+    #print("Number of params in DB: ", len(param_db))
+    #print("param in DB: ", param_db)
+
+    # get all the information from all parameters from db
     db_execute(cur, """
         SELECT p.* FROM Parameter p 
         WHERE p.idStandard={0} OR p.idStandard IS NULL or p.idStandard in 
@@ -367,7 +389,7 @@ def get_params(db, standard):
             param["size"])
         param["_value"] = (
             param["value"] if len(param["value"]) > 0 else
-            param["type"]["value"] if param["type"] != None else # TODO: uncomment if needed
+            param["type"]["value"] if param["type"] is not None else  # TODO: uncomment if needed
             None)
 
         # None := multiplicity unknown / undefined
@@ -406,7 +428,30 @@ def get_params(db, standard):
             param["desc"] if param["desc"] else 
             param["shortDesc"] if param["shortDesc"] else
             param["type"]["desc"] if param["type"] else "")
-        param["_nr"] = project["_nr_param"]
+
+        # OLD
+        #param["_nr"] = project["_nr_param"] # TODO: get _nr from db table
+        #project["_nr_param"] = project["_nr_param"]+1
+        # NEW
+        param_id = param["id"]
+        value_found = [item for item in param_db if item[0] == param_id]
+        #print("value_of_key: ", value_found)
+        if len(value_found) == 0:
+            # insert param in DB table
+            param_max_nr += 1
+            #print("new parameter (", param_id, ") found: insert param in DB table with new number: ", param_max_nr)
+            db_execute(cur, """
+                INSERT INTO parameteridentifier (idProject, nrParameter, idParameter) VALUES ({0}, {1}, {2})""".format(
+                project["id"], param_max_nr, param_id))
+            db.commit()
+            param["_nr"] = param_max_nr
+        elif len(value_found) == 1:
+            # param found in DB table
+            #print("parameter (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+            param["_nr"] = value_found[0][1]
+        else:
+            # error
+            print("error ", value_found)
         project["_nr_param"] = project["_nr_param"]+1
 
         param["_sequence"] = []
@@ -423,6 +468,8 @@ def get_params(db, standard):
             standard["datapool"]["params"].append(param)
         if param["kind"] == 6:
             standard["datapool"]["vars"].append(param)
+
+        #print("Parameter: ID=", param["id"], ", Name='", param["name"],"', Nr=", param["_nr"])
 
     params = {}
     params["list"] = as_list
@@ -489,7 +536,24 @@ def get_types(db, standard):
 
     project = standard["project"]
 
-    cur = db.cursor()   
+    cur = db.cursor()
+
+    # get maximal number of parameter identifier from db
+    db_execute(cur, """
+        SELECT MAX(nrType) FROM typeidentifier WHERE idProject={0}""".format(project["id"]))
+    type_max_nr_fetch = cur.fetchall()
+    type_max_nr = type_max_nr_fetch[0][0]
+    if type_max_nr is None: type_max_nr = 0
+    #print("Project ID = ", project["id"], ", Type Max Nr = ", type_max_nr)
+
+    # get all tupel (idType, nrType) from db
+    db_execute(cur, """
+        SELECT idType, nrType FROM typeidentifier WHERE idProject={0}""".format(project["id"]))
+    type_db = cur.fetchall()
+    #print("Number of types in DB: ", len(type_db))
+    #print("type in DB: ", type_db)
+
+    # get all the information from all types from db
     db_execute(cur, """
         SELECT t.* FROM Type t
         WHERE t.idStandard={0} or t.idStandard IS NULL or t.idStandard in 
@@ -518,8 +582,32 @@ def get_types(db, standard):
         type_["enumsMin"] = minMax["min"]       # Either 0 (if not enumerated) or the symbolic name of the enumerated constant with minimum value
         type_["enumsMax"] = minMax["max"]       # Either 0 (if not enumerated) or the symbolic name of the enumerated constant with maximum value        
         type_["params"] = [] # Will hold all parameters with this type
-        type_["_nr"] = project["_nr_type"]
+
+        # OLD
+        #type_["_nr"] = project["_nr_type"] # TODO: get _nr from db table
+        #project["_nr_type"] = project["_nr_type"]+1
+        # NEW
+        type_id = type_["id"]
+        value_found = [item for item in type_db if item[0] == type_id]
+        #print("value_of_key: ", value_found)
+        if len(value_found) == 0:
+            # insert type in DB table
+            type_max_nr += 1
+            #print("new type (", type_id, ") found: insert param in DB table with new number: ", type_max_nr)
+            db_execute(cur, """
+                INSERT INTO typeidentifier (idProject, nrType, idType) VALUES ({0}, {1}, {2})""".format(
+                project["id"], type_max_nr, type_id))
+            db.commit()
+            type_["_nr"] = type_max_nr
+        elif len(value_found) == 1:
+            # type found in DB table
+            #print("type (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+            type_["_nr"] = value_found[0][1]
+        else:
+            # error
+            print("error ", value_found)
         project["_nr_type"] = project["_nr_type"]+1
+
         types[type_["id"]] = type_
     return types
 
@@ -684,6 +772,23 @@ def get_derived_packets(db, parent):
     project = standard["project"]
 
     cur = db.cursor()
+
+    # get maximal number of packet identifier from db
+    db_execute(cur, """
+        SELECT MAX(nrPacket) FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
+    packet_max_nr_fetch = cur.fetchall()
+    packet_max_nr = packet_max_nr_fetch[0][0]
+    if packet_max_nr is None: packet_max_nr = 0
+    #print("Project ID = ", project["id"], ", Packet Max Nr = ", packet_max_nr)
+
+    # get all tupel (idPacket, nrPacket) from db
+    db_execute(cur, """
+        SELECT idPacket, nrPacket FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
+    packet_db = cur.fetchall()
+    #print("Number of types in DB: ", len(packet_db))
+    #print("type in DB: ", packet_db)
+
+    # get all the information from all packets from db
     db_execute(cur, """
         SELECT p.* FROM Packet p
         WHERE p.idParent={0}
@@ -720,8 +825,32 @@ def get_derived_packets(db, parent):
         packet["_desc"] = packet["shortDesc"] + packet["desc"] + packet["descParam"] + packet["descDest"]
         packet["_length"] = get_param_sequence_length(packet["body"])
         #print("Desc: ", packet["id"], packet["type"], packet["subtype"], " _nr = ", project["_nr_packet"])
-        packet["_nr"] = project["_nr_packet"]
+
+        # OLD
+        #packet["_nr"] = project["_nr_packet"] # TODO: get _nr from db table
+        #project["_nr_packet"] = project["_nr_packet"]+1
+        # NEW
+        packet_id = packet["id"]
+        value_found = [item for item in packet_db if item[0] == packet_id]
+        #print("value_of_key: ", value_found)
+        if len(value_found) == 0:
+            # insert packet in DB table
+            packet_max_nr += 1
+            print("new derived packet (", packet_id, ") found: insert param in DB table with new number: ", packet_max_nr)
+            db_execute(cur, """
+                INSERT INTO packetidentifier (idProject, nrPacket, idPacket) VALUES ({0}, {1}, {2})""".format(
+                project["id"], packet_max_nr, packet_id))
+            db.commit()
+            packet["_nr"] = packet_max_nr
+        elif len(value_found) == 1:
+            # packet found in DB table
+            print("derived packet (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+            packet["_nr"] = value_found[0][1]
+        else:
+            # error
+            print("error ", value_found)
         project["_nr_packet"] = project["_nr_packet"]+1
+
         as_list.append(packet)
         as_hash[packet['disc']] = packet
     res = {}
@@ -766,6 +895,8 @@ def get_packets(db, standard):
     project = standard["project"]
 
     cur = db.cursor()
+
+    # get all the information from all packets from db
     db_execute(cur, """
         SELECT p.* FROM Packet p 
         WHERE p.idParent IS NULL and (p.idStandard={0} or p.idStandard in 
@@ -775,6 +906,22 @@ def get_packets(db, standard):
     as_list = []
     as_hash = {}
     for row in cur.fetchall():
+
+        # get maximal number of packet identifier from db
+        db_execute(cur, """
+            SELECT MAX(nrPacket) FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
+        packet_max_nr_fetch = cur.fetchall()
+        packet_max_nr = packet_max_nr_fetch[0][0]
+        if packet_max_nr is None: packet_max_nr = 0
+        # print("Project ID = ", project["id"], ", Packet Max Nr = ", packet_max_nr)
+
+        # get all tupel (idPacket, nrPacket) from db
+        db_execute(cur, """
+            SELECT idPacket, nrPacket FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
+        packet_db = cur.fetchall()
+        # print("Number of types in DB: ", len(packet_db))
+        # print("type in DB: ", packet_db)
+
         packet = {}
         packet["id"] = row[0]
         packet["standard"] = standard
@@ -809,11 +956,34 @@ def get_packets(db, standard):
         packet['derivations'] = get_derived_packets(db, packet)
         packet["disc"] = 0
         packet["_disc"] = 0
-        #if len(packet["derivations"]["list"]) == 0:     # The packet has no derived packets
-        packet["_nr"] = project["_nr_packet"]
-        project["_nr_packet"] = project["_nr_packet"]+1
-        #else:
-        #   packet["_nr"] = 0   # FIXME: otherwise KeyError "_nr" occurs for derived packets
+
+        if len(packet["derivations"]["list"]) == 0:     # The packet has no derived packets
+            # OLD
+            #packet["_nr"] = project["_nr_packet"] # TODO: get _nr from db table
+            #project["_nr_packet"] = project["_nr_packet"]+1
+            # NEW
+            packet_id = packet["id"]
+            value_found = [item for item in packet_db if item[0] == packet_id]
+            #print("value_of_key: ", value_found)
+            if len(value_found) == 0:
+                # insert packet in DB table
+                packet_max_nr += 1
+                print("new packet (", packet_id, ") found: insert param in DB table with new number: ", packet_max_nr)
+                db_execute(cur, """
+                    INSERT INTO packetidentifier (idProject, nrPacket, idPacket) VALUES ({0}, {1}, {2})""".format(
+                    project["id"], packet_max_nr, packet_id))
+                db.commit()
+                packet["_nr"] = packet_max_nr
+            elif len(value_found) == 1:
+                # packet found in DB table
+                print("packet (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+                packet["_nr"] = value_found[0][1]
+            else:
+                # error
+                print("error ", value_found)
+            project["_nr_packet"] = project["_nr_packet"] + 1
+        else:
+            packet["_nr"] = 0   # FIXME: otherwise KeyError "_nr" occurs for derived packets
 
         as_list.append(packet)
         as_hash[packet["id"]] = packet

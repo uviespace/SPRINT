@@ -197,9 +197,11 @@ def gen_packet_functions_param(f, packet_domain, packet_name, param_i):
         return comment
 
     def wrap_endian(size, s):
+        #print(">>> ", settings["endian"]["swap"], size)
         if settings["endian"]["swap"]:
             if size % 16 == 0:
                 s = "{0}{1}({2})".format(settings["endian"]["fnc"], str(size), s)
+                #print(s)
         return s
 
     if param_i["param"]["_size"] == None:

@@ -28,7 +28,7 @@ $userName = $row["name"];
 <!DOCTYPE html>
 <html>
 <head>
-	<title>SRINT Editor</title>
+	<title>SRINT</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->

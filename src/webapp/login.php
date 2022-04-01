@@ -36,7 +36,7 @@ if(isset($_GET['login'])) {
         header( "refresh:0;url=index.php" );
         //die('Login successful. Continue to <a href="index.php">internal area</a>');
     } else {
-        $errorMessage = "<b><font color=red>The email or password was invalid</font></b><br>";
+        $errorMessage = "<b><font color=red>The email or password is invalid</font></b><br>";
     }
     
 }
@@ -44,7 +44,7 @@ if(isset($_GET['login'])) {
 <!DOCTYPE html> 
 <html> 
 <head>
-  <title>Login</title>
+  <title>SPRINT Login</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
@@ -58,7 +58,7 @@ if(isset($_GET['login'])) {
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>CORDET FW Editor</h2>
+		            <h2>Space Project Ressource Integration Network Toolbox</h2>
 		        </div>
 		    </div>
 		</div>

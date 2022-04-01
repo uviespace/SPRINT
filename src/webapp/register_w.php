@@ -5,7 +5,7 @@ require 'api/db_config.php';
 <!DOCTYPE html> 
 <html> 
 <head>
-  <title>Register</title>
+  <title>SPRINT Registration</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
@@ -19,7 +19,7 @@ require 'api/db_config.php';
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>CORDET FW Editor</h2>
+		            <h2>Space Project Ressource Integration Network Toolbox</h2>
 		        </div>
 		    </div>
 		</div>

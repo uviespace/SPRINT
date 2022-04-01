@@ -58,7 +58,7 @@ if(isset($_GET['login'])) {
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>Space Project Ressource Integration Network Toolbox</h2>
+		            <h2>Space Project Resource Integration Network Toolbox</h2>
 		        </div>
 		    </div>
 		</div>

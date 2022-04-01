@@ -88,7 +88,7 @@ $userName = $row["name"];
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
-		            <h2>Space Project Ressource Integration Network Toolbox</h2>
+		            <h2>Space Project Resource Integration Network Toolbox</h2>
 		        </div>
 				
 				<!--
@@ -102,7 +102,7 @@ $userName = $row["name"];
 		</div>
 
         <div>
-            The Space Project Ressource Integration Network Tool integrates following standards, resources and processes:
+            The Space Project Resource Integration Network Tool integrates following standards, resources and processes:
             <ul>
                 <li>ECSS (European Co-operation for Space Standardisation) Software Engineering standardization and processes:
                     <a href="https://ecss.nl/" target="_blank">ECSS</a>,

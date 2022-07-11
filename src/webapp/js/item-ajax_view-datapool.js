@@ -103,10 +103,10 @@ function getPageData() {
 function getDropdownDataKind(kind) {
     var data = { 
         "data": [ 
-            { "kind":"3", "name":"Par", "desc":"Parameter" }, 
-            { "kind":"4", "name":"Var", "desc":"Variable" },
-            { "kind":"5", "name":"Par Imp", "desc":"Parameter Imported" }, 
-            { "kind":"6", "name":"Var Imp", "desc":"Variable Imported" }
+            { "kind":"3", "name":"DpPar", "desc":"Datapool Parameter" }, 
+            { "kind":"4", "name":"DpVar", "desc":"Datapool Variable" },
+            { "kind":"5", "name":"DpPar Imp", "desc":"Datapool Parameter Imported" }, 
+            { "kind":"6", "name":"DpVar Imp", "desc":"Datapool Variable Imported" }
         ]
     };
     manageOptionKind(data.data, kind);
@@ -152,10 +152,10 @@ function getDropdownDataKindCreate() {
     var data = { 
         "data": [ 
             { "kind":"", "name":"--- Please select ---", "desc":"" }, 
-            { "kind":"3", "name":"Par", "desc":"Parameter" }, 
-            { "kind":"4", "name":"Var", "desc":"Variable" },
-            { "kind":"5", "name":"Par Imp", "desc":"Parameter Imported" }, 
-            { "kind":"6", "name":"Var Imp", "desc":"Variable Imported" }
+            { "kind":"3", "name":"DpPar", "desc":"Datapool Parameter" }, 
+            { "kind":"4", "name":"DpVar", "desc":"Datapool Variable" },
+            { "kind":"5", "name":"DpPar Imp", "desc":"Datapool Parameter Imported" }, 
+            { "kind":"6", "name":"DpVar Imp", "desc":"Datapool Variable Imported" }
         ]
     };
     manageOptionKindCreate(data.data);

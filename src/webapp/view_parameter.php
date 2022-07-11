@@ -127,6 +127,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 				<th>Domain</th>
 				<th>Name</th> 
 				<th width="250px">Short Description</th>
+				<th>Kind</th> <!-- Dropdown -->
 				<th>Datatype</th> <!-- Dropdown -->
 				<th>Multiplicity</th>
 				<th width="135px">Default Value</th>
@@ -167,6 +168,14 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
 							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Kind:</label>
+							<select id="sel_kind_create" name="kind" class="form-control" data-error="Please enter kind." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -238,6 +247,14 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
 							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Kind:</label>
+							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
+								<option value="select"></option>
+							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 

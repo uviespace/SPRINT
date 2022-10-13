@@ -138,7 +138,7 @@ function delRel($mysqli, $idApplication, $idStandard, $relation) {
 
 $arr_rel = array();
 
-$sql = "SELECT * FROM `standard` AS s, `applicationstandard` AS aps WHERE s.id = aps.idStandard AND aps.idApplication = ".$idApplication." ORDER BY `idStandard` ASC";
+$sql = "SELECT * FROM `standard` AS s, `applicationstandard` AS aps WHERE s.id = aps.idStandard AND s.idProject = ".$idProject." AND aps.idApplication = ".$idApplication." ORDER BY `idStandard` ASC";
 
 $result = $mysqli->query($sql);
 
@@ -153,7 +153,7 @@ if ($result->num_rows > 0) {
 }
 
 
-$sql = "SELECT * FROM `standard` ORDER BY `id`";
+$sql = "SELECT * FROM `standard` WHERE idProject = ".$idProject." ORDER BY `id`";
 
 $result = $mysqli->query($sql);
 

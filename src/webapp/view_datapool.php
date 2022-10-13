@@ -126,8 +126,8 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 				<th>ID</th>
 				<th>Domain</th>
 				<th>Name</th> 
-				<th>Kind</th> <!-- Dropdown -->
 				<th width="250px">Short Description</th>
+				<th>Kind</th> <!-- Dropdown -->
 				<th>Datatype</th> <!-- Dropdown -->
 				<th>Multiplicity</th>
 				<th width="135px">Value</th>
@@ -181,6 +181,13 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 							<div class="help-block with-errors"></div>
 						</div>
 -->
+						
+						<div class="form-group">
+							<label class="control-label" for="title">Short Description:</label>
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
+							<div class="help-block with-errors"></div>
+						</div>
+
 						<div class="form-group">
 							<label class="control-label" for="title">Kind:</label>
 							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." />-->
@@ -191,12 +198,6 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 							<select id="sel_kind_create" name="kind" class="form-control" data-error="Please enter kind." required>
 								<option value="select"></option>
 							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-						
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
 							<div class="help-block with-errors"></div>
 						</div>
 <!--
@@ -272,6 +273,12 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						</div>
 
 						<div class="form-group">
+							<label class="control-label" for="title">Short Description:</label>
+							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
 							<label class="control-label" for="title">Kind:</label>
 							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." />-->
 							<!--<select name="kind" class="form-control" data-error="Please enter kind." required>
@@ -281,12 +288,6 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
 								<option value="select"></option>
 							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
 							<div class="help-block with-errors"></div>
 						</div>
 

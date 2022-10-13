@@ -201,8 +201,8 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.id+'</td>';
 	  	rows = rows + '<td>'+value.domain+'</td>';
 	  	rows = rows + '<td>'+value.name+'</td>';
-	  	rows = rows + '<td>'+value.kind+'</td>';
 	  	rows = rows + '<td>'+value.shortDesc+'</td>';
+	  	rows = rows + '<td>'+value.kind+'</td>';
 	  	rows = rows + '<td>'+value.idType+'</td>';
 	  	rows = rows + '<td>'+value.multiplicity+'</td>';
 	  	rows = rows + '<td class="td-hover-break">'+value.value+'</td>';
@@ -322,8 +322,8 @@ $("body").on("click",".edit-item",function(){
     var id = $(this).parent("td").data('id');
     var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
     var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
     var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
     var value = $(this).parent("td").prev("td").prev("td").text();

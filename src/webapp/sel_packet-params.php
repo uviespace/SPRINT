@@ -131,7 +131,8 @@ $sql =
   "`packet` p ".
   "WHERE ".
   "p.idStandard = ".$idStandard." AND ".
-  "p.discriminant = '' ".
+  "(p.discriminant = '' OR ".
+  "p.discriminant IS NULL) ".
   "ORDER BY p.domain, p.subtype";
 
 $result = $mysqli->query($sql);

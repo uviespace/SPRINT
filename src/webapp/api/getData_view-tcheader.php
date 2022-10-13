@@ -34,8 +34,7 @@ $sqlTotal =
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
-  "    (p.idStandard = ".$idStandard." OR ".
-  "    p.idStandard IS NULL) AND ".
+  "    p.idStandard = ".$idStandard." AND ".
   "    ps.idParameter = p.id AND ".
   "    (p.kind = 1 OR ".
   "    p.kind = 0) AND ".
@@ -55,14 +54,16 @@ $sql =
   "    `parameter` AS p, ".
   "    `parametersequence` AS ps ".
   "WHERE ".
-  "    (p.idStandard = ".$idStandard." OR ".
-  "    p.idStandard IS NULL) AND ".
+  "    p.idStandard = ".$idStandard." AND ".
   "    ps.idParameter = p.id AND ".
   "    (p.kind = 1 OR ".
   "    p.kind = 0) AND ".
   "    ps.type = 0 ".
   "ORDER BY ps.order ASC LIMIT $start_from, $num_rec_per_page"; 
 }
+
+//  "    (p.idStandard = ".$idStandard." OR ".
+//  "    p.idStandard IS NULL) AND ".
 
 $result = $mysqli->query($sql);
 

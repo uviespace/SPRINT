@@ -310,6 +310,39 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 		  </div>
 		</div>
 
+		<!-- Edit Item Modal -->
+		<div class="modal fade" id="edit-schema" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		        <h4 class="modal-title" id="myModalLabel">Edit Schema</h4>
+		      </div>
+
+		      <div class="modal-body">
+					<form data-toggle="validator" action="api/update_view-type-schema.php" method="POST">
+
+		      			<input type="hidden" name="id" class="edit-id">
+
+						<div class="form-group">
+							<label class="control-label" for="title">Schema:</label>
+							<textarea name="schema" class="form-control" rows="25" data-error="Please enter schema." required></textarea>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-success crud-submit-edit-schema">Submit</button>
+						</div>
+
+		      		</form>
+
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+
+
 				<div class="topcorner_left">
 <?php include 'logos.php'; ?>
 					<br/><br/>

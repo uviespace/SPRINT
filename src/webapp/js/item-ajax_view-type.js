@@ -7,6 +7,7 @@ var is_ajax_fire = 0;
 
 var userrole = document.getElementById("user_role");
 
+var idProject = getUrlVars()["idProject"];
 var idStandard = getUrlVars()["idStandard"];
 
 manageData();
@@ -95,6 +96,22 @@ function getPageData() {
 	});
 }
 
+/* Get Type Schema*/
+function getTypeSchema(idType) {
+	$.ajax({
+		dataType: 'json',
+		url: url+'api/getData_view-type-schema.php?idType='+idType,
+		data: {page:page}
+	}).done(function(data){
+        //console.log(data);
+        //console.log(data.data);
+        //console.log(data.data[0]);
+        //var jsonSchema = JSON.stringify(data.data[0].schema, null, 4);
+        //console.log(jsonSchema);
+        $("#edit-schema").find("textarea[name='schema']").val(data.data[0].schema);
+	});
+}
+
 /* Add new Item table row */
 function manageRow(data) {
 	var	rows = '';
@@ -112,6 +129,8 @@ function manageRow(data) {
 	  	rows = rows + '<td data-id="'+value.id+'">';
         if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
+        rows = rows + '<button data-toggle="modal" data-target="#edit-setting" class="btn btn-primary edit-setting">Setting</button> ';
+        rows = rows + '<button data-toggle="modal" data-target="#edit-schema" class="btn btn-primary edit-schema">Schema</button> ';
         if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
         }
@@ -216,6 +235,27 @@ $("body").on("click",".edit-item",function(){
 
 });
 
+/* Edit Setting */
+$("body").on("click",".edit-setting",function(){
+
+    var idType = $(this).parent("td").data('id');
+
+    window.location = url+'open_datatype_setting_editor.php?idProject='+idProject+'&idStandard='+idStandard+'&id='+idType; 
+
+});
+
+/* Edit Schema */
+$("body").on("click",".edit-schema",function(){
+
+    var id = $(this).parent("td").data('id');
+    
+    console.log(id);
+    getTypeSchema(id);
+
+    $("#edit-schema").find(".edit-id").val(id);
+
+});
+
 /* Updated new Item */
 $(".crud-submit-edit").click(function(e){
 
@@ -238,6 +278,36 @@ $(".crud-submit-edit").click(function(e){
             url: url + form_action,
             data:{id:id, domain:domain, name:name, nativeType:nativeType,
             size:size, pusdatatype:pusdatatype, value:value, desc:desc}
+        }).done(function(data){
+            getPageData();
+            $(".modal").modal('hide');
+            toastr.success('Item Updated Successfully.', 'Success Alert', {timeOut: 5000});
+        });
+    }else{
+        alert('You are missing something.')
+    }
+
+});
+
+/* Updated Schema */
+$(".crud-submit-edit-schema").click(function(e){
+    
+    e.preventDefault();
+    var form_action = $("#edit-schema").find("form").attr("action");
+    var schema = $("#edit-schema").find("textarea[name='schema']").val();
+    var id = $("#edit-schema").find(".edit-id").val();
+    
+    //console.log(id);
+    //console.log(schema);
+    //console.log(JSON.stringify(schema, null, 4));
+    //console.log(form_action);
+    
+    if(id != '' && schema != ''){
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + form_action,
+            data:{id:id, schema:schema}
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');

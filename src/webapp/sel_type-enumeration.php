@@ -109,13 +109,34 @@ $userEmail = $row["email"];
 
 <?php
 
+$sql = "SELECT * FROM `type` WHERE idStandard = ".$idStandard." AND JSON_CONTAINS_PATH(setting, 'one', '$.Enumerations') = 1";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "$num_rows hits in JSON<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        echo "<div style='height:24px; padding:2px; margin-bottom: 2px; width:50%; background-color:#D7E6AC;'>";
+        echo "<a href='open_datatype_setting_editor.php?idProject=".$idProject."&idStandard=".$idStandard."&id=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / ".$row["name"]."</b></a>";
+        echo "</div>";
+    }
+    echo "<br/>";
+} else {
+    //echo "0 results";
+}
+
 $sql = "SELECT DISTINCT t.* FROM `type` t LEFT JOIN `enumeration` e ON t.id = e.idType WHERE  t.idStandard = ".$idStandard." AND e.idType IS NOT NULL ORDER BY t.domain, t.name";
 
 $result = $mysqli->query($sql);
 
 $num_rows = mysqli_num_rows($result);
 
-echo "$num_rows hits<br/><br/>";
+echo "$num_rows hits in Table<br/><br/>";
 
 if ($result->num_rows > 0) {
     // output data of each row
@@ -137,13 +158,34 @@ if ($result->num_rows > 0) {
 
 <?php
 
+$sql = "SELECT * FROM `type` WHERE idStandard = ".$idStandard." AND (JSON_CONTAINS_PATH(setting, 'one', '$.Enumerations') = 0 OR JSON_CONTAINS_PATH(setting, 'one', '$.Enumerations') IS NULL)";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+echo "$num_rows hits in JSON<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        echo "<div style='height:24px; padding:2px; margin-bottom: 2px; width:50%; background-color:#D7E6AC;'>";
+        echo "<a href='open_datatype_setting_editor.php?idProject=".$idProject."&idStandard=".$idStandard."&id=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / ".$row["name"]."</b></a>";
+        echo "</div>";
+    }
+    echo "<br/>";
+} else {
+    //echo "0 results";
+}
+
 $sql = "SELECT DISTINCT t.* FROM `type` t LEFT JOIN `enumeration` e ON t.id = e.idType WHERE  t.idStandard = ".$idStandard." AND e.idType IS NULL ORDER BY t.domain, t.name";
 
 $result = $mysqli->query($sql);
 
 $num_rows = mysqli_num_rows($result);
 
-echo "$num_rows hits<br/><br/>";
+echo "$num_rows hits in Table<br/><br/>";
 
 if ($result->num_rows > 0) {
     // output data of each row

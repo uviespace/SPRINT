@@ -232,64 +232,248 @@ if ($result->num_rows > 0) {
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_tcheader.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">TC Header...</a>
+<?php
+$sql = 
+  "SELECT ".
+    "* ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `parametersequence` AS ps ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    ps.idParameter = p.id AND ".
+  "    (p.kind = 1 OR ".
+  "    p.kind = 0) AND ".
+  "    ps.type = 0";
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." parameters)";
+?>
 				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_tmheader.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">TM Header...</a>
+<?php
+$sql = 
+  "SELECT ".
+    "* ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `parametersequence` AS ps ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    ps.idParameter = p.id AND ".
+  "    (p.kind = 1 OR ".
+  "    p.kind = 0) AND ".
+  "    ps.type = 1";
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." parameters)";
+?>
 				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_apid.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">APIDs...</a>
+<?php
+$sql = 
+  "SELECT * FROM `process` WHERE idProject = ".$idProject;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." items)";
+?>
 				</div>
 				
                 <br/>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_service.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Services...</a>
+<?php
+$sql = 
+  "SELECT * FROM `service` WHERE idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." services)";
+?>
 				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_packet.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Packets...</a>
+<?php
+$sql = 
+  "SELECT * FROM `packet` WHERE `type` IS NOT NULL AND idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." packets)";
+?>
 				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="sel_packet-derived.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Packets (Derived Packets)</a>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ==> <a href="sel_packet-derived.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Packets (Derived Packets)</a>
+<?php
+$sql = 
+  "SELECT DISTINCT ".
+  "p.* ".
+  "FROM ".
+  "`packet` p ".
+  "INNER JOIN ".
+  "`packet` pa ".
+  "ON ".
+  "p.id = pa.idParent ".
+  "WHERE ".
+  "p.idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRowsDerivPckt = mysqli_num_rows($result);
+$sql =
+  "SELECT ".
+  "p.* ".
+  "FROM ".
+  "`packet` AS p, `parametersequence` AS ps ".
+  "WHERE ".
+  "p.idStandard = ".$idStandard." AND ".
+  "p.id = ps.idPacket AND ".
+  "ps.role = 3 ";
+$result = $mysqli->query($sql);
+$nmbOfRowsBasePckt = mysqli_num_rows($result);
+echo " (".$nmbOfRowsDerivPckt." derived packets and ".$nmbOfRowsBasePckt." base packets)";
+?>
 				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="sel_packet-params.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Packets (Parameters)</a>
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ==> <a href="sel_packet-params.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Packets (Parameters)</a>
+<?php
+$sql = 
+  "SELECT * FROM `packet` WHERE `type` IS NOT NULL AND idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." packets)";
+?>
 				</div>
 
                 <br/>
-
-				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="view_type.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datatypes...</a>
-				</div>
-
-				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="sel_type-enumeration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datatypes (Enumerations)</a>
-				</div>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_constant.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Constants...</a>
+<?php
+$sql = 
+  "SELECT * FROM `constants` WHERE idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." constants)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					<a href="view_type.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datatypes...</a>
+<?php
+$sql = 
+  "SELECT ".
+  "* ".
+  "FROM `type` ".
+  "WHERE idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." datatypes)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ==> <a href="sel_type-enumeration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datatypes (Enumerations)</a>
+<?php
+$sql = 
+  "SELECT * FROM `type` WHERE idStandard = ".$idStandard." AND JSON_CONTAINS_PATH(setting, 'one', '$.Enumerations') = 1";
+$result = $mysqli->query($sql);
+$nmbOfRowsEnumJson = mysqli_num_rows($result);
+$sql = 
+  "SELECT DISTINCT t.* FROM `type` t LEFT JOIN `enumeration` e ON t.id = e.idType WHERE  t.idStandard = ".$idStandard." AND e.idType IS NOT NULL";
+$result = $mysqli->query($sql);
+$nmbOfRowsEnumTable = mysqli_num_rows($result);
+echo " (".$nmbOfRowsEnumJson." datatypes with enumerations in JSON and ".$nmbOfRowsEnumTable." datatypes with enumerations in DB table)";
+?>
 				</div>
 
                 <br/>
 
 				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="view_parameter.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters...</a>
-				</div>
-
-				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="sel_parameter-derived.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters (Derived Packets)</a>
-				</div>
-
-				<div style="background-color:#EEEEEE;padding:2px;">
-					<a href="sel_parameter-limit.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters (Limits)</a>
-				</div>
-
-				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_datapool.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datapool...</a>
+<?php
+$sql = 
+  "SELECT ".
+  "    * ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `type` AS t ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType = t.id AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ";
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." datapool items)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					<a href="view_parameter.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters...</a>
+<?php
+$sql = 
+  "SELECT ".
+  "* ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `type` AS t ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType = t.id AND ".
+  "    (p.kind = 0 OR ".
+  "    p.kind = 1 OR ".
+  "    p.kind = 2) ";
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." parameters)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ==> <a href="sel_parameter-derived.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters (Derived Packets)</a>
+<?php
+$sql = 
+    "SELECT DISTINCT ".
+  "p.* ".
+  "FROM ".
+  "`packet` p ".
+  "INNER JOIN ".
+  "`packet` pa ".
+  "ON ".
+  "p.id = pa.idParent ".
+  "WHERE ".
+  "p.idStandard = ".$idStandard;
+$result = $mysqli->query($sql);
+$nmbOfRows = mysqli_num_rows($result);
+echo " (".$nmbOfRows." derived packets)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    ==> <a href="sel_parameter-limit.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters (Limits)</a>
+<?php
+$sql = 
+  "SELECT DISTINCT t.* FROM `parameter` t LEFT JOIN `limit` e ON t.id = e.idParameter WHERE  t.idStandard = ".$idStandard." AND e.idParameter IS NOT NULL";
+$result = $mysqli->query($sql);
+$nmbOfRowsLimits = mysqli_num_rows($result);
+$sql =
+  "SELECT DISTINCT t.* FROM `parameter` t LEFT JOIN `limit` e ON t.id = e.idParameter WHERE  t.idStandard = ".$idStandard." AND e.idParameter IS NULL";
+$result = $mysqli->query($sql);
+$nmbOfRowsNoLimits = mysqli_num_rows($result);
+echo " (".$nmbOfRowsLimits." parameters with limits and ".$nmbOfRowsNoLimits." parameters with no limits)";
+?>
 				</div>
 
                 <br/>

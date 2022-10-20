@@ -144,9 +144,13 @@ margin: 5px;
 	visibility: hidden;
 }
 
-
 .form-control-min {
 border: 0;
+}
+
+.form-control-min-full {
+border: 0;
+width: 100%;
 }
 
 

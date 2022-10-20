@@ -92,7 +92,7 @@ function delRel($mysqli, $idApplication, $idStandard, $relation) {
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Application - Components</title>
+	<title>Application - Relations</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -172,8 +172,8 @@ if ($result->num_rows > 0) {
         echo "<input type='hidden' name='idStandard' value='".$row["id"]."' />";
         if (array_key_exists($row["id"], $arr_rel)) {
             echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
-            //echo "<a href='open_component_editor.php?id=".$row["id"]."&idProject=".$idProject."&idApplication=".$idApplication."'>".$row["id"]." <b>".$arr_rel[$row["id"]]."</b></a>";
-            echo $row["id"]." <b>".explode("|", $arr_rel[$row["id"]])[0]."</b>";
+            echo "<a href='view_application-packet.php?rel=".explode("|", $arr_rel[$row["id"]])[1]."&idProject=".$idProject."&idApplication=".$idApplication."&idStandard=".$row["id"]."'>".$row["id"]." <b>".explode("|", $arr_rel[$row["id"]])[0]."</b></a>";
+            //echo $row["id"]." <b>".explode("|", $arr_rel[$row["id"]])[0]."</b>";
             //echo "<span style='float:right;'>[DEL]&nbsp;</span>";
             echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;' type='submit' class='btn btn-danger remove-item' name='del_relation' onclick='return confirm(\"Are you sure to delete this component?\")'>DEL</button>";
             echo "<span style='float:right;height:20px;display:flex;justify-content:center;align-items:center;'>&nbsp;</span>";

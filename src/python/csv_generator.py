@@ -25,7 +25,8 @@ class CsvGenerator(Generator):
             ['&', "\\&"],
             ["\#defaultImplementation","Default implementation"]
         ]
-        if isinstance(s, basestring):
+        #if isinstance(s, basestring):
+        if isinstance(s, ("".__class__, u"".__class__)):  # for Python2 and Python3
             for old, new in replacements:
                 s = s.replace(old, new)
         return s

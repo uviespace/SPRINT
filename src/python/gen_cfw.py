@@ -16,14 +16,15 @@ def cname(s):
     return s.replace(" ", "").replace("-", "").replace("/", "").replace("\\", "")
 
 def writeln(f, s, indent_level=0):
-    f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    #f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    f += "{0}{1}\n".format(" " * get_indent(indent_level), s)
 
 def write_separator(f):
     f += "/*{0}*/\n".format("-" * (settings["max_line_length"]-4))
 
 def gen_file(f, path, s, isHeader, addTypeInclude=True, desc="Interface for accessing data pool items."):
     f_ = new_file(path, s, isHeader, addTypeInclude, desc)
-    f_.write(fig_ref_conv.fig_ref_conv(''.join(f), "doxy"))
+    f_.write(fig_ref_conv.fig_ref_conv(''.join(f), "doxy").encode('utf-8'))
     close_file(f_)
 
 def gen_file_name(dname):
@@ -42,6 +43,7 @@ def new_file(path, s, isHeader, addTypeInclude=True, desc="Interface for accessi
             os.makedirs(directory)
 
     global filenameCap
+    #print("path: ", path, " | file: ", s)
 
     ensure_dir(path)
     f = list()
@@ -66,8 +68,8 @@ def new_file(path, s, isHeader, addTypeInclude=True, desc="Interface for accessi
     else:
         filenameCap = None
     writeln(f, "")
-    f_ = open("{0}/{1}".format(path, s), "w")
-    f_.write(''.join(f))
+    f_ = open("{0}/{1}".format(path, s), "wb")
+    f_.write(''.join(f).encode('utf-8'))
     return f_
 
 def close_file(f_):
@@ -79,7 +81,7 @@ def close_file(f_):
         write_separator(f)
         writeln(f, "#endif /* {0} */".format(filenameCap))
 
-    f_.write(''.join(f))
+    f_.write(''.join(f).encode('utf-8'))
     f_.close
 
 def write_comment_text(f, text, indent_level = 0):
@@ -163,7 +165,7 @@ def get_ref_spec(key, spec):
                 if "parent" in packet and \
                     packet["parent"]["type"] == type_ and \
                     packet["parent"]["subtype"] == subtype and \
-                    packet["disc"] == disc:
+                    packet["disc"] == discriminant:
                  
                     return spec_
                     
@@ -207,161 +209,162 @@ def gen_spec(path, spec):
         
     def gen_funcs(h, incCode, spec, full_name, pname, kind):
         term = ";" if not incCode else ""
-        if spec["relation"] > 0: # Service provider
-            if kind == "TC":
-                if is_impl_needed(spec["cmdPrvCheckAcceptance"]):
-                    write_doxy(h, [
-                        "Validity check of {0}.".format(full_name),
-                        spec["cmdPrvCheckAcceptance"],
-                        "@param prDesc The descriptor of the validity check procedure.",
-                        "@return The validity check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}ValidityCheck(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))     
-                    gen_stub(h, incCode, "{0}{1}ValidityCheck".format(settings["prefix"], pname), "prDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdPrvCheckReady"]):
-                    write_doxy(h, [
-                        "Ready check of {0}.".format(full_name),
-                        spec["cmdPrvCheckReady"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The ready check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))            
-                    gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdPrvActionStart"]):
-                    write_doxy(h, [
-                        "Start action of {0}.".format(full_name),
-                        spec["cmdPrvActionStart"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}StartAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))            
-                    gen_stub(h, incCode, "{0}{1}StartAction".format(settings["prefix"], pname), "smDesc", "")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdPrvActionProgress"]):
-                    write_doxy(h, [
-                        "Progress action of {0}.".format(full_name),
-                        spec["cmdPrvActionProgress"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}ProgressAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))            
-                    gen_stub(h, incCode, "{0}{1}ProgressAction".format(settings["prefix"], pname), "smDesc", "")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdPrvActionTermination"]):
-                    write_doxy(h, [
-                        "Termination action of {0}.".format(full_name),
-                        spec["cmdPrvActionTermination"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}TerminationAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))                
-                    gen_stub(h, incCode, "{0}{1}TerminationAction".format(settings["prefix"], pname), "smDesc", "")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdPrvActionAbort"]):
-                    write_doxy(h, [
-                        "Abort action of {0}.".format(full_name),
-                        spec["cmdPrvActionAbort"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}AbortAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))                
-                    gen_stub(h, incCode, "{0}{1}AbortAction".format(settings["prefix"], pname), "smDesc", "")       
+        if spec["relation"] is not None:
+            if int(spec["relation"]) > 0:  # Service provider
+                if kind == "TC":
+                    if is_impl_needed(spec["cmdPrvCheckAcceptance"]):
+                        write_doxy(h, [
+                            "Validity check of {0}.".format(full_name),
+                            spec["cmdPrvCheckAcceptance"],
+                            "@param prDesc The descriptor of the validity check procedure.",
+                            "@return The validity check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}ValidityCheck(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}ValidityCheck".format(settings["prefix"], pname), "prDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdPrvCheckReady"]):
+                        write_doxy(h, [
+                            "Ready check of {0}.".format(full_name),
+                            spec["cmdPrvCheckReady"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The ready check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdPrvActionStart"]):
+                        write_doxy(h, [
+                            "Start action of {0}.".format(full_name),
+                            spec["cmdPrvActionStart"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}StartAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}StartAction".format(settings["prefix"], pname), "smDesc", "")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdPrvActionProgress"]):
+                        write_doxy(h, [
+                            "Progress action of {0}.".format(full_name),
+                            spec["cmdPrvActionProgress"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}ProgressAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}ProgressAction".format(settings["prefix"], pname), "smDesc", "")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdPrvActionTermination"]):
+                        write_doxy(h, [
+                            "Termination action of {0}.".format(full_name),
+                            spec["cmdPrvActionTermination"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}TerminationAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}TerminationAction".format(settings["prefix"], pname), "smDesc", "")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdPrvActionAbort"]):
+                        write_doxy(h, [
+                            "Abort action of {0}.".format(full_name),
+                            spec["cmdPrvActionAbort"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}AbortAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}AbortAction".format(settings["prefix"], pname), "smDesc", "")
+                else:
+                    if is_impl_needed(spec["repPrvCheckEnable"]):
+                        write_doxy(h, [
+                            "Enable check of {0}.".format(full_name),
+                            spec["repPrvCheckEnable"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The enable check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}EnableCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}EnableCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["repPrvCheckReady"]):
+                        write_doxy(h, [
+                            "Ready check of {0}.".format(full_name),
+                            spec["repPrvCheckReady"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The ready check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["repPrvCheckRepeat"]):
+                        write_doxy(h, [
+                            "Repeat check of {0}.".format(full_name),
+                            spec["repPrvCheckRepeat"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The repeat check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}RepeatCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}RepeatCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["repPrvActionUpdate"]):
+                        write_doxy(h, [
+                            "Update action of {0}.".format(full_name),
+                            spec["repPrvActionUpdate"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}UpdateAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "smDesc", "")
             else:
-                if is_impl_needed(spec["repPrvCheckEnable"]):
-                    write_doxy(h, [
-                        "Enable check of {0}.".format(full_name),
-                        spec["repPrvCheckEnable"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The enable check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}EnableCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}EnableCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["repPrvCheckReady"]):
-                    write_doxy(h, [
-                        "Ready check of {0}.".format(full_name),
-                        spec["repPrvCheckReady"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The ready check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["repPrvCheckRepeat"]):
-                    write_doxy(h, [
-                        "Repeat check of {0}.".format(full_name),
-                        spec["repPrvCheckRepeat"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The repeat check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}RepeatCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}RepeatCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["repPrvActionUpdate"]):
-                    write_doxy(h, [
-                        "Update action of {0}.".format(full_name),
-                        spec["repPrvActionUpdate"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}UpdateAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "smDesc", "")       
-        else:
-            if kind == "TC":
-                if is_impl_needed(spec["cmdUsrCheckEnable"]):
-                    write_doxy(h, [
-                        "Enable check of {0}.".format(full_name),
-                        spec["cmdUsrCheckEnable"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The enable check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}EnableCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}EnableCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdUsrCheckReady"]):
-                    write_doxy(h, [
-                        "Ready check of {0}.".format(full_name),
-                        spec["cmdUsrCheckReady"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The ready check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")
-                if is_impl_needed(spec["cmdUsrCheckRepeat"]):
-                    write_doxy(h, [
-                        "Repeat check of {0}.".format(full_name),
-                        spec["cmdUsrCheckRepeat"],
-                        "@param smDesc The state machine descriptor.",
-                        "@return The repeat check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}RepeatCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))            
-                    gen_stub(h, incCode, "{0}{1}RepeatCheck".format(settings["prefix"], pname), "smDesc", "1")       
-                    writeln(h, "")            
-                if is_impl_needed(spec["cmdUsrActionUpdate"]):
-                    write_doxy(h, [
-                        "Update action of {0}.".format(full_name),
-                        spec["cmdUsrActionUpdate"],
-                        "@param smDesc The state machine descriptor."
-                    ])
-                    writeln(h, "void {0}{1}UpdateAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
-                    gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "smDesc", "")       
-            else: # TM
-                if is_impl_needed(spec["repUsrCheckAcceptance"]):
-                    write_doxy(h, [
-                        "Acceptance check of {0}.".format(full_name),
-                        spec["repUsrCheckAcceptance"],
-                        "@param prDesc The descriptor of the Reset Procedure of the InReport.",
-                        "@return The acceptance check result."
-                    ])
-                    writeln(h, "CrFwBool_t {0}{1}AcceptanceCheck(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))                    
-                    gen_stub(h, incCode, "{0}{1}AcceptanceCheck".format(settings["prefix"], pname), "prDesc", "1")       
-                    writeln(h, "")            
-                if is_impl_needed(spec["repUsrActionUpdate"]):
-                    write_doxy(h, [
-                        "Update action of {0}.".format(full_name),
-                        spec["repUsrActionUpdate"],
-                        "@param prDesc The descriptor of the Execution Procedure of the InReport."
-                    ])
-                    writeln(h, "void {0}{1}UpdateAction(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))        
-                    gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "prDesc", "")       
+                if kind == "TC":
+                    if is_impl_needed(spec["cmdUsrCheckEnable"]):
+                        write_doxy(h, [
+                            "Enable check of {0}.".format(full_name),
+                            spec["cmdUsrCheckEnable"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The enable check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}EnableCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}EnableCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdUsrCheckReady"]):
+                        write_doxy(h, [
+                            "Ready check of {0}.".format(full_name),
+                            spec["cmdUsrCheckReady"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The ready check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}ReadyCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}ReadyCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdUsrCheckRepeat"]):
+                        write_doxy(h, [
+                            "Repeat check of {0}.".format(full_name),
+                            spec["cmdUsrCheckRepeat"],
+                            "@param smDesc The state machine descriptor.",
+                            "@return The repeat check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}RepeatCheck(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}RepeatCheck".format(settings["prefix"], pname), "smDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["cmdUsrActionUpdate"]):
+                        write_doxy(h, [
+                            "Update action of {0}.".format(full_name),
+                            spec["cmdUsrActionUpdate"],
+                            "@param smDesc The state machine descriptor."
+                        ])
+                        writeln(h, "void {0}{1}UpdateAction(FwSmDesc_t smDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "smDesc", "")
+                else: # TM
+                    if is_impl_needed(spec["repUsrCheckAcceptance"]):
+                        write_doxy(h, [
+                            "Acceptance check of {0}.".format(full_name),
+                            spec["repUsrCheckAcceptance"],
+                            "@param prDesc The descriptor of the Reset Procedure of the InReport.",
+                            "@return The acceptance check result."
+                        ])
+                        writeln(h, "CrFwBool_t {0}{1}AcceptanceCheck(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}AcceptanceCheck".format(settings["prefix"], pname), "prDesc", "1")
+                        writeln(h, "")
+                    if is_impl_needed(spec["repUsrActionUpdate"]):
+                        write_doxy(h, [
+                            "Update action of {0}.".format(full_name),
+                            spec["repUsrActionUpdate"],
+                            "@param prDesc The descriptor of the Execution Procedure of the InReport."
+                        ])
+                        writeln(h, "void {0}{1}UpdateAction(FwPrDesc_t prDesc){2}".format(settings["prefix"], pname, term))
+                        gen_stub(h, incCode, "{0}{1}UpdateAction".format(settings["prefix"], pname), "prDesc", "")
 
     packet = spec["packet"]
     if 'derivations' in packet:
@@ -371,48 +374,54 @@ def gen_spec(path, spec):
 
     pdom = packet["domain"]
     pname = cname(packet["name"])
-    if (packet["spec"]["relation"] > 0): 
-        if (packet["kind"]=="TC"):      # TC in a service provider application
-            cmpKind = "InCmd"
-            cmpKindName = "incoming command"
+    #print("packet domain: ", pdom)
+    #print("packet name: ", pname)
+    #print("packet spec relation", packet["spec"]["relation"])
+    if packet["spec"]["relation"] is not None:
+        if int(packet["spec"]["relation"]) > 0:
+            if (packet["kind"]=="TC"):      # TC in a service provider application
+                cmpKind = "InCmd"
+                cmpKindName = "incoming command"
+            else:
+                cmpKind = "OutCmp"          # TM report in a service provider appliation
+                cmpKindName = "out-going report"
         else:
-            cmpKind = "OutCmp"          # TM report in a service provider appliation
-            cmpKindName = "out-going report"
-    else:
-        if (packet["kind"]=="TC"):      # TC in a service user application
-            cmpKind = "OutCmp"
-            cmpKindName = "out-going commend"
-        else:
-            cmpKind = "InRep"          # TM report in a service user appliation
-            cmpKindName = "incoming report"
+            if (packet["kind"]=="TC"):      # TC in a service user application
+                cmpKind = "OutCmp"
+                cmpKindName = "out-going commend"
+            else:
+                cmpKind = "InRep"          # TM report in a service user appliation
+                cmpKindName = "incoming report"
     
-    full_name = "{0}({1},{2}) {3}{4}".format(p["kind"], p["type"], p["subtype"], p["domain"], p["name"])
-    desc = "Implementation of {0} as an {1}.".format(full_name,cmpKindName)
-    
-    f = list()
-    writeln(f, "#include \"FwSmCore.h\"")
-    writeln(f, "#include \"CrFwConstants.h\"")
-    writeln(f, "")
-    gen_funcs(f, False, spec, full_name, cmpKind+pdom+pname, p["kind"])
-    gen_file(f, path+"/"+packet["domain"]+"/", gen_file_name_h(cmpKind+pdom+pname), True, True, desc)
+        full_name = "{0}({1},{2}) {3}{4}".format(p["kind"], p["type"], p["subtype"], p["domain"], p["name"])
+        desc = "Implementation of {0} as an {1}.".format(full_name,cmpKindName)
+        #print("full_name: ", full_name)
+        #print("desc: ", desc)
 
-    f = list()
-    writeln(f, "#include \"{0}\"".format(gen_file_name_h(cmpKind+pdom+pname)))
-    writeln(f, "")
-    gen_funcs(f, True, spec, full_name, cmpKind+pdom+pname, p["kind"])
-    gen_file(f, path+"/"+packet["domain"]+"/", gen_file_name_c(cmpKind+pdom+pname), False, False, desc)
+        f = list()
+        writeln(f, "#include \"FwSmCore.h\"")
+        writeln(f, "#include \"CrFwConstants.h\"")
+        writeln(f, "")
+        gen_funcs(f, False, spec, full_name, cmpKind+pdom+pname, p["kind"])
+        gen_file(f, path+"/"+packet["domain"]+"/", gen_file_name_h(cmpKind+pdom+pname), True, True, desc)
+
+        f = list()
+        writeln(f, "#include \"{0}\"".format(gen_file_name_h(cmpKind+pdom+pname)))
+        writeln(f, "")
+        gen_funcs(f, True, spec, full_name, cmpKind+pdom+pname, p["kind"])
+        gen_file(f, path+"/"+packet["domain"]+"/", gen_file_name_c(cmpKind+pdom+pname), False, False, desc)
 
 #-------------------------------------------------------------------------------
 def get_cr_check(spec, kind, spec_base, default, adaptationPoint, pname1):
     useDefault = True
     if spec != None:
         if kind == "TC":
-            if spec["relation"] > 0: # service provider
+            if int(spec["relation"]) > 0:  # service provider
                 key = "cmdPrv" + spec_base
             else:
                 key = "cmdUsr" + spec_base
         else:
-            if spec["relation"] > 0: # service provider
+            if int(spec["relation"]) > 0: # service provider
                 key = "repPrv" + spec_base
             else:
                 key = "repUsr" + spec_base    
@@ -714,23 +723,24 @@ def gen_cfw(path, comp):
         return
 
     for spec in app["specifications"]:
-        #print("SPEC - ", spec["packet"]["type"], spec["packet"]["subtype"], spec["packet"]["kind"], spec["packet"]["name"]) # 76 spec for SMILE IASW
+        #print("SPEC - ", spec["packet"]["type"], spec["packet"]["subtype"], spec["packet"]["kind"], spec["packet"]["name"])  # 76 spec for SMILE IASW
         gen_spec(path, spec)
 
     spec_in_cmd = []
     spec_in_rep = []
     spec_out_cmp = []
     for spec in app["specifications"]:
-        if spec["relation"] > 0:                # Service provider
-            if spec["packet"]["kind"] == "TC":  # incoming command
-                spec_in_cmd.append(spec)
-            else:                               # outgoing report
-                spec_out_cmp.append(spec)
-        else:                                   # Service user
-            if spec["packet"]["kind"] == "TC":  # out-going command
-                spec_out_cmp.append(spec)
-            else:                               # incoming report
-                spec_in_rep.append(spec)
+        if spec["relation"] is not None:
+            if int(spec["relation"]) > 0:           # Service provider
+                if spec["packet"]["kind"] == "TC":  # incoming command
+                    spec_in_cmd.append(spec)
+                else:                               # outgoing report
+                    spec_out_cmp.append(spec)
+            else:                                   # Service user
+                if spec["packet"]["kind"] == "TC":  # out-going command
+                    spec_out_cmp.append(spec)
+                else:                               # incoming report
+                    spec_in_rep.append(spec)
 
     app["__dp_spec_in_cmd"] = spec_in_cmd
     app["__dp_spec_in_rep"] = spec_in_rep
@@ -745,7 +755,7 @@ if __name__ == '__main__':
         app_id = sys.argv[2]
         try:
             il = get_data.get_data(project_id)
-            print("il = ", il)
+            #print("il = ", il)
             app = il["apps"]["hash"][int(app_id)]
             gen_cfw("./cfw", app["components"]["hash"]["cfw"])
             print("Done")

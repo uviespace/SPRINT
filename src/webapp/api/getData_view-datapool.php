@@ -20,28 +20,7 @@ $sqlTotal = "SELECT * FROM `parameter`";
 $sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT $start_from, $num_rec_per_page"; 
 } else {
 $sqlTotal = 
-  "SELECT ".
-  "    p.id, ".
-  "    p.domain, ".
-  "    p.name, ".
-  "    p.kind, ".
-  "    p.shortDesc, ".
-  "    p.idType, ".
-  "    concat(t.domain, ' / ', t.name) AS datatype, ".
-  "    p.multiplicity, ".
-  "    p.value, ".
-  "    p.unit ".
-  "FROM ".
-  "    `parameter` AS p, ".
-  "    `type` AS t ".
-  "WHERE ".
-  "    p.idStandard = ".$idStandard." AND ".
-  "    p.idType = t.id AND ".
-  "    (p.kind = 3 OR ".
-  "    p.kind = 4 OR ".
-  "    p.kind = 5 OR ".
-  "    p.kind = 6) ";
-$sql = 
+  "SELECT * FROM (".
   "SELECT ".
   "    p.id, ".
   "    p.domain, ".
@@ -63,7 +42,74 @@ $sql =
   "    p.kind = 4 OR ".
   "    p.kind = 5 OR ".
   "    p.kind = 6) ".
-  "    ORDER BY p.id ASC LIMIT $start_from, $num_rec_per_page"; 
+  "UNION ".
+  "SELECT ".
+  "    p.id, ".
+  "    p.domain, ".
+  "    p.name, ".
+  "    p.kind, ".
+  "    p.shortDesc, ".
+  "    p.idType, ".
+  "    concat('None / None') AS datatype, ".
+  "    p.multiplicity, ".
+  "    p.value, ".
+  "    p.unit ".
+  "FROM ".
+  "    `parameter` AS p ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType IS NULL AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  ") AS u ";
+$sql = 
+  "SELECT * FROM (".
+  "SELECT ".
+  "    p.id, ".
+  "    p.domain, ".
+  "    p.name, ".
+  "    p.kind, ".
+  "    p.shortDesc, ".
+  "    p.idType, ".
+  "    concat(t.domain, ' / ', t.name) AS datatype, ".
+  "    p.multiplicity, ".
+  "    p.value, ".
+  "    p.unit ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `type` AS t ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType = t.id AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  "UNION ".
+  "SELECT ".
+  "    p.id, ".
+  "    p.domain, ".
+  "    p.name, ".
+  "    p.kind, ".
+  "    p.shortDesc, ".
+  "    p.idType, ".
+  "    concat('None / None') AS datatype, ".
+  "    p.multiplicity, ".
+  "    p.value, ".
+  "    p.unit ".
+  "FROM ".
+  "    `parameter` AS p ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType IS NULL AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  ") AS u ".
+  "ORDER BY u.domain, u.kind, u.name ASC LIMIT $start_from, $num_rec_per_page";
 }
 
 $result = $mysqli->query($sql);

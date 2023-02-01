@@ -1,4 +1,5 @@
-#!C:\Users\chris\Anaconda2\python.exe
+#!C:\Python310\python.exe
+##!C:\Users\chris\Anaconda2\python.exe
 ##!/usr/bin/python
 
 import sys
@@ -10,16 +11,16 @@ def get_settings():
     settings = {}
     if cwd.startswith("/homepages/"):
         # We are on the server
-        settings["tmp_path"] = "/tmp"
-        settings["db_host"] = "db_host"
-        settings["db_user"] = "db_user"
-        settings["db_passwd"] = "db_passwd"
-        settings["db_name"] = "db_name"
+        settings["tmp_path"] = ""
+        settings["db_host"] = ""
+        settings["db_user"] = ""
+        settings["db_passwd"] = ""
+        settings["db_name"] = ""
     else:
         # We are on the developer machine
-        settings["tmp_path"] = "/tmp"
-        settings["db_host"] = "db_host"
-        settings["db_user"] = "db_user"
-        settings["db_passwd"] = "db_passwd"
-        settings["db_name"] = "db_name"
+        settings["tmp_path"] = "/tmp/local"  # "/tmp/local"
+        settings["db_host"] = "localhost"
+        settings["db_user"] = "cordetfw"
+        settings["db_passwd"] = "Tmj1j!29"
+        settings["db_name"] = "dbeditor"  # test or dbeditor
     return settings

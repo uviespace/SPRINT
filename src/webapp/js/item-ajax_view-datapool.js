@@ -96,6 +96,7 @@ function getPageData() {
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);
+        $("#result_nmb").val(data.total);
 	});
 }
 
@@ -138,6 +139,9 @@ function manageOptionKind(data, kind) {
 /* Add new option to select */
 function manageOptionParameterDatatype(data, idType) {
 	$("#sel_datatype").empty();
+    if (idType=='null') {
+        $("#sel_datatype").append('<option value="" selected>None / None</option>');
+    }
 	$.each( data, function( key, value ) {
 		if (idType==value.id) {
 			$("#sel_datatype").append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+' ('+value.id+')</option>');

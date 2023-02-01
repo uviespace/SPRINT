@@ -18,10 +18,12 @@ class Generator:
         self.f.close()
 
     def writeln(self, s):
-        self.f.write(s.encode('utf8') + "\n")    
+        #self.f.write(str(s.encode('utf8')) + "\n")
+        self.f.write(str(s) + "\n")
 
     def conv(self, data):
-        return [u"" if d is None else unicode(d) for d in data]
+        #return [u"" if d is None else unicode(d) for d in data]
+        return [u"" if d is None else str(d) for d in data]  # unicode of Python2 is equivalent to str in Python3
 
     def validName(self, name):
         return name.replace(" ", "").replace("/", "").replace("_", "")

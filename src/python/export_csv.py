@@ -10,7 +10,7 @@ from db import *
 from common import *
 
 def new_file(path, filename):
-    f = open("{0}/{1}".format(path, filename), "w")
+    f = open("{0}/{1}".format(path, filename), "w", encoding="utf-8")
     return f
 
 def close_file(f):
@@ -20,8 +20,10 @@ def quote(s):
     if s is None:
         s = u"NULL"
     else:
-        if not isinstance(s, unicode):
-            s = unicode(s)
+        #if not isinstance(s, unicode):   # Python 2.x
+        #    s = unicode(s)
+        if not isinstance(s, str):
+            s = str(s)
     
     s = s.replace("\\", "\\\\")
     s = s.replace("\"", "\\\"")    
@@ -36,17 +38,20 @@ def export_data(path, filename, cur, sql, columns=None):
         f.write(u"{0}\n".format(u"|".join(columns)))
     for row in cur.fetchall():
         u = u"{0}\n".format("|".join([quote(item) for item in row]))
-        f.write(u.encode("utf8"))    
+        #f.write(u.encode("utf8"))   # Python 2.x 
+        #f.write(str(u.encode("utf8")))
+        f.write(u)    
     close_file(f)
 
 def get_table_columns(db, table_name):
     cur = db.cursor()
     db_execute(cur, """
-        SELECT COLUMN_NAME 
+        SELECT DISTINCT COLUMN_NAME 
         FROM INFORMATION_SCHEMA.COLUMNS 
-        WHERE TABLE_NAME='{0}'""".format(table_name))
+        WHERE TABLE_NAME='{0}'""".format(table_name))  # TODO: WHY get column names two times without DISTINCT?
     col_names = []
     for col_name in cur.fetchall():
+        #print("COL: ", col_name[0])  # TODO: WHY two times?
         col_names.append("{0}".format(col_name[0]))
     return col_names
 
@@ -54,9 +59,9 @@ def export_const(path, standard_id):
     db = db_open()
     cur = db.cursor()
     export_data(path, "Constants.csv", cur, """
-        SELECT c.domain, c.name, c.desc, c.value FROM Constants c
+        SELECT c.domain, c.name, c.desc, c.value FROM constants c
         WHERE c.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(standard_id),
         ["Domain", "Name", "Desc", "Value"])
@@ -85,58 +90,58 @@ def export_std(path, id):
     db = db_open()
     cur = db.cursor()    
     export_data(path, "Standard.csv", cur, """
-        SELECT * FROM Standard s
+        SELECT * FROM standard s
         WHERE s.id={0}""".format(id),
         get_table_columns(db, "Standard"))
     export_data(path, "Service.csv", cur, """
-        SELECT * FROM Service s
+        SELECT * FROM service s
         WHERE s.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "Service"))
     export_data(path, "Packet.csv", cur, """
-        SELECT * FROM Packet p
+        SELECT * FROM packet p
         WHERE p.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "Packet"))
     export_data(path, "ParameterSequence.csv", cur, """
-        SELECT * FROM ParameterSequence ps
+        SELECT * FROM parametersequence ps
         WHERE ps.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "ParameterSequence"))
     export_data(path, "Parameter.csv", cur, """
-        SELECT * FROM Parameter p
+        SELECT * FROM parameter p
         WHERE p.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "Parameter"))
     export_data(path, "Type.csv", cur, """
-        SELECT * FROM Type t
+        SELECT * FROM type t
         WHERE t.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "Type"))
     export_data(path, "Enumeration.csv", cur, """
-        SELECT * FROM Enumeration e
+        SELECT * FROM enumeration e
         WHERE e.idType in (
-            SELECT id FROM Type t
+            SELECT id FROM type t
             WHERE t.idStandard in (
-                SELECT id FROM Standard s
+                SELECT id FROM standard s
                 WHERE s.id={0}
             )
         )""".format(id),
         get_table_columns(db, "Enumeration"))
     export_data(path, "Constants.csv", cur, """
-        SELECT * FROM Constants c
+        SELECT * FROM constants c
         WHERE c.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.id={0}
         )""".format(id),
         get_table_columns(db, "Constants"))
@@ -148,102 +153,102 @@ def export_proj(path, id):
     cur = db.cursor()
 
     export_data(path, "Project.csv", cur, """
-        SELECT * FROM Project p
+        SELECT * FROM project p
         WHERE p.id={0}""".format(id),
         get_table_columns(db, "Project"))
     export_data(path, "Process.csv", cur, """
-        SELECT * FROM Process p
+        SELECT * FROM process p
         WHERE p.idProject={0}""".format(id),
         get_table_columns(db, "Process"))
     export_data(path, "Application.csv", cur, """
-        SELECT * FROM Application a
+        SELECT * FROM application a
         WHERE a.idProject={0}""".format(id),
         get_table_columns(db, "Application"))
     export_data(path, "ApplicationComponent.csv", cur, """
-        SELECT * FROM ApplicationComponent ac
+        SELECT * FROM applicationcomponent ac
         WHERE ac.idApplication in (
-            SELECT id FROM Application a
+            SELECT id FROM application a
             WHERE a.idProject={0}
         )""".format(id),
         get_table_columns(db, "ApplicationComponent"))        
     export_data(path, "ApplicationStandard.csv", cur, """
-        SELECT * FROM ApplicationStandard s
+        SELECT * FROM applicationstandard s
         WHERE s.idApplication in (
-            SELECT id FROM Application a
+            SELECT id FROM application a
             WHERE a.idProject={0}
         )""".format(id),
         get_table_columns(db, "ApplicationStandard"))        
     export_data(path, "ApplicationPacket.csv", cur, """
-        SELECT * FROM ApplicationPacket ap
+        SELECT * FROM applicationPacket ap
         WHERE ap.idApplication in (
-            SELECT id FROM Application a
+            SELECT id FROM application a
             WHERE a.idProject={0}
         )""".format(id),
         get_table_columns(db, "ApplicationPacket"))
     export_data(path, "Standard.csv", cur, """
-        SELECT * FROM Standard s
+        SELECT * FROM standard s
         WHERE s.idProject={0}""".format(id),
         get_table_columns(db, "Standard"))
-    export_data(path, "StandardStandard.csv", cur, """
-        SELECT * FROM StandardStandard s
+    export_data(path, "standardstandard.csv", cur, """
+        SELECT * FROM standardstandard s
         WHERE s.idStandardParent in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}) AND
           s.idStandardChild in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "StandardStandard"))
     export_data(path, "Service.csv", cur, """
-        SELECT * FROM Service s
+        SELECT * FROM service s
         WHERE s.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "Service"))
     export_data(path, "Packet.csv", cur, """
-        SELECT * FROM Packet p
+        SELECT * FROM packet p
         WHERE p.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )
         ORDER BY idParent ASC""".format(id),
         get_table_columns(db, "Packet"))
     export_data(path, "ParameterSequence.csv", cur, """
-        SELECT * FROM ParameterSequence ps
+        SELECT * FROM parametersequence ps
         WHERE ps.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "ParameterSequence"))
     export_data(path, "Parameter.csv", cur, """
-        SELECT * FROM Parameter p
+        SELECT * FROM parameter p
         WHERE p.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "Parameter"))
     export_data(path, "Type.csv", cur, """
-        SELECT * FROM Type t
+        SELECT * FROM type t
         WHERE t.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "Type"))
-    export_data(path, "Enumeration.csv", cur, """
-        SELECT * FROM Enumeration e
+    export_data(path, "enumeration.csv", cur, """
+        SELECT * FROM enumeration e
         WHERE e.idType in (
-            SELECT id FROM Type t
+            SELECT id FROM type t
             WHERE t.idStandard in (
-                SELECT id FROM Standard s
+                SELECT id FROM standard s
                 WHERE s.idProject={0}
             )
         )""".format(id),
         get_table_columns(db, "Enumeration"))
     export_data(path, "Constants.csv", cur, """
-        SELECT * FROM Constants c
+        SELECT * FROM constants c
         WHERE c.idStandard in (
-            SELECT id FROM Standard s
+            SELECT id FROM standard s
             WHERE s.idProject={0}
         )""".format(id),
         get_table_columns(db, "Constants"))
@@ -256,7 +261,7 @@ def help():
 if __name__ == '__main__':
     res = help()
 
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+    locale.setlocale(locale.LC_ALL, '')  # was 'en_US.UTF-8'
 
     try:
         if (len(sys.argv) == 3 and sys.argv[1] == "project"):

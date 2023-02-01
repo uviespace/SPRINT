@@ -1,11 +1,13 @@
-#!/usr/bin/python
+#!C:\Python310\python.exe
+##!/usr/bin/python
 # coding: utf-8
-
+import os
 import sys
 import get_data
 import math
 import traceback
 import simplejson
+import datetime
 
 settings = {}
 
@@ -17,12 +19,13 @@ settings = {}
 # - Defaults for arrays not supported. Format unclear.
 
 def new_file(path, name):
-    f = open(u"{0}/{1}.csv".format(path, name), "w")
+    f = open(u"{0}/{1}.csv".format(path, name), "wb")
     return f
 
 def writeln(f, data):
     #f.write(u"{0}\n".format(u"\t".join(data)).encode('utf8'))
-    f.write(u"{0}\n".format(u"".join(data)).encode('utf8'))
+    f.write(u"{0}\n".format(u"".join(data)).encode('utf8'))  # Python 2.x
+    #f.write(u"{0}\n".format(u"".join(data)))  # Python 3.x
 
 def close_file(f):
     f.close()    
@@ -47,7 +50,7 @@ def get_paf_name(type_):
     return s
 
 def get_pid_name(packet):
-    return outp(settings["pid"]["offset"] + packet["_nr"], 10)
+    return outp(settings["pid"]["offset"] + int(packet["_nr"]), 10)
 
 def get_pcf_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcf"]["preamble"])
@@ -88,7 +91,8 @@ def outp(s, max_len, stripSpaces = False):
     if s == None:
         return ''
 
-    s = unicode(s).replace('\t', '').replace('\n', '')
+    #s = unicode(s).replace('\t', '').replace('\n', '')  # Python 2.x
+    s = str(s).replace('\t', '').replace('\n', '')  # Python 3.x
     if stripSpaces and " " in s:
         s = s.title().replace(' ', '')
 
@@ -96,7 +100,7 @@ def outp(s, max_len, stripSpaces = False):
 
 def check_packet_type(app, param_ii):
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for packet in standard["packets"]["TC"]["list"]:
                 for param_i in packet["body"]:
@@ -127,7 +131,10 @@ def get_ptc_pfc(param):
     multi = param["multi"] if param["multi"] != None else -1
     #setting = param["type"]["setting"]
     #enums = param["type"]["setting"]["Enumerations"]
-    dtype_data = param["type"]["datatype"][0]
+    if param["type"] is not None:
+        dtype_data = param["type"]["datatype"][0]
+    else:
+        dtype_data = None
 
     ptc = 0
     pfc = 0
@@ -170,27 +177,27 @@ def get_ptc_pfc(param):
 
 def get_ptc_pfc_GEN(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = param["_size"]
-    multi = param["multi"] if param["multi"] != None else -1
+    size = int(param["_size"])
+    multi = int(param["multi"]) if param["multi"] != None else -1
 
     # char and (u)int8_t arrays can be mapped to SCOS-2000 types. For arrays of other types, a repetition group
     # must be introduced.
     # format: (ptc, pfc, width, repetition)
     return \
         (1, 0, 1, multi) if domain == "General" and name == "bit" else \
-        (3, 4, 8, multi) if domain == "C99" and name == "uint8_t" and multi < 0 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "uint8_t" else \
+        (3, 4, 8, multi) if domain == "C99" and name == "uint8_t" and int(multi) < 0 else \
+        (7, int(param["_length"])/8, param["_length"], -1) if domain == "C99" and name == "uint8_t" else \
         (3, 12, 16, multi) if domain == "C99" and name == "uint16_t" else \
         (3, 14, 32, multi) if domain == "C99" and name == "uint32_t" else \
         (3, 16, 64, multi) if domain == "C99" and name == "uint64_t" else \
         (4, 4, 8, multi) if domain == "C99" and name == "int8_t" and multi < 0 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "int8_t" else \
+        (7, int(param["_length"])/8, param["_length"], -1) if domain == "C99" and name == "int8_t" else \
         (4, 12, 16, multi) if domain == "C99" and name == "int16_t" else \
         (4, 14, 32, multi) if domain == "C99" and name == "int32_t" else \
         (4, 16, 64, multi) if domain == "C99" and name == "int64_t" else \
         (5, 1, 32, multi) if domain == "C99" and name == "float" else \
         (5, 2, 64, multi) if domain == "C99" and name == "double" else \
-        (8, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "char" else \
+        (8, int(param["_length"])/8, param["_length"], -1) if domain == "C99" and name == "char" else \
         (3, size-4, size, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size >= 4 and size <= 16 else \
         (3, 13, 24, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size == 24 else \
         (3, 14, 32, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size == 32 else \
@@ -198,8 +205,8 @@ def get_ptc_pfc_GEN(param):
         (4, size-4, size, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size >= 4 and size <= 16 else \
         (4, 13, 24, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size == 24 else \
         (4, 14, 32, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size == 32 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "SCOS-2000" and name == "Octet string" else \
-        (8, param["_length"]/8, param["_length"], -1) if domain == "SCOS-2000" and name == "ASCII string" else \
+        (7, int(param["_length"])/8, int(param["_length"]), -1) if domain == "SCOS-2000" and name == "Octet string" else \
+        (8, int(param["_length"])/8, int(param["_length"]), -1) if domain == "SCOS-2000" and name == "ASCII string" else \
         (9, 1, 0, multi) if domain == "SCOS-2000" and name == u"Absolute time CDS w/o μs" else \
         (9, 2, 0, multi) if domain == "SCOS-2000" and name == u"Absolute time CDS with μs" else \
         (9, 3, 0, multi) if domain == "SCOS-2000" and name == "Absolute time CUC (1/0)" else \
@@ -401,7 +408,7 @@ def getDatatype(ptc, pfc, width):
             dt = "FLOAT"+" ("+str(ptc)+"/"+str(pfc)+")"
     elif (ptc == 7):
         dt = "Octet string"+" ("+str(ptc)+"/"+str(pfc)+") "+str(width)
-        dt = "UINT"+str(width/pfc)
+        dt = "UINT"+str(float(width)/pfc)
     else:
         dt = "UNKNOWN"+" ("+str(ptc)+"/"+str(pfc)+")"
 
@@ -415,11 +422,23 @@ def gen_dp_list(app, path):
             d[param["domain"]]["vars"] = []
         d[param["domain"]][type_].append(param)
 
+    f = new_file(path, "dp")
+
     dpid_offset = 345544320 - 0  # -1 because dpid starts with 0+1
     delimiter = "|"
     additionalInfo = True
 
-    f = new_file(path, "dp")
+    writeln(f, ['# IASW Version: _._ p_; commit hash: ____; MIB Version: _._._'])
+    writeln(f, [
+        'Name' + delimiter,  # name
+        'ID' + delimiter,  # id
+        'Datatype' + delimiter,  # bit size
+        'Multiplicity' + delimiter,  # multiplicity
+        'PAR/VAR' + delimiter,  # par/var
+        'Value' + delimiter if additionalInfo else delimiter,  # default value
+        'Description' if additionalInfo else ""  # short description
+        'Domain' if additionalInfo else ""  # domain
+    ])
 
     domain_dict = {}
     params_list = []
@@ -428,11 +447,11 @@ def gen_dp_list(app, path):
     for standard_relation in app["standards"]:
         standard = standard_relation["standard"]
         for param in standard["datapool"]["params"]:
-            if param["ownerStandardId"] == standard["id"]:
+            if int(param["ownerStandardId"]) == int(standard["id"]):
                 add_elem(domain_dict, param, "params")
                 params_list.append(param)
         for var in standard["datapool"]["vars"]:
-            if param["ownerStandardId"] == standard["id"]:
+            if int(param["ownerStandardId"]) == int(standard["id"]):
                 add_elem(domain_dict, var, "vars")
                 vars_list.append(var)
 
@@ -448,21 +467,21 @@ def gen_dp_list(app, path):
             if param["size"] is not None:
                 bitsize = str(param["size"])
             elif ptc == 7:
-                bitsize = str(width/long(param["multi"]))
+                bitsize = str(int(width)/int(param["multi"]))
             else:
                 bitsize = str(width)
             writeln(f, [
-                outp(param["name"], 24, True) + delimiter,
-                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,
-                datatype + delimiter,
+                outp(param["name"], 24, True) + delimiter,  # name
+                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
+                datatype + delimiter,  # data type
                 #str(width) + delimiter,
                 #str(repetition) + delimiter,
-                bitsize + delimiter,
-                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,
-                'PAR'+delimiter,
-                param["value"]+delimiter if additionalInfo else delimiter,
-                param["shortDesc"]+delimiter if additionalInfo else delimiter,
-                param["domain"] if additionalInfo else ""
+                #bitsize + delimiter,  # bit size
+                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
+                'PAR'+delimiter,  # par/var
+                param["value"]+delimiter if additionalInfo else delimiter,  # default value
+                param["shortDesc"]+delimiter if additionalInfo else "",  # short description
+                param["domain"] if additionalInfo else ""  # domain
             ])
     if len(vars_list) > 0:
         #writeln(f, "/* Variables */")
@@ -476,34 +495,47 @@ def gen_dp_list(app, path):
             if param["size"] is not None:
                 bitsize = str(param["size"])
             elif ptc == 7:
-                bitsize = str(width/long(param["multi"]))
+                bitsize = str(width/int(param["multi"]))
             else:
                 bitsize = str(width)
             writeln(f, [
-                outp(param["name"], 24, True) + delimiter,
-                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,
-                datatype + delimiter,
+                outp(param["name"], 24, True) + delimiter,  # name
+                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
+                datatype + delimiter,  # data type
                 #str(width) + delimiter,
                 #str(repetition) + delimiter,
-                bitsize + delimiter,
-                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,
-                'VAR'+delimiter,
-                param["value"]+delimiter if additionalInfo else delimiter,
-                param["shortDesc"]+delimiter if additionalInfo else delimiter,
-                param["domain"] if additionalInfo else ""
+                #bitsize + delimiter,  # bit size
+                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
+                'VAR'+delimiter,  # par/var
+                param["value"]+delimiter if additionalInfo else delimiter,  # default value
+                param["shortDesc"]+delimiter if additionalInfo else "",  # short description
+                param["domain"] if additionalInfo else ""  # domain
             ])
 
     close_file(f)
 
 def gen_dp_pckt_list(app, path):
     f = new_file(path, "dp_pckt")
+
+    dpid_offset = 345544320 - 0  # -1 because dpid starts with 0+1
+    delimiter = ","
+    additionalInfo = False
+
+    writeln(f, ['# IASW Version: _._ p_; commit hash: ____; MIB Version: _._._'])
+    writeln(f, [
+        'Name' + delimiter,  # name
+        'ID' + delimiter,  # id
+        'Bit size' + delimiter,  # bit size
+        'Multiplicity' + delimiter,  # multiplicity
+        'PAR/VAR' + delimiter,  # par/var
+        'Value' + delimiter if additionalInfo else delimiter,  # default value
+        'Description' + delimiter if additionalInfo else delimiter,  # short description
+        'Domain' if additionalInfo else ""  # domain
+    ])
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
 
-            dpid_offset = 345544320 - 0   # -1 because dpid starts with 0+1
-            delimiter = ","
-            additionalInfo = False
 
             #for tm in standard["packets"]["TM"]["list"]:
             #    for param_i in tm["body"]:
@@ -539,14 +571,14 @@ def gen_dp_pckt_list(app, path):
 
                                 if "_dpid" in param:
                                     writeln(f, [
-                                        outp(param["name"], 24, True)+delimiter,
-                                        outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,
-                                        outp(width, 6)+delimiter,
-                                        '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,
-                                        ''+delimiter,
-                                        param["value"]+delimiter if additionalInfo else delimiter,
-                                        param["shortDesc"]+delimiter if additionalInfo else delimiter,
-                                        param["domain"] if additionalInfo else ""
+                                        outp(param["name"], 24, True)+delimiter,  # name
+                                        outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,  # id
+                                        outp(width, 6)+delimiter,  # bit size
+                                        '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,  # multiplicity
+                                        ''+delimiter,  # par/var
+                                        param["value"]+delimiter if additionalInfo else delimiter,  # default value
+                                        param["shortDesc"]+delimiter if additionalInfo else delimiter,  # short description
+                                        param["domain"] if additionalInfo else ""  # domain
                                     ])
                                 written = 1
                                 break
@@ -559,15 +591,16 @@ def gen_dp_pckt_list(app, path):
                                     ptc, pfc, width, repetition = get_ptc_pfc(param)
                                     hasTextualCalibration = (len(param["type"]["enums"]) > 0)
                                     if "_dpid" in param:
+                                        #print("CSV - DP ID: ", param["_dpid"], " Param: ", param["name"])
                                         writeln(f, [
-                                            outp(param["name"], 24, True)+delimiter,
-                                            outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,
-                                            outp(width, 6)+delimiter,
-                                            '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,
-                                            ''+delimiter,
-                                            param["value"]+delimiter if additionalInfo else delimiter,
-                                            param["shortDesc"]+delimiter if additionalInfo else delimiter,
-                                            param["domain"] if additionalInfo else ""
+                                            outp(param["name"], 24, True)+delimiter,  # name
+                                            outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,  # id
+                                            outp(width, 6)+delimiter,  # bit size
+                                            '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,  # multiplicity
+                                            ''+delimiter,  # par/var
+                                            param["value"]+delimiter if additionalInfo else delimiter,  # default value
+                                            param["shortDesc"]+delimiter if additionalInfo else delimiter,  # short description
+                                            param["domain"] if additionalInfo else ""  # domain
                                         ])
                                     written = 1
                                     break
@@ -579,11 +612,10 @@ def gen_dp_pckt_list(app, path):
     close_file(f)
 
 
-
 def prepare(app):
     # Generate SPID for all TM packets
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for tm in standard["packets"]["TM"]["list"]:
                 if len(tm["derivations"]["list"]) > 0:
@@ -591,26 +623,29 @@ def prepare(app):
                         derived["__mib_spid"] = get_pid_name(derived)
                 else:
                     tm["__mib_spid"] = get_pid_name(tm)
+        else:
+            standard = {}
 
-    # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
-    for packet in standard["packets"]["TC"]["list"]:
-        #ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TC"]["params"][param["id"]] = param
-            #print("param: "+str(param["id"]))
+    if bool(standard):  # check if dictionary is not empty
+        # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
+        for packet in standard["packets"]["TC"]["list"]:
+            #ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TC"]["params"][param["id"]] = param
+                #print("param: "+str(param["id"]))
 
-    # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
-    for packet in standard["packets"]["TM"]["list"]:
-        # ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TM"]["params"][param["id"]] = param
-            # print("param: "+str(param["id"]))
+        # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
+        for packet in standard["packets"]["TM"]["list"]:
+            # ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TM"]["params"][param["id"]] = param
+                #print("param: "+str(param["id"]))
 
     # Mark all types for whether they are used for commands and/or reports
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for type_ in standard["types"].values():
                 type_["__mib_used_tc"] = False
@@ -629,7 +664,6 @@ def gen_dp_csv(path, comp):
     global settings
 
     settings = comp["setting"]
-    #print(settings["pid"])
 
     if settings is None:
         return
@@ -641,7 +675,6 @@ def gen_dp_csv(path, comp):
     gen_dp_pckt_list(app, path)
     gen_dp_list(app, path)
 
-
 if __name__ == '__main__':
 
     if (len(sys.argv) == 3):
@@ -649,9 +682,15 @@ if __name__ == '__main__':
         project_id = sys.argv[1]
         app_id = sys.argv[2]
         try:
-            il = get_data.get_data(project_id)            
+            il = get_data.get_data(int(project_id))
             app = il["apps"]["hash"][int(app_id)]
-            gen_dp_csv("./dp_csv", app["components"]["hash"]["mib"])
+            #print('Timestamp: {:%Y-%m-%d %H:%M:%S}'.format(datetime.datetime.now()))
+            timestamp = "{:%Y%m%d%H%M}".format(datetime.datetime.now())
+            path = "./dp_csv/"+timestamp
+            isExistPath = os.path.exists(path)
+            if not isExistPath:
+                os.makedirs(path)
+            gen_dp_csv(path, app["components"]["hash"]["mib"])
             print("Done")
         except Exception as e:
             print("Something went wrong...")

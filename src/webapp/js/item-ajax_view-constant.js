@@ -92,6 +92,7 @@ function getPageData() {
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);
+        $("#result_nmb").val(data.total);
 	});
 }
 

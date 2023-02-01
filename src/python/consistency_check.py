@@ -31,11 +31,11 @@ def check_cc002_list(standard, res, elem_list, container_name):
     for elem in elem_list:
         n = elem["group"]
         m = len(elem_list)-1-i
-        if n != None and n > 0:
+        if n != None and int(n) > 0:
             my_assert(res,
                 "CC-002",
                 "[{0}] Parameter '{1}' in '{4}' specifies group size of N={2}, M={3} parameters follow in this sequence. M >= N.".format(standard["name"], elem["param"]["name"], n, m, container_name),
-                m >= n)
+                m >= int(n))
         i = i+1
 
 def check_cc002(standard, res):
@@ -70,7 +70,7 @@ def check_cc004_cc005(id, standard, res, role_id, role_desc):
         n_type = 0
         params = standard["headers"][header]
         for param in params:
-            if param["role"] == role_id:
+            if int(param["role"]) == int(role_id):
                 n_type = n_type+1
         my_assert(res, id,
             "[{0}] Exactly one parameter in the {1} header definition must be given the role {2}.".format(standard["name"], header, role_desc),
@@ -93,7 +93,7 @@ def check_cc006(standard, res):
         if len(packet["derivations"]["list"]) > 0:
             n_discriminant = 0
             for param in packet["body"]:
-                if param["role"] == 3:
+                if int(param["role"]) == 3:
                     n_discriminant = n_discriminant+1
             my_assert(res, "CC-006",
                 "[{0}] Body of packet '{1}' must have exactly one parameter with role 'Discriminant'.".format(standard["name"], packet["name"]),
@@ -121,13 +121,13 @@ def check_cc008(standard, res):
 # Generate warning for unused types
 def check_cc009(standard, res):
     for type_id, type_ in standard["types"].items():
-        if type_id >= 1000: # Type IDs below 1000 are pre-defined types, e.g. the C types
+        if int(type_id) >= 1000: # Type IDs below 1000 are pre-defined types, e.g. the C types
             my_assert(res, "CC-009",
                 """[{0}] Type '{1}/{2}' should be used.""".format(standard["name"], type_["domain"], type_["name"]), len(type_["params"]) > 0, 1)
 
 def check_cc010(standard, res):
     for param in standard["params"]["list"]:
-        if param["id"] >= 1000: # Parameter IDs below 1000 are for pre-defined parameters, e.g. Spare n-bit
+        if int(param["id"]) >= 1000: # Parameter IDs below 1000 are for pre-defined parameters, e.g. Spare n-bit
             if param["kind"] == 1 or param["kind"] == 2: # kind 1: parameter can be part of a TC/TM header; kind 2: parameter can be part of body definition
                 is_used = (len(param["_sequence"]) > 0)
                 my_assert(res, "CC-010",
@@ -136,7 +136,7 @@ def check_cc010(standard, res):
 # Generate warning for every enumerated type who's default value is not in the enumerated list.
 def check_cc011(standard, res):
     for type_id, type_ in standard["types"].items():
-        if type_id >= 1000: # Don't perform check for pre-defined types.
+        if int(type_id) >= 1000: # Don't perform check for pre-defined types.
             if type_["value"] != None and len(type_["value"]) > 0 and len(type_["enums"]) > 0:
                 valid = False
                 for enum in type_["enums"]:
@@ -148,10 +148,10 @@ def check_cc011(standard, res):
 # Generate warning for every parameter who's default value is not in the enumerated list of its type.
 def check_cc012(standard, res):
     for param in standard["params"]["list"]:
-        if param["id"] >= 1000:    
+        if int(param["id"]) >= 1000:
             type_ = param["type"]
             if type_ != None:
-                if type_["id"] >= 1000: # Don't perform check for pre-defined types.
+                if int(type_["id"]) >= 1000: # Don't perform check for pre-defined types.
                     if param["value"] != None and len(param["value"]) > 0 and len(type_["enums"]) > 0:
                         valid = False
                         for enum in type_["enums"]:
@@ -163,7 +163,7 @@ def check_cc012(standard, res):
 # The multiplicity must either be a positive integer or state the name of a constant who's value is a positive integer.
 def check_cc013(standard, res):
     for param in standard["params"]["list"]:
-        if param["id"] >= 1000:
+        if int(param["id"]) >= 1000:
             valid = (param["_multi"] != None)
             my_assert(res, "CC-013",
                 """[{0}] Parameter '{1}/{2}' must have a multiplicity of either a positive integer or state the name of a constant who's value is a positive integer.""".format(standard["name"], param["domain"], param["name"]), valid)

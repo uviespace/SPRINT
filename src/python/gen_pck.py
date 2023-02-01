@@ -464,9 +464,9 @@ def get_param_hierarchy_group(parent, hierarchy, body, i):
     param_i["__dp_isOnlyChild"] = False
     hierarchy.append(param_i)
     i = i + 1
-    if param_i["group"] > 0:
+    if param_i["group"] is not None and int(param_i["group"]) > 0:
         param_i["__dp_isLeaf"] = False
-        n = i + param_i["group"]
+        n = i + int(param_i["group"])
         while i < n:
             i = get_param_hierarchy_group(param_i, param_i["__dp_subparams"], body, i)
     if (len(param_i["__dp_subparams"]) == 1):

@@ -7,6 +7,7 @@ import locale
 import traceback
 
 from db import *
+from settings import *
 
 def save_int(t):    
     s = "NULL"
@@ -66,7 +67,7 @@ def import_dp(idStandard, import_kind, path):
         types = {}
         cur = db.cursor()        
         db_execute(cur, """
-            SELECT t.id, CONCAT(t.domain, '/', t.name) from Type t
+            SELECT t.id, CONCAT(t.domain, '/', t.name) from type t
             WHERE t.idStandard IS NULL OR t.idStandard={0}""".format(idStandard))
         for row in cur.fetchall():
             types[row[1]] = row[0]
@@ -166,24 +167,30 @@ def import_proj(idUser, path):
         idProject = list(changes["Project"].values())[0]
         idRole = 2 # Role is fixed to 2=Maintainer        
         db_execute(cur, """
-            UPDATE Project
+            UPDATE project
             SET isPublic=False
             WHERE id={0};""".format(idProject))
         db_execute(cur, """
-            INSERT INTO UserProject (idUser, idProject, idRole)
+            INSERT INTO userproject (idUser, idProject, idRole)
             VALUES({0}, {1}, {2});"""
             .format(idUser, idProject, idRole))
         cur.close()        
-        db.commit()        
+        db.commit()
+        db_close(db)
     except:
         db.rollback()
         res = False
-    db_close(db)   
-    return res        
+        db_close(db)
+    return res
 
 def import_table(db, changes, path, table_name, parent_table_names, num_pk):
-    file_name = "{0}/{1}.csv".format(path, table_name)
-    
+    file_name = "{0}\{1}.csv".format(path, table_name)
+    #print("file_name: ", file_name)
+
+    settings = get_settings()
+    db_name = settings["db_name"]
+    #print("db_name: ", db_name)
+
     if (not os.path.isfile(file_name)):
         return
 
@@ -213,12 +220,24 @@ def import_table(db, changes, path, table_name, parent_table_names, num_pk):
             else:
                 values.append(key_old)
         for i in range(num_cols-num_pk-num_fk):
-            values.append(conv(row[i+num_pk+num_fk]))        
+            values.append(conv(row[i+num_pk+num_fk]))
 
-        db_execute(cur, u"""INSERT INTO `{0}` ({2}) VALUES({1});""".format(table_name, ','.join(values), ','.join(col_names)))
+        #print(u"""INSERT INTO `{0}` ({2}) VALUES ({1});""".format(table_name, ','.join(values), ','.join(col_names)))
+        db_execute(cur, u"""INSERT INTO `{0}` ({2}) VALUES ({1});""".format(table_name, ','.join(values), ','.join(col_names)))
 
         if num_pk > 0:
-            changes[table_name][row[0]] = str(cur.lastrowid)
+            # TODO: call cur.lastrowid
+            '''
+            db_execute(cur, u"""SELECT last_insert_id() FROM `{0}`;""".format(table_name))
+            lastid = len(cur.fetchall())
+            '''
+            #print(u"""SELECT `auto_increment` FROM INFORMATION_SCHEMA.TABLES WHERE table_name = '{0}' AND table_schema = '{1}';""".format(table_name, db_name))
+            db_execute(cur, u"""SELECT `auto_increment` FROM INFORMATION_SCHEMA.TABLES WHERE table_name = '{0}' AND table_schema = '{1}';""".format(table_name, db_name))
+            for sqlres in cur.fetchall():
+                lastid = int(sqlres[0]) - 1
+            print("table: ", table_name, "lastid: ", lastid)
+            #print(settings["db_name"])
+            changes[table_name][row[0]] = str(lastid)
 
     cur.close()
     f.close()    
@@ -229,7 +248,7 @@ def help():
 if __name__ == '__main__':
     res = False
 
-    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')    
+    locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')   # was 'en_US.UTF-8'
 
     try:
         if (len(sys.argv) == 4 and sys.argv[1] == "project"):

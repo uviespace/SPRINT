@@ -15,14 +15,15 @@ def cname(s):
     return s.replace(" ", "").replace("-", "").replace("/", "").replace("\\", "")
 
 def writeln(f, s, indent_level=0):
-    f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    #f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    f += "{0}{1}\n".format(" " * get_indent(indent_level), s)
 
 def write_separator(f):
     f += "/*{0}*/\n".format("-" * (settings["max_line_length"]-4))
 
 def gen_file(f, path, s, isHeader, addTypeInclude=True, desc="Interface for accessing data pool items."):
     f_ = new_file(path, s, isHeader, addTypeInclude, desc)
-    f_.write(fig_ref_conv.fig_ref_conv(''.join(f), "doxy"))
+    f_.write(fig_ref_conv.fig_ref_conv(''.join(f), "doxy").encode('utf-8'))
     close_file(f_)
 
 def new_file(path, s, isHeader, addTypeInclude=True, desc="Interface for accessing data pool items."):
@@ -57,8 +58,8 @@ def new_file(path, s, isHeader, addTypeInclude=True, desc="Interface for accessi
     else:
         filenameCap = None
     writeln(f, "")
-    f_ = open("{0}/{1}".format(path, s), "w")
-    f_.write(''.join(f))
+    f_ = open("{0}/{1}".format(path, s), "wb")
+    f_.write(''.join(f).encode('utf-8'))
     return f_
 
 def close_file(f_):
@@ -70,7 +71,7 @@ def close_file(f_):
         write_separator(f)
         writeln(f, "#endif /* {0} */".format(filenameCap))
 
-    f_.write(''.join(f))
+    f_.write(''.join(f).encode('utf-8'))
     f_.close
 
 def write_comment_text(f, text, indent_level = 0):
@@ -211,8 +212,10 @@ def gen_files(path, domain, params, vars):
         for param in params:
             pname = cname(param["name"])
             value = param["value"]
-            if (param["multi"] > 0) and not ("{" in value):
-                value = "{"+value+"}"
+
+            if param["multi"] is not None:
+                if (int(param["multi"]) > 0) and not ("{" in value):
+                    value = "{"+value+"}"
             if param == params[-1]:    
                 writeln(f, "{0} /* {1} */ \\".format(value, pname), 1)
             else:

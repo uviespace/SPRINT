@@ -69,7 +69,7 @@ def check_service_subtype(service_type, service_subtype):
 def outp_services(standard, g):
     g.begin(standard["name"], "Services", "Services", ["Type", "Name", "Description"])
     for service in standard["services"]["list"]:
-        if check_service_type(service["type"]): # sort out used services
+        if check_service_type(int(service["type"])): # sort out used services
             g.write([save_str(service["type"]), service["name"], service["desc"]])
     g.end()
 
@@ -77,10 +77,10 @@ def outp_services(standard, g):
 def outp_service_overview(standard, g):
     g.begin(standard["name"], "Service Overview", "Service Overview", ["Type", "Name", "Description", "APID"])
     for service in standard["services"]["list"]:
-        if check_service_type(service["type"]): # sort out unused services by service type
+        if check_service_type(int(service["type"])): # sort out unused services by service type
             g.write([save_str(service["type"]) + " - " + service["name"]])
             for packet in service["packets"]:
-                if check_service_subtype(packet["type"], packet["subtype"]): # sort out unused services by service type and subtype
+                if check_service_subtype(int(packet["type"]), int(packet["subtype"])): # sort out unused services by service type and subtype
                     g.write([
                         "{0}({1},{2})".format(packet["kind"], packet["type"], packet["subtype"]),
                         packet["name"], packet["shortDesc"],packet["process"]["address"]])
@@ -88,10 +88,10 @@ def outp_service_overview(standard, g):
 
 #-------------------------------------------------------------------------------------
 def outp_service_desc(service, g):
-    if check_service_type(service["type"]): # sort out unused services by service type
+    if check_service_type(int(service["type"])): # sort out unused services by service type
         g.begin(service["name"], "Description"+service["name"], service["name"]+" Commands and Reports", ["Kind", "Type", "Subtype", "Name", "Short Description", "Description", "Parameters", "Destination"])
         for packet in service["packets"]:
-            if check_service_subtype(packet["type"], packet["subtype"]): # sort out unused services by service type and subtype
+            if check_service_subtype(int(packet["type"]), int(packet["subtype"])): # sort out unused services by service type and subtype
                 g.write([packet["kind"], packet["type"], packet["subtype"], packet["name"], packet["shortDesc"], packet["desc"], packet["descParam"], packet["descDest"]])
         g.end()
 
@@ -124,8 +124,8 @@ def outp_elem(element, info, g, rep_desc, size_desc, depth):
     param = element["param"]
 
     if info["length"] is not None:
-        offset_byte = save_str(info["length"] / 8)
-        offset_bit = save_str(info["length"] % 8)
+        offset_byte = save_str(int(int(info["length"]) / 8))
+        offset_bit = save_str(int(info["length"]) % 8)
     else:
         offset_byte = "-"
         offset_bit = "-"
@@ -164,8 +164,8 @@ def outp_cont_line(depth, g):
 #-------------------------------------------------------------------------------------
 def process_elem(elements, i, info, g, rep_desc, size_desc, depth):
     element = elements[i]
-    group = element["group"]
-    repetition = element["repetition"]
+    group = int(element["group"]) if element["group"] is not None else None
+    repetition = int(element["repetition"]) if element["repetition"] is not None else None
 
     if group != None and group > 0:
         depth = outp_elem(element, info, g, rep_desc, size_desc, depth)
@@ -212,9 +212,9 @@ def outp_sequence_table(name, caption, caption_tbl, elements, g):
 
     if info["length"] != None:
         s = "Total bits: {0}\nTotal bytes: {1}\nTotal words: {2}".format(
-            save_str(info["length"]),
-            save_str(info["length"]/8.0),
-            save_str(info["length"]/16.0))
+            save_str(int(info["length"])),
+            save_str(int(info["length"])/8.0),
+            save_str(int(info["length"])/16.0))
         g.write(["", "", "" ,"", "", s])
     g.end()
 
@@ -254,13 +254,14 @@ def outp_service(service, g):
     g.setPopCol(4)
     name = service["standard"]["name"]
     for packet in service["packets"]:
-        if check_service_type(packet["type"]) and check_service_subtype(packet["type"], packet["subtype"]):  # sort out unused services by service type and subtype
+        if check_service_type(int(packet["type"])) and check_service_subtype(int(packet["type"]), int(packet["subtype"])):  # sort out unused services by service type and subtype
             body_params = packet["body"]
             if len(packet["derivations"]["list"]) > 0:
                 n = 1
                 discriminant_param = get_discriminant_param(body_params)
                 for derived in packet["derivations"]["list"]:
-                    discriminant_param["_value"] = derived["disc"]
+                    #if derived["disc"] is not None:
+                    #    discriminant_param["_value"] = derived["disc"]
                     base_name = "{0}{1}s{2}d{3}".format(name, packet["type"], packet["subtype"], n)
                     params = body_params + derived["body"]
                     caption = "{0}{1}".format(packet["name"], n)
@@ -354,7 +355,6 @@ def outp_gen_files(app, tex):
     for fileName in fileNames:
         tex.writeln(u"\\input{{./GeneratedTables/{0}}}".format(fileName))
     tex.close()
-
 
 #-------------------------------------------------------------------------------------
 # Generate the file defining the data types defined in all the standards

@@ -17,11 +17,11 @@ settings = {}
 # - Defaults for arrays not supported. Format unclear.
 
 def new_file(path, name):
-    f = open(u"{0}/{1}.dat".format(path, name), "w")
+    f = open(u"{0}/{1}.dat".format(path, name), "wb")
     return f
 
 def writeln(f, data):
-    f.write(u"{0}\n".format(u"\t".join(data)).encode('utf8'))
+    f.write("{0}\n".format(u"\t".join(data)).encode('utf8'))
 
 def close_file(f):
     f.close()    
@@ -46,7 +46,7 @@ def get_paf_name(type_):
     return s
 
 def get_pid_name(packet):
-    return outp(settings["pid"]["offset"] + packet["_nr"], 10)
+    return outp(settings["pid"]["offset"] + int(packet["_nr"]), 10)
 
 def get_pcf_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcf"]["preamble"])
@@ -64,6 +64,7 @@ def get_ccf_name(packet):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["ccf"]["preamble"])
     f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))
     s = f.format(preamble, settings["ccf"]["offset"] + packet["_nr"])
+    #print(packet['name'], settings["ccf"]["offset"] + packet["_nr"])
     return s
 
 def get_cpc_name(param):
@@ -87,7 +88,8 @@ def outp(s, max_len, stripSpaces = False):
     if s == None:
         return ''
 
-    s = unicode(s).replace('\t', '').replace('\n', '')
+    #s = unicode(s).replace('\t', '').replace('\n', '')
+    s = str(s).replace('\t', '').replace('\n', '')
     if stripSpaces and " " in s:
         s = s.title().replace(' ', '')
 
@@ -122,8 +124,8 @@ def gen_vdf(app, path):
 
 def get_ptc_pfc(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = param["_size"]
-    multi = param["multi"] if param["multi"] != None else -1
+    size = int(param["_size"])
+    multi = int(param["multi"]) if param["multi"] != None else -1
     #setting = param["type"]["setting"]
     #enums = param["type"]["setting"]["Enumerations"]
     dtype_data = param["type"]["datatype"][0]
@@ -138,8 +140,8 @@ def get_ptc_pfc(param):
     if (dtype_data != None):
         if ('PUS' in dtype_data):
             #print("get_ptc_pfc_NEW: datatype = ", dtype_data["PUS"])
-            ptc = dtype_data["PUS"]["ptc"]
-            pfc = dtype_data["PUS"]["pfc"]
+            ptc = int(dtype_data["PUS"]["ptc"])
+            pfc = int(dtype_data["PUS"]["pfc"])
         #else:
             #print("get_ptc_pfc_NEW: No PUS found in datatype")
     else:
@@ -169,8 +171,8 @@ def get_ptc_pfc(param):
 
 def get_ptc_pfc_GEN(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = param["_size"]
-    multi = param["multi"] if param["multi"] != None else -1
+    size = int(param["_size"])
+    multi = int(param["multi"]) if param["multi"] != None else -1
 
     # char and (u)int8_t arrays can be mapped to SCOS-2000 types. For arrays of other types, a repetition group
     # must be introduced.
@@ -178,18 +180,18 @@ def get_ptc_pfc_GEN(param):
     return \
         (1, 0, 1, multi) if domain == "General" and name == "bit" else \
         (3, 4, 8, multi) if domain == "C99" and name == "uint8_t" and multi < 0 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "uint8_t" else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "uint8_t" else \
         (3, 12, 16, multi) if domain == "C99" and name == "uint16_t" else \
         (3, 14, 32, multi) if domain == "C99" and name == "uint32_t" else \
         (3, 16, 64, multi) if domain == "C99" and name == "uint64_t" else \
         (4, 4, 8, multi) if domain == "C99" and name == "int8_t" and multi < 0 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "int8_t" else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "int8_t" else \
         (4, 12, 16, multi) if domain == "C99" and name == "int16_t" else \
         (4, 14, 32, multi) if domain == "C99" and name == "int32_t" else \
         (4, 16, 64, multi) if domain == "C99" and name == "int64_t" else \
         (5, 1, 32, multi) if domain == "C99" and name == "float" else \
         (5, 2, 64, multi) if domain == "C99" and name == "double" else \
-        (8, param["_length"]/8, param["_length"], -1) if domain == "C99" and name == "char" else \
+        (8, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "char" else \
         (3, size-4, size, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size >= 4 and size <= 16 else \
         (3, 13, 24, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size == 24 else \
         (3, 14, 32, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size == 32 else \
@@ -197,8 +199,8 @@ def get_ptc_pfc_GEN(param):
         (4, size-4, size, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size >= 4 and size <= 16 else \
         (4, 13, 24, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size == 24 else \
         (4, 14, 32, multi) if domain == "SCOS-2000" and name == "Signed Integer" and size == 32 else \
-        (7, param["_length"]/8, param["_length"], -1) if domain == "SCOS-2000" and name == "Octet string" else \
-        (8, param["_length"]/8, param["_length"], -1) if domain == "SCOS-2000" and name == "ASCII string" else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "SCOS-2000" and name == "Octet string" else \
+        (8, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "SCOS-2000" and name == "ASCII string" else \
         (9, 1, 0, multi) if domain == "SCOS-2000" and name == u"Absolute time CDS w/o μs" else \
         (9, 2, 0, multi) if domain == "SCOS-2000" and name == u"Absolute time CDS with μs" else \
         (9, 3, 0, multi) if domain == "SCOS-2000" and name == "Absolute time CUC (1/0)" else \
@@ -462,37 +464,45 @@ def gen_ccf(app, path):
         if relation["relation"] == 1:
             standard = relation["standard"]
             for packet in standard["packets"]["TC"]["list"]:
-                npars = 0
-                for param_i in packet["body"]:
-                    npars = npars + 1
-                # !!! naming convention !!!
-                ccf_descr = "SASW "+outp(packet["name"], 19, True)
 
-                '''
-                if packet["derivations"]["list"]:
-                    print("Derived pakets found! ", packet["name"])
-
+                ### check for derived packets
+                if len(packet["derivations"]["list"]) > 0:
+                    print("CCF >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
                     for derived in packet["derivations"]["list"]:
-
-                        print("Disc.: ", derived["disc"])
-
-                        npars_derived = npars
-
-                        for param_i in derived["body"]:
-                            print("Param: ", param_i["param"]["name"])
-                            npars_derived = npars_derived + 1
-
+                        npars = 0
+                        '''
+                        derived["_disc"] = None
+                        if is_int(derived["disc"]):
+                            derived["_disc"] = int(derived["disc"])
+                        else:
+                            param_i = packet["_param_derived"]
+                            enum = None
+                            if param_i != None:
+                                t = param_i["param"]["type"]
+                                if t["setting"] != None:
+                                    for enum in t["setting"]["Enumerations"]:
+                                        #print("ENUM: ", enum["Name"])
+                                        if enum["Name"] == derived["disc"]:
+                                            derived["_disc"] = enum["_dec"]
+                                            break
+                        '''
+                        for param_body in packet["body"]:
+                            npars = npars + 1
+                        for param_derived in derived["body"]:
+                            npars = npars + 1
+                        # !!! naming convention !!!
+                        ccf_descr = "SASW "+outp(derived["name"], 19, True)
                         writeln(f, [
-                            get_ccf_name_derived(packet),  # CCF_NAME
+                            get_ccf_name(derived),  # CCF_NAME
                             ccf_descr,  # CCF_DESCR; was: outp(packet["name"], 24, True),
-                            outp(packet["shortDesc"], 64),  # CCF_DESCR2
+                            outp(derived["shortDesc"], 64),  # CCF_DESCR2
                             '',  # CCF_CTYPE
                             'N',  # CCF_CRITICAL
                             outp(standard["name"], 8, True),  # CCF_PKTID
                             outp(packet["type"], 3),  # CCF_TYPE
                             outp(packet["subtype"], 3),  # CCF_STYPE
                             outp(packet["process"]["address"], 5),  # CCF_APID
-                            outp(npars_derived, 3),  # CCF_NPARS: Number of elements
+                            outp(npars, 3),  # CCF_NPARS: Number of elements
                             'A',
                             'Y',
                             'N',
@@ -505,42 +515,196 @@ def gen_ccf(app, path):
                             '9',
                             ''
                         ])
-
                 else:
-                '''
-                writeln(f, [
-                    get_ccf_name(packet),                   # CCF_NAME
-                    ccf_descr,                              # CCF_DESCR; was: outp(packet["name"], 24, True),
-                    outp(packet["shortDesc"], 64),          # CCF_DESCR2
-                    '',                                     # CCF_CTYPE
-                    'N',                                    # CCF_CRITICAL
-                    outp(standard["name"], 8, True),        # CCF_PKTID
-                    outp(packet["type"], 3),                # CCF_TYPE
-                    outp(packet["subtype"], 3),             # CCF_STYPE
-                    outp(packet["process"]["address"], 5),  # CCF_APID
-                    outp(npars, 3),                         # CCF_NPARS: Number of elements
-                    'A',
-                    'Y',
-                    'N',
-                    'C',
-                    '',                                     # CCF_SUBSYS
-                    'N',
-                    '',
-                    '',
-                    '',
-                    '9',
-                    ''
-                ])
+                    npars = 0
+                    for param_i in packet["body"]:
+                        npars = npars + 1
+                    # !!! naming convention !!!
+                    ccf_descr = "SASW "+outp(packet["name"], 19, True)
+
+                    '''
+                    if packet["derivations"]["list"]:
+                        print("Derived pakets found! ", packet["name"])
+
+                        for derived in packet["derivations"]["list"]:
+
+                            print("Disc.: ", derived["disc"])
+
+                             npars_derived = npars
+
+                            for param_i in derived["body"]:
+                                print("Param: ", param_i["param"]["name"])
+                                npars_derived = npars_derived + 1
+
+                            writeln(f, [
+                                get_ccf_name_derived(packet),  # CCF_NAME
+                                ccf_descr,  # CCF_DESCR; was: outp(packet["name"], 24, True),
+                                outp(packet["shortDesc"], 64),  # CCF_DESCR2
+                                '',  # CCF_CTYPE
+                                'N',  # CCF_CRITICAL
+                                outp(standard["name"], 8, True),  # CCF_PKTID
+                                outp(packet["type"], 3),  # CCF_TYPE
+                                outp(packet["subtype"], 3),  # CCF_STYPE
+                                outp(packet["process"]["address"], 5),  # CCF_APID
+                                outp(npars_derived, 3),  # CCF_NPARS: Number of elements
+                                'A',
+                                'Y',
+                                'N',
+                                'C',
+                                '',  # CCF_SUBSYS
+                                'N',
+                                '',
+                                '',
+                                '',
+                                '9',
+                                ''
+                            ])
+
+                    else:
+                    '''
+                    writeln(f, [
+                        get_ccf_name(packet),                   # CCF_NAME
+                        ccf_descr,                              # CCF_DESCR; was: outp(packet["name"], 24, True),
+                        outp(packet["shortDesc"], 64),          # CCF_DESCR2
+                        '',                                     # CCF_CTYPE
+                        'N',                                    # CCF_CRITICAL
+                        outp(standard["name"], 8, True),        # CCF_PKTID
+                        outp(packet["type"], 3),                # CCF_TYPE
+                        outp(packet["subtype"], 3),             # CCF_STYPE
+                        outp(packet["process"]["address"], 5),  # CCF_APID
+                        outp(npars, 3),                         # CCF_NPARS: Number of elements
+                        'A',
+                        'Y',
+                        'N',
+                        'C',
+                        '',                                     # CCF_SUBSYS
+                        'N',
+                        '',
+                        '',
+                        '',
+                        '9',
+                        ''
+                    ])
     close_file(f)
+
+def is_int(s):
+    try:
+        int(s)
+        return True
+    except ValueError:
+        return False
+
+def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
+    parambase = packetbase["body"]
+    for param_i in parambase:
+        param = param_i["param"]
+        #print("param name: ", param["name"], ", ccf_name: ", ccf_name)
+
+        if int(param_i["group"]) > 0 and int(param_i["repetition"]) > 0:
+            value = outp(param_i["repetition"], 17)
+            print("param_i['repetition'] = ", value)
+        elif int(param_i["role"]) == 8:  # Spare
+            value = "0"
+        elif int(param_i["role"]) == 3:  # Fixed (Discriminant)
+
+            #print("derivedbase['name'] = ", derivedbase["name"])
+            value = ''
+            t = param_i["param"]["type"]
+            if t["setting"] != None:
+                for enum in t["setting"]["Enumerations"]:
+                    if enum["Name"] == derivedbase["disc"]:
+                        value = outp(enum["Name"], 16)  # get from enumerated value for distinct discriminant
+
+            print("discriminant = ", value)
+        elif param_i["value"] != '':
+            value = param_i["value"]
+            print("param_i['value'] = ", value)
+        else:
+            value = None
+
+        # print(">>>>>>>>>>>>>> ", param["name"], value)
+
+        # value = outp(param_i["repetition"], 17) if param_i["group"] > 0 and param_i["repetition"] > 0 else None
+        size = outp(param["_size"], 4) if param["_size"] != None or param["_size"] == "" else '0'
+        eltype = \
+            'A' if int(param_i["role"]) == 8 else \
+            'F' if value != None or int(param_i["role"]) == 3 else \
+            'E'
+        writeln(f, [
+            ccf_name,  # CDF_CNAME
+            eltype,  # CDF_ELTYPE:  'A' for Spares, 'F' for Fixed
+            'SPARE' if int(param_i["role"]) == 8 else '',  # CDF_DESCR  # TODO: or CPC_DESCR
+            size,  # CDF_ELLEN
+            outp(param_i["_offset"]+offset, 4) if param_i["_offset"] is not None else outp(offset, 4),  # CDF_BIT ... TODO: check exception
+            outp(param_i["group"], 2) if int(param_i["group"]) != 0 else '',  # CDF_GRPSIZE
+            '' if int(param_i["role"]) == 8 else get_cpc_name(param),  # CDF_PNAME:  '' for Spare
+            # NOTE: if text/numeric calibrated (CPC_CATEG = T/C) then 'E'
+            'E' if (param_i["value"] != '' and not param_i["value"].isdigit()) or (len(param["type"]["enums"]) > 0 and int(param_i["role"]) == 3) else 'R',  # CDF_INTER
+            value if value != None else '',  # CDF_VALUE
+            ''
+        ])
 
 def gen_cdf(app, path):
     f = new_file(path, "cdf")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
+            '''
+            for tc in standard["packets"]["TC"]["list"]:
+                if len(tc["derivations"]["list"]) > 0:
+                    for derived in tc["derivations"]["list"]:
+                        derived["_disc"] = None
+                        if is_int(derived["disc"]):
+                            derived["_disc"] = int(derived["disc"])
+                        else:
+                            param_i = tc["_param_derived"]
+                            enum = None
+                            if param_i != None:
+                                t = param_i["param"]["type"]
+                                if t["setting"] != None:
+                                    for enum in t["setting"]["Enumerations"]:
+                                        #print("ENUM: ", enum["Name"])
+                                        if enum["Name"] == derived["disc"]:
+                                            derived["_disc"] = enum["_dec"]
+                                            break
+
+                        print("############### derived: ", derived["_disc"], derived["name"], get_ccf_name(derived), tc["name"], param_i["param"]["name"])
+                        for param_ib in tc["body"]:
+                            param_b = param_ib["param"]
+                            print(param_b["name"])
+                        for param_i in derived["body"]:
+                            param = param_i["param"]
+                            print(param["name"])
+                        #print(param_i["param"]["type"]["setting"]["Enumerations"])
+            '''
             for packet in standard["packets"]["TC"]["list"]:
                 ccf_name = get_ccf_name(packet)
-                for param_i in packet["body"]:
+                if len(packet["derivations"]["list"]) > 0:
+                    print("CDF >>>>>>>>>>>> derived: ", packet["name"], ": ", ccf_name)
+                    for derived in packet["derivations"]["list"]:
+                        '''
+                        derived["_disc"] = None
+                        if is_int(derived["disc"]):
+                            derived["_disc"] = int(derived["disc"])
+                        else:
+                            param_i = packet["_param_derived"]
+                            enum = None
+                            if param_i != None:
+                                t = param_i["param"]["type"]
+                                if t["setting"] != None:
+                                    for enum in t["setting"]["Enumerations"]:
+                                        #print("ENUM: ", enum["Name"])
+                                        if enum["Name"] == derived["disc"]:
+                                            derived["_disc"] = enum["_dec"]
+                                            break
+                        '''
+                        write_file_cdf(f, get_ccf_name(derived), packet, derived, 0)
+                        write_file_cdf(f, get_ccf_name(derived), derived, None, 16)  # TODO: calculate offset
+                else:
+                    write_file_cdf(f, ccf_name, packet, None, 0)
+    close_file(f)
+    '''
+                for param_i in packet["body"]:  # TODO: check also for parameters of derived packets
                     param = param_i["param"]
                     # Fixed value only for group / repetition parameters
 
@@ -574,11 +738,12 @@ def gen_cdf(app, path):
                         ''
                     ])
     close_file(f)
+    '''
 
 def gen_cpc(app, path):
     f = new_file(path, "cpc")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for param in standard["packets"]["TC"]["params"].values():
                 if "Spare" in param["name"]:  # !!!! TODO !!!!!!!!! better solution needed
@@ -589,8 +754,8 @@ def gen_cpc(app, path):
                 # Role = 6 (Parameter ID), Role = 7 (Command ID)
                 categ = \
                     'T' if param["type"] != None and len(param["type"]["enums"]) > 0 else \
-                    'A' if param["role"] == 7 else \
-                    'P' if param["role"] == 6 else \
+                    'A' if int(param["role"]) == 7 else \
+                    'P' if int(param["role"]) == 6 else \
                     'N'
                 # numerische calibration 'C'
                 dispfmt = \
@@ -642,7 +807,7 @@ def gen_cpc(app, path):
                     '',                            # CPC_CCAREF - numeric calibration curve set (unsupported)
                     get_paf_name(param["type"]) if categ == 'T' else '',          # CPC_PAFREF
                     'E' if categ == 'T' else 'R',  # CPC_INTER
-                    outp(param["_value"], 17) if param["multi"] is None else '',  # CPC_DEFVAL: TODO: Not supported: default for arrays. empty for discriminants (e.g. EvtId, Sid, MemoryId, ParamSetId
+                    outp(param["_value"], 17) if (param["multi"] is None and categ != 'T') else '',  # CPC_DEFVAL: TODO: Not supported: default for arrays. empty for discriminants (e.g. EvtId, Sid, MemoryId, ParamSetId, ProcId (where categ == 'T')
                     'Y',
                     '0'
                 ])
@@ -654,12 +819,39 @@ def gen_cvp(app, path):
         if relation["relation"] == 1:
             standard = relation["standard"]
             for packet in standard["packets"]["TC"]["list"]:
-                for cvsid in [0, 1, 2]:
-                    writeln(f, [
-                        get_ccf_name(packet),  # CVP_TASK
-                        'C',                   # CVP_TYPE
-                        outp(cvsid, 1)         # CVP_CVSID
-                    ])
+                ### check for derived packets
+                if len(packet["derivations"]["list"]) > 0:
+                    print("CVP >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
+                    for derived in packet["derivations"]["list"]:
+                        '''
+                        derived["_disc"] = None
+                        if is_int(derived["disc"]):
+                            derived["_disc"] = int(derived["disc"])
+                        else:
+                            param_i = packet["_param_derived"]
+                            enum = None
+                            if param_i != None:
+                                t = param_i["param"]["type"]
+                                if t["setting"] != None:
+                                    for enum in t["setting"]["Enumerations"]:
+                                        #print("ENUM: ", enum["Name"])
+                                        if enum["Name"] == derived["disc"]:
+                                            derived["_disc"] = enum["_dec"]
+                                            break
+                        '''
+                        for cvsid in [0, 1, 2]:
+                            writeln(f, [
+                                get_ccf_name(derived),  # CVP_TASK
+                                'C',                    # CVP_TYPE
+                                outp(cvsid, 1)          # CVP_CVSID
+                            ])
+                else:
+                    for cvsid in [0, 1, 2]:
+                        writeln(f, [
+                            get_ccf_name(packet),  # CVP_TASK
+                            'C',                   # CVP_TYPE
+                            outp(cvsid, 1)         # CVP_CVSID
+                        ])
     close_file(f)
 
 def gen_cvs(app, path):
@@ -731,7 +923,7 @@ def gen_prf(app, path):
                                     setting = simplejson.loads(str(limit[id][y]))
 
                                 if y == "type":
-                                    type_val = limit[id][y]
+                                    type_val = int(limit[id][y])
                                     if type_val >= 10:
                                         prf_inter = 'E'
                                         type_val -= 10
@@ -753,7 +945,7 @@ def gen_prf(app, path):
                             break  # only once
                         writeln(f, [
                             par_limit_id,                       # parameter range set identification name.
-                            outp(setting["prf"]["descr"], 24),  # textual description of the parameter range set
+                            outp(setting["prf"]["descr"], 24) if "prf" in setting.keys() else "",  # textual description of the parameter range set
                             prf_inter,                          # raw representation 'R' or engineering representation 'E'
                             prf_dspfmt,                         # representation type of the values specified for this range set (PRV table)
                             prf_radix,                          # radix used for the range values specified in the corresponding records (PRV table)
@@ -820,7 +1012,7 @@ def gen_paf(app, path):
                 if num_enums > 0 and type_["__mib_used_tc"]:
                     rawfmt = 'U'
                     for enum in type_["enums"]:
-                        if enum["Value"] < 0:
+                        if int(enum["Value"]) < 0:
                             rawfmt = 'I'
                             break
 
@@ -896,11 +1088,11 @@ def gen_tcp(app, path):
 def gen_pcpc(app, path):
     f = new_file(path, "pcpc")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             offset = 0
             for param_i in standard["headers"]["TC"]:
-                if param_i["role"] in [1, 2, 4, 5] or param_i["_value"] == None:
+                if int(param_i["role"]) in [1, 2, 4, 5] or param_i["_value"] == None:
                     if offset >= 48:
                         prefix = "DF"
                     else:  # primary header
@@ -911,14 +1103,14 @@ def gen_pcpc(app, path):
                         outp(param_i["param"]["name"], 24),
                         'U'
                     ])
-                pcdf_len = param_i["param"]["_size"]
+                pcdf_len = int(param_i["param"]["_size"])
                 offset = offset + pcdf_len
     close_file(f)    
 
 def gen_pcdf(app, path):
     f = new_file(path, "pcdf")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             offset = 0
             for param_i in standard["headers"]["TC"]:
@@ -928,10 +1120,10 @@ def gen_pcdf(app, path):
                     prefix = "P"
                 pcpc_name = prefix + get_pcpc_name(standard, param_i)
                 pcdf_type, pcdf_pname, pcdf_value = \
-                    ('T', pcpc_name, '0') if param_i["role"] == 1 else \
-                    ('S', pcpc_name, '0') if param_i["role"] == 2 else \
-                    ('A', pcpc_name, '0') if param_i["role"] == 4 else \
-                    ('K', pcpc_name, '0') if param_i["role"] == 5 else \
+                    ('T', pcpc_name, '0') if int(param_i["role"]) == 1 else \
+                    ('S', pcpc_name, '0') if int(param_i["role"]) == 2 else \
+                    ('A', pcpc_name, '0') if int(param_i["role"]) == 4 else \
+                    ('K', pcpc_name, '0') if int(param_i["role"]) == 5 else \
                     ('P', pcpc_name, '0') if param_i["_value"] is None else \
                     ('F', '', param_i["_value"])
                 pcdf_len = param_i["param"]["_size"]
@@ -1083,12 +1275,12 @@ def gen_vpd_param(f, param_i, attr):
         outp(attr["spid"], 10), # VPD_TPSD
         outp(attr["pos"], 4), # VPD_POS
         get_pcf_name(param), # VPD_NAME
-        outp(param_i["group"], 3),
-        outp(param_i["repetition"], 3),
+        outp(param_i["group"], 3) if int(param_i["group"]) != 0 else '',
+        outp(param_i["repetition"], 3) if int(param_i["repetition"]) != 0 else '',
         'N',
-        'Y' if param["role"] == 6 else 'N',
+        'Y' if int(param["role"]) == 6 else 'N',
         outp(param["name"], 16, True),
-        '0' if param_i["group"] != None and param_i["group"] > 0 else '1',
+        '0' if param_i["group"] != None and int(param_i["group"]) > 0 else '1',
         'L',
         'N',
         '0',
@@ -1109,7 +1301,7 @@ def gen_vpd_params(f, spid, base, derived):
 def gen_vpd(app, path):
     f = new_file(path, "vpd")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for tm in standard["packets"]["TM"]["list"]:
                 if len(tm["derivations"]["list"]) > 0:
@@ -1123,9 +1315,9 @@ def gen_vpd(app, path):
 
 def gen_plf_param(f, param_i, spid, offset):
     param = param_i["param"]
-    offby = offset / 8
-    offbi = offset % 8
-    nbocc = param_i["repetition"] if param_i["repetition"] != None and param_i["repetition"] > 0 else 1
+    offby = int(offset / 8)
+    offbi = int(offset % 8)
+    nbocc = int(param_i["repetition"]) if param_i["repetition"] != None and int(param_i["repetition"]) > 0 else 1
 
     writeln(f, [
         get_pcf_name(param),
@@ -1148,10 +1340,10 @@ def gen_plf_params(f, base, derived, spid, offset):
 def gen_plf(app, path):
     f = new_file(path, "plf")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for tm in standard["packets"]["TM"]["list"]:
-                offset = standard["headers"]["TM_length"]
+                offset = int(standard["headers"]["TM_length"])
                 if len(tm["derivations"]["list"]) > 0:
                     for derived in tm["derivations"]["list"]:
                         if tm["_length"] != None and derived["_length"] != None:
@@ -1187,14 +1379,14 @@ def getSpidPrefix(tm_type):
 def gen_tpcf_line(f, tm, derived=None):
     if derived is None:
         spid = tm["__mib_spid"]
-        nbits = tm["_header_length"]
+        nbits = int(tm["_header_length"])
     else:
         spid = derived["__mib_spid"]
-        nbits = tm["_header_length"] + derived["_length"]
+        nbits = int(tm["_header_length"]) + int(derived["_length"])
 
     # !!! naming convention !!!
     # get prefix from lookup table
-    spid_prefix = getSpidPrefix(tm["type"])
+    spid_prefix = getSpidPrefix(int(tm["type"]))
     spid_name = spid_prefix+spid
     #print ""
     #print "SPID: "+spid
@@ -1203,7 +1395,7 @@ def gen_tpcf_line(f, tm, derived=None):
     writeln(f, [
         spid,
         spid_name,  # TPCF_NAME: prefix added to SPID e.g. KSY_EVTspid, KSY_HK_spid, ...
-        outp((tm["standard"]["headers"]["TM_length"] + nbits + 16)/8, 8) if nbits != None else '0'  # checksum length: 2 Bytes = 16 bits
+        outp(int((int(tm["standard"]["headers"]["TM_length"]) + nbits + 16)/8), 8) if nbits != None else '0'  # checksum length: 2 Bytes = 16 bits
     ])
 
 def gen_tpcf(app, path):
@@ -1222,15 +1414,15 @@ def gen_tpcf(app, path):
 def gen_pic(app, path):
     f = new_file(path, "pic")
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for tm in standard["packets"]["TM"]["list"]:
                 pi1_off = -1
                 pi1_wid = 0
                 for param_i in tm["body"]:
-                    if param_i["role"] == 3:
-                        pi1_off = tm["standard"]["headers"]["TM_length"]/8 + param_i["_offset"]/8  # including TM header length
-                        pi1_wid = param_i["param"]["_size"]
+                    if int(param_i["role"]) == 3:
+                        pi1_off = int(int(tm["standard"]["headers"]["TM_length"])/8 + int(param_i["_offset"])/8)  # including TM header length
+                        pi1_wid = int(param_i["param"]["_size"])
 
                 writeln(f, [
                     outp(tm["type"], 3),     # PIC_TYPE
@@ -1247,7 +1439,7 @@ def gen_pic(app, path):
 def prepare(app):
     # Generate SPID for all TM packets
     for relation in app["standards"]:
-        if relation["relation"] == 1:
+        if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for tm in standard["packets"]["TM"]["list"]:
                 if len(tm["derivations"]["list"]) > 0:

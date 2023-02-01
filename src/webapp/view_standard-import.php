@@ -142,7 +142,18 @@ $userEmail = $row["email"];
 			<b>Select Project:</b>
 <?php
 // TODO: select only project's the current user should have access (not available for guests!)
-$sql = "SELECT * FROM `project` WHERE `id` <> ".$idProject;
+//$sql = "SELECT * FROM `project` WHERE `id` <> ".$idProject;
+$sql = 
+  "SELECT DISTINCT ".
+  "  p.* ".
+  "FROM ".
+  "  `project`p, `userproject` up ".
+  "WHERE ".
+  "  p.id <> ".$idProject." AND ".
+  "  p.id = up.idProject AND ".
+  "  (up.idUser = ".$userid." OR ":
+  "  (up.email = '".$userEmail."' AND ".
+  "  up.idRole < 4))";
 
 $result = $mysqli->query($sql);
 

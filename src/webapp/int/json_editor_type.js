@@ -21,31 +21,9 @@ var button = $("button")
   banner.addClass("alt")
 })*/
 
+var editor
 
-$(function(){
-
-//var response = JSON.parse(
-$.ajax({
-  //url: 'https://randomuser.me/api/',
-  //url: 'http://localhost/jsoneditor/json/randomuser.me-api.json',
-  //url: 'http://localhost/jsoneditor/json/mib.json',
-  //url: url+'api/getData_json-component-setting.php',
-  url: url+'api/getData_json-type-setting.php?idType='+idType,
-  dataType: 'json',
-  success: function(data) {
-    console.log(data);
-    console.log(data.setting);
-    if (data == "{}") {
-        console.log("data is empty!");
-        return "{}";
-    } else {
-        data = JSON.parse(data.setting);
-        console.log(data);
-        editor.setValue(data);
-        return data;
-    }
-  }
-});
+$(window.document).ready(function () {
 
 var response2 = JSON.parse(
 $.ajax({
@@ -121,7 +99,7 @@ console.log(schema);
     if (document.getElementById('editor_holder_type') != null) {
 
     // Initialize the editor
-    var editor = new JSONEditor(document.getElementById('editor_holder_type'),{
+    editor = new JSONEditor(document.getElementById('editor_holder_type'),{
         // The schema for the editor, TODO: get schema from database
         schema: schema
         /*schema: {
@@ -158,7 +136,7 @@ console.log(schema);
     } else if (document.getElementById('editor_holder_type_schema') != null) {
 
     // Initialize the editor
-    var editor = new JSONEditor(document.getElementById('editor_holder_type_schema'),{
+    editor = new JSONEditor(document.getElementById('editor_holder_type_schema'),{
         // The schema for the editor
         schema: schema
         /*schema: {
@@ -272,7 +250,36 @@ console.log(schema);
     });
     
     }
+	
+	
+//var response = JSON.parse(
+$.ajax({
+  //url: 'https://randomuser.me/api/',
+  //url: 'http://localhost/jsoneditor/json/randomuser.me-api.json',
+  //url: 'http://localhost/jsoneditor/json/mib.json',
+  //url: url+'api/getData_json-component-setting.php',
+  url: url+'api/getData_json-type-setting.php?idType='+idType,
+  dataType: 'json',
+  success: function(data) {
+    console.log(data);
+    console.log(data.setting);
+    if (data == "{}") {
+        console.log("data is empty!");
+        return "{}";
+    } else {
+        data = JSON.parse(data.setting);
+        console.log(data);
+        editor.setValue(data);
+        return data;
+    }
+  }
+});
 
+});
+
+	
+$(function(){
+	
     // Hook up the save button to log to the console
     document.getElementById('save').addEventListener('click',function() {
         // Get the value from the editor
@@ -280,17 +287,18 @@ console.log(schema);
         var setting = editor.getValue();
         console.log(setting);
         var setting2 = JSON.stringify(setting);
-        
+		       
         if(id == '' && setting != ''){
             
             url = '/dbeditor/api/update_view-type-setting.php';
+			//url = '/SPRINT/api/update_view-type-setting.php';
             var posting = $.post( url, { setting: setting2, idStandard: idStandard, idType: idType } );
             //alert('You are sending ...: (posting = '+posting+')');
             
             //getPageData();
             //$(".modal").modal('hide');
             toastr.success('Item Updated Successfully.', 'Success Alert', {timeOut: 5000});
-            location.reload();
+            //location.reload();
             
             /*$.ajax({
                 dataType: 'json',

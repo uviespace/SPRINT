@@ -313,22 +313,48 @@ if($imageFileType == "csv") {
 	  }
 	  
 	  // description
-	  if ($num==8) {
+	  if ($num>=8) {
 	    $shortDesc = $data[7];
 	  }else {
 	    $shortDesc = "";
 	  }
 	  
 	  // datatype <-> bitsize
-	  if($data[3]<="8") {
-	    $datatype = "200";
-	  } else if($data[3]<="16") {
-	    $datatype = "201";
-	  } else if($data[3]<="32") {
-	    $datatype = "202";
-	  } else {
-	    $datatype = $data[3];
+	  // check datatype and bitsize
+	  if($data[2]=="") {
+		if($data[3]<="8") {
+	      $datatype = "200";
+        } else if($data[3]<="16") {
+	      $datatype = "201";
+        } else if($data[3]<="24") {
+	      $datatype = "202";
+	    } else if($data[3]<="32") {
+	      $datatype = "202";
+	    } else {
+	      $datatype = $data[3];
+	    }
+      } else {
+		if($data[2]=="UINT8") {
+		  $datatype = "200";
+		} else if($data[2]=="UINT16") {
+		  $datatype = "201";
+		} else if($data[2]=="UINT24") {
+		  $datatype = "202"; // ###########################
+		} else if($data[2]=="UINT32") {
+		  $datatype = "202";
+		} else if($data[2]=="INT8") {
+		  $datatype = "210";
+		} else if($data[2]=="INT16") {
+		  $datatype = "211";
+		} else if($data[2]=="INT32") {
+		  $datatype = "212";
+		} else if($data[2]=="FLOAT") {
+		  $datatype = "220";
+		} else {
+		  $datatype = $data[2];
+		}
 	  }
+	  
 	  
 	  // multiplicity
 	  $multiplicity = $data[4];

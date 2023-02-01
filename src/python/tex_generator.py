@@ -3,8 +3,12 @@
 import sys
 import latexcodec
 from generator import *
-from string import maketrans
+#from string import maketrans  # not needed for Python3, is implemented via str.maketrans
 from fig_ref_conv import fig_ref_conv 
+
+# TODO: \newcommand in stead of \def
+# TODO: generate one file ___-private.sty with all the \newcommand definitions
+# TODO: in tex-document use \usepackage{___-private} and remove all the \input{___}
 
 class TexGenerator(Generator):
 
@@ -12,7 +16,8 @@ class TexGenerator(Generator):
         Generator.__init__(self, path)
         self.col_num = 0        
         self.setting = setting
-        self.tblTranslate = maketrans(b"1234567890", b"abcdefghij")
+        #self.tblTranslate = maketrans(b"1234567890", b"abcdefghij")
+        self.tblTranslate = bytes.maketrans(b"1234567890", b"abcdefghij")
 
     def name(self):
         return "LaTeX"
@@ -50,7 +55,8 @@ class TexGenerator(Generator):
         self.col_num = len(column_names)
         caption = self.texName(caption)
         self.writeln(
-            u"\\def \\print{0}#1 {{\n".format(caption) + 
+            #u"\\def \\print{0}#1 {{\n".format(caption) +
+            u"\\newcommand{{\\print{0}}}[1]{{\n".format(caption) +
             "\\begin{pnptable}{#1}" + 
             "{" + self.enc(caption_tbl) + "}" + 
             "{tab:" + caption + "}" +

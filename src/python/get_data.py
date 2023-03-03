@@ -318,7 +318,7 @@ def get_standards(db, project):
         for row in cur.fetchall():
             s_id = row[0]
             s_relation = int(row[1])
-            s_parent = as_hash[row[0]]
+            s_parent = as_hash[int(row[0])]
 
             if s_relation == 0:
                 standard["conforms"].append(s_parent)
@@ -391,7 +391,7 @@ def get_params(db, standard):
         param["value"] = row[8]
         param["size"] = int(row[9]) if row[9] is not None else None
         param["unit"] = row[10]
-        param["multi"] = int(row[11]) if (row[11] is not None and row[11] != '') else None
+        param["multi"] = row[11]  # int(row[11]) if (row[11] is not None and row[11] != '') else None
         param["role"] = int(row[13]) if row[13] is not None else None
         # None := size unknown / undefined
         # -1 := variable size

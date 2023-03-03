@@ -124,8 +124,14 @@ def gen_vdf(app, path):
 
 def get_ptc_pfc(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = int(param["_size"])
-    multi = int(param["multi"]) if param["multi"] != None else -1
+    if isinstance(param["_size"], int):
+        size = int(param["_size"])
+    else:
+        size = None
+    if isinstance(param["multi"], int):
+        multi = int(param["multi"]) if param["multi"] != None else -1
+    else:
+        multi = -1  # TODO: check if constants like 'SCD_N_GROUP' also gives -1
     #setting = param["type"]["setting"]
     #enums = param["type"]["setting"]["Enumerations"]
     dtype_data = param["type"]["datatype"][0]
@@ -171,7 +177,10 @@ def get_ptc_pfc(param):
 
 def get_ptc_pfc_GEN(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = int(param["_size"])
+    if isinstance(param["_size"], int):
+        size = int(param["_size"])
+    else:
+        size = None
     multi = int(param["multi"]) if param["multi"] != None else -1
 
     # char and (u)int8_t arrays can be mapped to SCOS-2000 types. For arrays of other types, a repetition group

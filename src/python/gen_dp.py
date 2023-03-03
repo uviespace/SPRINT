@@ -214,8 +214,11 @@ def gen_files(path, domain, params, vars):
             value = param["value"]
 
             if param["multi"] is not None:
-                if (int(param["multi"]) > 0) and not ("{" in value):
-                    value = "{"+value+"}"
+                if isinstance(param["multi"], int):
+                    if (int(param["multi"]) > 0) and not ("{" in value):
+                        value = "{"+value+"}"
+                elif not ("{" in value):
+                    value = "{" + value + "}"
             if param == params[-1]:    
                 writeln(f, "{0} /* {1} */ \\".format(value, pname), 1)
             else:

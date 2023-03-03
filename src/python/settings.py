@@ -18,9 +18,9 @@ def get_settings():
         settings["db_name"] = ""
     else:
         # We are on the developer machine
-        settings["tmp_path"] = "/tmp/local"  # "/tmp/local"
+        settings["tmp_path"] = "/tmp/local"
         settings["db_host"] = "localhost"
-        settings["db_user"] = "cordetfw"
-        settings["db_passwd"] = "Tmj1j!29"
-        settings["db_name"] = "dbeditor"  # test or dbeditor
+        settings["db_user"] = "dbuser"
+        settings["db_passwd"] = "dbpwd"
+        settings["db_name"] = "dbnam"
     return settings

@@ -408,7 +408,7 @@ def getDatatype(ptc, pfc, width):
             dt = "FLOAT"+" ("+str(ptc)+"/"+str(pfc)+")"
     elif (ptc == 7):
         dt = "Octet string"+" ("+str(ptc)+"/"+str(pfc)+") "+str(width)
-        dt = "UINT"+str(float(width)/pfc)
+        dt = "UINT"+str(int(float(width)/pfc))
     else:
         dt = "UNKNOWN"+" ("+str(ptc)+"/"+str(pfc)+")"
 

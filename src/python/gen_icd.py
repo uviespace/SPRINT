@@ -313,7 +313,7 @@ def outp_datapool(std_name, name, list, g):
     for item in list:
         isArray = (item["multi"] is not None and item["multi"] != 1)
         multi = (1 if not isArray else item["_multi"])
-            
+
         g.write([
             hex(item["_dpid"]),
             #"{0}/{1}".format(item["domain"], item["name"]) if len(item["domain"]) > 0 else item["name"],
@@ -338,10 +338,10 @@ def outp_app(app, g):
             outp_service_desc(s,g)
         for t in standard["types"].values():
             outp_type(std_name, t, g)
-        outp_services(standard, g)   
+        outp_services(standard, g)
         outp_service_overview(standard, g)
         for service in standard["services"]["list"]:
-            outp_service(service, g)            
+            outp_service(service, g)
         outp_datapool(std_name, "Datapool Parameters", standard["datapool"]["params"], g)
         outp_datapool(std_name, "Datapool Variables", standard["datapool"]["vars"], g)
 

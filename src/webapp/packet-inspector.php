@@ -68,12 +68,13 @@ $num_rows = mysqli_num_rows($result);
 if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
-        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        //echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
         $basePacket_name = $row["name"];
         $basePacket_desc = $row["desc"];
         $basePacket_kind = $row["kind"];
         $basePacket_type = $row["type"];
         $basePacket_subt = $row["subtype"];
+		//echo "kind: " . $row["kind"]. " - Type: " . $row["type"]. "  - Subtype: " . $row["subtype"]. "<br/>";
     }
 } else {
     //echo "0 results";
@@ -86,6 +87,8 @@ if ($basePacket_kind == 0) {
 } else {
     $basePacket_kind_str = "n/a";
 }
+
+//echo "basePacket_kind_str: " . $basePacket_kind_str . "<br/>";
 
 if ($idParent != 0) {
     $sql = "SELECT * FROM `packet` WHERE `id` = ".$idPacket;
@@ -109,9 +112,13 @@ if ($result->num_rows > 0) {
 }
 
 function get_header_len($mysqli, $standard_id, $header_type) {
+	
+	//echo "get_header_len() called.<br/>";
     
     $sql = "SELECT p.* FROM `parameter` AS p, `parametersequence` AS ps WHERE p.id = ps.idParameter AND (p.kind = 1 OR p.kind = 0) AND ps.type = ".$header_type." AND ps.idStandard = ".$standard_id;
     
+	//echo "sql query: " .$sql. "<br/>";
+	
     $result = $mysqli->query($sql);
 
     $num_rows = mysqli_num_rows($result);
@@ -145,10 +152,13 @@ function get_header_len($mysqli, $standard_id, $header_type) {
                 $add_size = $row_param_size['size'];
                 
             }
-            
-            if (isset($row['multiplicity']) AND $row['multiplicity'] > 1) {
-                $add_size = $add_size*$row['multiplicity'];
-            }
+			
+            if (isset($row['multiplicity']) AND $row['multiplicity'] != NULL AND $row['multiplicity'] != 'null') {
+				//echo "multiplicity: '".$row['multiplicity']."'<br/>";
+             	if ($row['multiplicity'] > 1) {
+                    $add_size = $add_size*$row['multiplicity'];
+                }
+			}
             
             //echo $add_size."<br/>";
             
@@ -278,7 +288,16 @@ $debug = false;
 $scale = 5; // scale = 5: 1b = 5px; 1B = 40px
 $nbGroup = 0;
 
+if ($debug) {
+   echo "DEBUGGING activated.<br/><br/>";
+}
+
 // ### HEADER ###
+
+if ($debug) {
+    echo "HEADER ...";
+	echo "basePacket_kind: " . $basePacket_kind . " ";
+}
 
 /*$header_type = $basePacket_kind; // TC: 0 ; TM: 1
 $header_len = get_header_len($mysqli, $idStandard, $header_type);
@@ -302,6 +321,11 @@ if ($basePacket_kind == 0) {
 }
 
 $header_len = $field_len_B;
+
+if ($debug) {
+    echo "length: " . $header_len . " ";
+    echo "... HEADER<br/>";
+}
 
 // ### DATA ###
 

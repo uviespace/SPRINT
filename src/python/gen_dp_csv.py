@@ -432,7 +432,8 @@ def gen_dp_list(app, path):
     writeln(f, [
         'Name' + delimiter,  # name
         'ID' + delimiter,  # id
-        'Datatype' + delimiter,  # bit size
+        'Datatype' + delimiter,  # data type
+        'Bitsize' + delimiter,  # bit size
         'Multiplicity' + delimiter,  # multiplicity
         'PAR/VAR' + delimiter,  # par/var
         'Value' + delimiter if additionalInfo else delimiter,  # default value
@@ -451,7 +452,7 @@ def gen_dp_list(app, path):
                 add_elem(domain_dict, param, "params")
                 params_list.append(param)
         for var in standard["datapool"]["vars"]:
-            if int(param["ownerStandardId"]) == int(standard["id"]):
+            if int(var["ownerStandardId"]) == int(standard["id"]):
                 add_elem(domain_dict, var, "vars")
                 vars_list.append(var)
 
@@ -476,7 +477,7 @@ def gen_dp_list(app, path):
                 datatype + delimiter,  # data type
                 #str(width) + delimiter,
                 #str(repetition) + delimiter,
-                #bitsize + delimiter,  # bit size
+                bitsize + delimiter,  # bit size
                 '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
                 'PAR'+delimiter,  # par/var
                 param["value"]+delimiter if additionalInfo else delimiter,  # default value
@@ -504,7 +505,7 @@ def gen_dp_list(app, path):
                 datatype + delimiter,  # data type
                 #str(width) + delimiter,
                 #str(repetition) + delimiter,
-                #bitsize + delimiter,  # bit size
+                bitsize + delimiter,  # bit size
                 '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
                 'VAR'+delimiter,  # par/var
                 param["value"]+delimiter if additionalInfo else delimiter,  # default value
@@ -525,7 +526,8 @@ def gen_dp_pckt_list(app, path):
     writeln(f, [
         'Name' + delimiter,  # name
         'ID' + delimiter,  # id
-        'Bit size' + delimiter,  # bit size
+        'Datatype' + delimiter,  # data type
+        'Bitsize' + delimiter,  # bit size
         'Multiplicity' + delimiter,  # multiplicity
         'PAR/VAR' + delimiter,  # par/var
         'Value' + delimiter if additionalInfo else delimiter,  # default value
@@ -567,12 +569,14 @@ def gen_dp_pckt_list(app, path):
                                 #print(param["id"], param["name"])
                                 ptc, pfc, width, repetition = get_ptc_pfc(param)
                                 #ptc2,pfc2,width2,repetition2 = get_ptc_pfc_NEW(param)
+                                datatype = getDatatype(ptc, pfc, width)
                                 hasTextualCalibration = (len(param["type"]["enums"]) > 0)
 
                                 if "_dpid" in param:
                                     writeln(f, [
                                         outp(param["name"], 24, True)+delimiter,  # name
                                         outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,  # id
+                                        outp(datatype, 10) + delimiter,  # data type
                                         outp(width, 6)+delimiter,  # bit size
                                         '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,  # multiplicity
                                         ''+delimiter,  # par/var
@@ -589,12 +593,14 @@ def gen_dp_pckt_list(app, path):
                                 if param_i["param"]["id"] == param["id"]:
                                     #print(param["id"], param["name"])
                                     ptc, pfc, width, repetition = get_ptc_pfc(param)
+                                    datatype = getDatatype(ptc, pfc, width)
                                     hasTextualCalibration = (len(param["type"]["enums"]) > 0)
                                     if "_dpid" in param:
                                         #print("CSV - DP ID: ", param["_dpid"], " Param: ", param["name"])
                                         writeln(f, [
                                             outp(param["name"], 24, True)+delimiter,  # name
                                             outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10)+delimiter,  # id
+                                            outp(datatype, 10) + delimiter,  # data type
                                             outp(width, 6)+delimiter,  # bit size
                                             '1'+delimiter if param["multi"] is None else outp(param["multi"], 6)+delimiter,  # multiplicity
                                             ''+delimiter,  # par/var

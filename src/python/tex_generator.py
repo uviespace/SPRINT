@@ -32,6 +32,7 @@ class TexGenerator(Generator):
         ]
 
         s = fig_ref_conv(s, "latex")
+        s = s.replace('\u200b', '')  # whitespace
         s = s.encode("latex")
         s = s.decode('utf-8')
 

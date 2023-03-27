@@ -476,7 +476,7 @@ def gen_ccf(app, path):
 
                 ### check for derived packets
                 if len(packet["derivations"]["list"]) > 0:
-                    print("CCF >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
+                    #print("CCF >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
                     for derived in packet["derivations"]["list"]:
                         npars = 0
                         '''
@@ -611,7 +611,7 @@ def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
 
         if int(param_i["group"]) > 0 and int(param_i["repetition"]) > 0:
             value = outp(param_i["repetition"], 17)
-            print("param_i['repetition'] = ", value)
+            #print("param_i['repetition'] = ", value)
         elif int(param_i["role"]) == 8:  # Spare
             value = "0"
         elif int(param_i["role"]) == 3:  # Fixed (Discriminant)
@@ -624,10 +624,10 @@ def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
                     if enum["Name"] == derivedbase["disc"]:
                         value = outp(enum["Name"], 16)  # get from enumerated value for distinct discriminant
 
-            print("discriminant = ", value)
+            #print("discriminant = ", value)
         elif param_i["value"] != '':
             value = param_i["value"]
-            print("param_i['value'] = ", value)
+            #print("param_i['value'] = ", value)
         else:
             value = None
 
@@ -689,7 +689,7 @@ def gen_cdf(app, path):
             for packet in standard["packets"]["TC"]["list"]:
                 ccf_name = get_ccf_name(packet)
                 if len(packet["derivations"]["list"]) > 0:
-                    print("CDF >>>>>>>>>>>> derived: ", packet["name"], ": ", ccf_name)
+                    #print("CDF >>>>>>>>>>>> derived: ", packet["name"], ": ", ccf_name)
                     for derived in packet["derivations"]["list"]:
                         '''
                         derived["_disc"] = None
@@ -830,7 +830,7 @@ def gen_cvp(app, path):
             for packet in standard["packets"]["TC"]["list"]:
                 ### check for derived packets
                 if len(packet["derivations"]["list"]) > 0:
-                    print("CVP >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
+                    #print("CVP >>>>>>>>>>>> derived: ", packet["name"], ": ", get_ccf_name(packet))
                     for derived in packet["derivations"]["list"]:
                         '''
                         derived["_disc"] = None

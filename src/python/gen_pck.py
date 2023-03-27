@@ -124,7 +124,7 @@ def gen_packet_struct_param(f, param_i, level=1):
             pname = cname(param_i["param"]["name"])
             tname = param_i["param"]["type"]["name"]
             if param_i["param"]["_multi"] != None and param_i["param"]["_multi"] > 1:
-                writeln(f, "{0} {1}[{2}];".format(tname, pname, param_i["param"]["_multi"]), level)
+                writeln(f, "{0} {1}[{2}];".format(tname, pname, int(param_i["param"]["_multi"])), level)
             else:
                 writeln(f, "{0} {1};".format(tname, pname), level)
             writeln(f, "", level)
@@ -133,12 +133,12 @@ def gen_packet_struct_param(f, param_i, level=1):
                 for subparam_i in param_i["__dp_subparams"]:
                     if not gen_packet_struct_param(f, subparam_i, level+1):
                         return False
-                writeln(f, "}} {0}_[{1}];".format(pname, param_i["repetition"] if param_i["repetition"] != None else '1'), level)
+                writeln(f, "}} {0}_[{1}];".format(pname, int(param_i["repetition"]) if param_i["repetition"] != None else '1'), level)
         else:
             __dp_packet_struct_param_unaligned_bits = __dp_packet_struct_param_unaligned_bits + param["_size"]
             if (__dp_packet_struct_param_unaligned_bits % 8) == 0:
                 writeln(f, "/** Spacer block */", 1)
-                writeln(f, "uint8_t block_{1}[{0}];".format(__dp_packet_struct_param_unaligned_bits/8, param_i["_offset"]), level)
+                writeln(f, "uint8_t block_{1}[{0}];".format(int(__dp_packet_struct_param_unaligned_bits/8), param_i["_offset"]), level)
                 writeln(f, "")
                 __dp_packet_struct_param_unaligned_bits = 0
         return True
@@ -388,7 +388,7 @@ def gen_packet_functions_param(f, packet_domain, packet_name, param_i):
         if param_i["param"]["_multi"] != None and param_i["param"]["_multi"] == 1:
             params = gen_function_params(parents)            
             base_bit = param_i["_offset"] - (param_i["_offset"]%8)
-            base_byte = base_bit/8
+            base_byte = int(base_bit/8)
             size = param_i["param"]["_size"]
             if size <= 9:
                 type_size = 16
@@ -579,7 +579,7 @@ def gen_getter_setter(path, service):
         pcktLength = packet["length"]+settings["crc_size"]
         writeln(f, " ")
         writeln(f, "/** Length constant for packet {0}{1} */".format(packet["domain"],packet["name"]))     
-        writeln(f, "#define {0} {1}".format(defConstName.upper(), pcktLength))
+        writeln(f, "#define {0} {1}".format(defConstName.upper(), int(pcktLength)))
     writeln(f, "")
     
     # Define constants holding number of discriminants

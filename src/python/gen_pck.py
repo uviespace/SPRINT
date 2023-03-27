@@ -15,7 +15,8 @@ def cname(s):
     return s.replace(" ", "").replace("-", "").replace("/", "").replace("\\", "")
 
 def writeln(f, s, indent_level=0):
-    f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    #f += "{0}{1}\n".format(" " * get_indent(indent_level), s.encode("utf8"))
+    f += "{0}{1}\n".format(" " * get_indent(indent_level), s)
 
 def write_separator(f):
     f += "/*{0}*/\n".format("-" * (settings["max_line_length"]-4))

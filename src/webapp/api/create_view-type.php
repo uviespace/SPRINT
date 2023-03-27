@@ -26,25 +26,25 @@ $schema =
   "                \"properties\": {\n".
   "                    \"Value\": { \"type\": \"string\" },\n".
   "                    \"Name\": { \"type\": \"string\" },\n".
-  "                    \"Description\" : { \"type\": \"string\", \"format\": \"textarea\" }\n".
+  "                    \"Description\" : { \"type\": \"string\", \"format\": \"textarea\" },\n".
   "                    \"Parameters\" : { \"type\": \"string\" }\n".
   "                }\n".
   "            }\n".
-  "        }\n".
+  "        },\n".
   "        \"PUS\": {\n".
   "            \"type\": \"object\",\n".
   "            \"properties\": {\n".
-  "                \"type\": { \"type\": \"string\" }\n".
+  "                \"type\": { \"type\": \"string\" },\n".
   "                \"ptc\": { \"type\":\"integer\" },\n".
-  "                \"pfc\": { \"type\": \"integer\" },\n".
+  "                \"pfc\": { \"type\": \"integer\" }\n".
   "            }\n".
-  "        }\n".
+  "        },\n".
   "        \"CC\": {\n".
     "            \"type\": \"object\",\n".
   "            \"properties\": {\n".
-  "                \"type\": { \"type\": \"string\" }\n".
+  "                \"type\": { \"type\": \"string\" },\n".
   "                \"property 1\": { \"type\":\"string\" },\n".
-  "                \"property 2\": { \"type\": \"string\" },\n".
+  "                \"property 2\": { \"type\": \"string\" }\n".
   "            }\n".
   "        }\n".
   "    }\n".

@@ -651,7 +651,7 @@ def gen_dp(path, comp):
                 add_elem(domain_dict, param, "params")
                 params_list.append(param)
         for var in standard["datapool"]["vars"]:
-            if param["ownerStandardId"] == standard["id"]:
+            if var["ownerStandardId"] == standard["id"]:  # was  'if param["ownerStandardId"] == standard["id"]:'  =>  UnboundLocalError: local variable 'param' referenced before assignment
                 add_elem(domain_dict, var, "vars")
                 vars_list.append(var)
 

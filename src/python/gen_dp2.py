@@ -556,7 +556,7 @@ def gen_dp2(path, comp):
                 add_elem(domain_dict, var, "vars")
                 vars_list.append(var)
 
-    if len(params_list) > 0 and len(vars_list) > 0:
+    if len(params_list) > 0 or len(vars_list) > 0:  # was and !
         gen_datapool_h(path, domain_dict, params_list, vars_list)
         gen_datapool_c(path, domain_dict, params_list, vars_list)
 

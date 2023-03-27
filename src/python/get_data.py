@@ -374,6 +374,7 @@ def get_params(db, standard):
     as_list = []
     as_hash = {}
     for row in cur.fetchall():
+        #print("param: ", row[5], " (", int(row[0]), ")")
         param = {}
         param["id"] = int(row[0])
         param["standard"] = standard
@@ -560,7 +561,13 @@ def get_types(db, standard):
     db_execute(cur, """
         SELECT MAX(nrType) FROM typeidentifier WHERE idProject={0}""".format(project["id"]))
     type_max_nr_fetch = cur.fetchall()
-    type_max_nr = type_max_nr_fetch[0][0]
+    #print("type_max_nr_fetch: ", type_max_nr_fetch)
+    if type_max_nr_fetch[0][0] is not None:
+        #print("...: ", type(type_max_nr_fetch[0][0]))
+        type_max_nr = int(type_max_nr_fetch[0][0])
+    else:
+        type_max_nr = 0
+    #print("type_max_nr: ", type_max_nr)
     if type_max_nr is None: type_max_nr = 0
     # print("Project ID = ", project["id"], ", Type Max Nr = ", type_max_nr)
 
@@ -590,6 +597,8 @@ def get_types(db, standard):
         type_["desc"] = row[5]
         type_["size"] = int(row[6]) if row[6] is not None else None
         type_["value"] = row[7]
+        #print("get_types: name = ", type_["name"])
+        #print(" | schema: ", json.loads(row[9], object_pairs_hook=OrderedDict) if row[9] else None)
         # type_["setting"] = {}
         # print("get_types: setting = ", json.loads(row[8]) if row[8] else None)
         type_["datatype"] = get_datatype(db, row[8])
@@ -801,7 +810,10 @@ def get_derived_packets(db, parent):
     db_execute(cur, """
         SELECT MAX(nrPacket) FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
     packet_max_nr_fetch = cur.fetchall()
-    packet_max_nr = packet_max_nr_fetch[0][0]
+    if packet_max_nr_fetch[0][0] is not None:
+        packet_max_nr = int(packet_max_nr_fetch[0][0])
+    else:
+        packet_max_nr = 0
     if packet_max_nr is None: packet_max_nr = 0
     # print("Project ID = ", project["id"], ", Packet Max Nr = ", packet_max_nr)
 
@@ -937,7 +949,10 @@ def get_packets(db, standard):
         db_execute(cur, """
             SELECT MAX(nrPacket) FROM packetidentifier WHERE idProject={0}""".format(project["id"]))
         packet_max_nr_fetch = cur.fetchall()
-        packet_max_nr = packet_max_nr_fetch[0][0]
+        if packet_max_nr_fetch[0][0] is not None:
+            packet_max_nr = int(packet_max_nr_fetch[0][0])
+        else:
+            packet_max_nr = 0
         if packet_max_nr is None: packet_max_nr = 0
         # print("Project ID = ", project["id"], ", Packet Max Nr = ", packet_max_nr)
 
@@ -1097,6 +1112,7 @@ def get_param_sequence(db, standard, _type, packet):
 
     res = []
     offset = 0
+    #print("---------------------------------------------------------")
     for row in cur.fetchall():
         param = standard["params"]["hash"][int(row[2])]
         elem = {}
@@ -1120,6 +1136,7 @@ def get_param_sequence(db, standard, _type, packet):
         elem["_nr"] = project["_nr_elem"]
         project["_nr_elem"] = project["_nr_elem"] + 1
         elem["_offset"] = offset
+        #print("elem name: ", param["name"], " | elem[\"param\"][\"_length\"]: ", elem["param"]["_length"], " | offset: ", offset)
 
         # TODO: group / repetition not yet supported.
         if offset != None and elem["param"]["_length"] != None:

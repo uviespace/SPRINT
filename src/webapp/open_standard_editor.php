@@ -66,7 +66,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Component <?php echo $component_name;?> </title>
+	<title>Settings </title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->

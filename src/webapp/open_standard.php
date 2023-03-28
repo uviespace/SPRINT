@@ -399,7 +399,7 @@ echo " (".$nmbOfRowsEnumJson." datatypes with enumerations in JSON and ".$nmbOfR
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="view_datapool.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Datapool...</a>
 <?php
-$sql = 
+/*$sql = 
   "SELECT ".
   "    * ".
   "FROM ".
@@ -411,7 +411,34 @@ $sql =
   "    (p.kind = 3 OR ".
   "    p.kind = 4 OR ".
   "    p.kind = 5 OR ".
-  "    p.kind = 6) ";
+  "    p.kind = 6) ";*/
+$sql = 
+  "SELECT * FROM (".
+  "SELECT ".
+  "    p.id ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `type` AS t ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType = t.id AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  "UNION ".
+  "SELECT ".
+  "    p.id ".
+  "FROM ".
+  "    `parameter` AS p ".
+  "WHERE ".
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType IS NULL AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  ") AS u ";
 $result = $mysqli->query($sql);
 $nmbOfRows = mysqli_num_rows($result);
 echo " (".$nmbOfRows." datapool items)";

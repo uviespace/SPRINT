@@ -246,6 +246,10 @@ $(".crud-submit").click(function(e){
     var value = $("#create-item").find("input[name='value']").val();
     var unit = $("#create-item").find("input[name='unit']").val();
 
+    if(multiplicity=='0') {
+		toastr.error('Multiplicity should not be zero!', 'Failure Alert', {timeOut: 5000});
+	} else {
+		
     if(domain != '' && name != '' && idType != '' && kind != ''){
         $.ajax({
             dataType: 'json',
@@ -285,6 +289,8 @@ $(".crud-submit").click(function(e){
     }else{
         alert('You are missing title or description.')
     }
+	
+	}
 
 });
 
@@ -364,6 +370,10 @@ $(".crud-submit-edit").click(function(e){
     var unit = $("#edit-item").find("input[name='unit']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
+    if(multiplicity=='0') {
+		toastr.error('Multiplicity should not be zero!', 'Failure Alert', {timeOut: 5000});
+	} else {
+
     if(id != '' && domain != '' && name != '' && idType != '' && kind != ''){
         $.ajax({
             dataType: 'json',
@@ -379,6 +389,8 @@ $(".crud-submit-edit").click(function(e){
     }else{
         alert('You are missing something.')
     }
+	
+	}
 
 });
 

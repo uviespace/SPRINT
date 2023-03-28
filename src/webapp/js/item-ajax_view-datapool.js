@@ -252,7 +252,11 @@ $(".crud-submit").click(function(e){
     var value = $("#create-item").find("input[name='value']").val();
     var unit = $("#create-item").find("input[name='unit']").val();
 
-    toastr.success('Create Entered. Stanbdard = ' + idStandard, 'Success Alert', {timeOut: 5000});
+    //toastr.success('Create Entered. Stanbdard = ' + idStandard, 'Success Alert', {timeOut: 5000});
+
+    if(multiplicity=='0') {
+		toastr.error('Multiplicity should not be zero!', 'Failure Alert', {timeOut: 5000});
+	} else {
 
     if(idStandard != '' && domain != '' && name != '' && kind != '' && idType != '' && value != ''){
         toastr.success('Checked necessary items.', 'Success Alert', {timeOut: 5000});
@@ -300,6 +304,8 @@ $(".crud-submit").click(function(e){
     }else{
         alert('You are missing name or another mandatory item.')
     }
+	
+	}
 
 });
 
@@ -379,6 +385,10 @@ $(".crud-submit-edit").click(function(e){
     var unit = $("#edit-item").find("input[name='unit']").val();
     var id = $("#edit-item").find(".edit-id").val();
 
+    if(multiplicity=='0') {
+		toastr.error('Multiplicity should not be zero!', 'Failure Alert', {timeOut: 5000});
+	} else {
+
     if(id != '' && domain != '' && name != '' && kind != '' && idType != '' && value != ''){
         $.ajax({
             dataType: 'json',
@@ -394,6 +404,8 @@ $(".crud-submit-edit").click(function(e){
     }else{
         alert('You are missing something.')
     }
+	
+	}
 
 });
 

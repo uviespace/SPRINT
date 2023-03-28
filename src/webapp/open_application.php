@@ -9,6 +9,13 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/config.php';
+
+$message = "Configuration:\n";
+$message .= "\noperating system: ".$os;
+$message .= "\npath_to_python: ".$path_to_python;
+$message .= "\npath_to_pyscripts: ".$path_to_pyscripts;
+$message .= "\npython_cmd: ".$python_cmd;
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idApplication"])) { $idApplication  = $_GET["idApplication"]; } else { $idApplication=0; };
@@ -58,13 +65,15 @@ if ($result->num_rows > 0) {
 	if(isset($_POST['build'])){
 		//$message = "The build function is called.";
 
-		$path_to_python = "C:\\Users\\chris\\Anaconda2\\";
+		//$path_to_python = "C:\\Users\\chris\\Anaconda2\\";
+		//$path_to_python = "";
 		//$path_to_pyscripts = "py\\";
-		$path_to_pyscripts = "..\\cordetfw\\editor-1.1\\_lib\\libraries\\sys\\python\\src\\";
+		//$path_to_pyscripts = "..\\cordetfw\\editor-1.1\\_lib\\libraries\\sys\\python\\src\\";
+		//$path_to_pyscripts = ".\\python\\";
 		//$cmd = "python ../_lib/libraries/sys/python/src/build_app.py " . $this->sc_temp_project_id . " " . $this->sc_temp_application_id . " 2>&1";
 		//$cmd = "python py/build_app.py " . $this->sc_temp_project_id . " " . $this->sc_temp_application_id . " 2>&1";
 		//$cmd = $path_to_python."python.exe ".$path_to_pyscripts."run_python.py 2>&1";
-		$cmd = $path_to_python."python.exe ".$path_to_pyscripts."build_app.py ".$idProject." ".$idApplication." 2>&1";
+		$cmd = $path_to_python.$python_cmd." ".$path_to_pyscripts."build_app.py ".$idProject." ".$idApplication." 2>&1";
 
 		$file = shell_exec($cmd);
 		$file = substr($file, 0, strlen($file)-1);
@@ -113,9 +122,9 @@ if ($result->num_rows > 0) {
 	if(isset($_POST['buildDpList'])){
 		$messageDpList = "The build Data Pool CSV function is called.\n\n";
 		
-		$path_to_python = "C:\\Users\\chris\\Anaconda2\\";
-		$path_to_pyscripts = "..\\cordetfw\\editor-1.1\\_lib\\libraries\\sys\\python\\src\\";
-		$cmd = $path_to_python."python.exe ".$path_to_pyscripts."build_dp_csv.py ".$idProject." ".$idApplication." 2>&1";
+		//$path_to_python = "C:\\Users\\chris\\Anaconda2\\";
+		//$path_to_pyscripts = "..\\cordetfw\\editor-1.1\\_lib\\libraries\\sys\\python\\src\\";
+		$cmd = $path_to_python.$python_cmd." ".$path_to_pyscripts."build_dp_csv.py ".$idProject." ".$idApplication." 2>&1";
 		
 		$file = shell_exec($cmd);
 		$file = substr($file, 0, strlen($file)-1);
@@ -177,6 +186,63 @@ while ($row = $result->fetch_assoc()) {
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
+	
+
+	
+	
+      $(document).ready(function () {
+        console.log("Document ready event handler");
+		
+		$('#loader').hide();
+		
+		const formBuildDpList = document.getElementById("formBuildDpList");
+        const log = document.getElementById("log");
+		const buttonBuildDpList = document.getElementById("buttonBuildDpList");
+        formBuildDpList.addEventListener("submit", logSubmit);
+		
+		const formBuild = document.getElementById("formBuild");
+		const buttonBuild = document.getElementById("buttonBuild");
+		formBuild.addEventListener("submit", logSubmitBuild);
+	
+        //document.getElementById("buttonBuildDpList").style.visibility = "hidden"; // show: "visible"; hide: "hidden"
+		//$("#buttonBuildDpList").hide();
+		
+      });
+	  
+/*	  $(document).ready(function() 
+{
+    $('#loader').hide();
+
+    $('formBuildDpList').submit(function() 
+    {
+        $('#loader').show();
+    }) 
+})*/
+	
+	window.onload = (event) => {
+        console.log("page is fully loaded");
+		
+
+    };
+	
+	function logSubmit(event) {
+		//$('#loader').show();
+		$("#buttonBuildDpList").hide();
+		//$("#progressBuildDpList").css({background:'linear-gradient(to right, #25b350, #e6e8ec)'});
+		$("#progressBuildDpList").css({background:'linear-gradient(to right, #cc0000, #e6e8ec)'});
+		//$("#progressBuildDpList").css({background:'linear-gradient(to right, #25b350, #25b350 ' + Math.round((event.loaded/event.total)*100) + '%, #e6e8ec ' + Math.round((event.loaded/event.total)*100) + '%)'});
+		//log.textContent = `Form Submitted! Timestamp: ${event.timeStamp}`;
+        //event.preventDefault();
+    }
+	
+	function logSubmitBuild(event) {
+		$("#buttonBuild").hide();
+		//$("#progressBuild").css({background:'linear-gradient(to right, #25b350, #e6e8ec)'});
+		$("#progressBuild").css({background:'linear-gradient(to right, #cc0000, #e6e8ec)'});
+		//log.textContent = `Form Submitted! Timestamp: ${event.timeStamp}`;
+        //event.preventDefault();
+    }
+	
 		function buildProject(idProject, idApplication) {
 			toastr.success('Debug: Project: '+idProject+', Application: '+idApplication, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: START ...', 'Success Alert', {timeOut: 5000}); 
@@ -186,9 +252,36 @@ while ($row = $result->fetch_assoc()) {
 			toastr.success('Debug: Output: '+$file, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: ... END', 'Success Alert', {timeOut: 5000}); 
 		}
+		
+	function myFunction(divName) {
+		let divs = ["divBuild", "divImportAcr", "divImportDat", "divImportReq"];
+		
+		for (div of divs) {
+			//var x = document.getElementById(div);
+			window['x'+div] = document.getElementById(div);  // dynamic variable names
+			var x = eval('x'+div);
+			if (div == divName) {
+			    if (x.style.display === "none") {
+			        x.style.display = "block";
+		        } else {
+			        x.style.display = "none";
+		        }
+			} else {
+				x.style.display = "none";
+			}
+			
+		}
+		
+	}
 	</script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
 	<style type="text/css">
+.progress { <!-- https://codeshack.io/file-upload-progress-bar-js-php/ -->
+  height: 20px;
+  border-radius: 4px;
+  margin: 10px 0;
+  background-color: #e6e8ec;
+}
 @media (min-width: 40em) {
 .table { 
    display: table;
@@ -199,7 +292,7 @@ while ($row = $result->fetch_assoc()) {
 }
 	</style>
 </head>
-<body>
+<body onload="myFunction('')">
 
 	<div class="container">
 
@@ -245,9 +338,7 @@ while ($row = $result->fetch_assoc()) {
 		      		</form>
 
 		      </div>
-
-				<br/>
-
+			  
                 <form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 5px 15px;" onsubmit="this.action='sel_application-standard.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'">
                     <input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
                     <input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
@@ -272,7 +363,24 @@ while ($row = $result->fetch_assoc()) {
                     &nbsp;&nbsp;&nbsp;  Components to be generated as source code, instrument database files, tex tables for documentation, etc. 
                 </form>
 
-                <br/><br/>
+
+                <br/><br/><br/>
+			  
+			  
+				<button class="btn btn-primary edit-item" onclick="myFunction('divBuild')">Build</button>
+				&nbsp;&nbsp;&nbsp;
+				<button class="btn btn-primary edit-item" onclick="myFunction('divImportAcr')">Import Acronym List</button>
+				&nbsp;&nbsp;&nbsp;
+				<button class="btn btn-primary edit-item" onclick="myFunction('divImportDat')">Import Data Pool List</button>
+				&nbsp;&nbsp;&nbsp;
+				<button class="btn btn-primary edit-item" onclick="myFunction('divImportReq')">Import Requirement List</button>
+				
+				<br/><br/><br/>
+
+
+				
+                <!-- ### Import Requirement List ################################################ -->
+				<div id="divImportReq">
 
 				<form id="formReqGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
 
@@ -360,10 +468,17 @@ while ($row = $result->fetch_assoc()) {
                     <input type="submit" name="importReqList" value="Import Requirement List" class="btn btn-success crud-submit-import-reqlist" disabled>
                     <?php } ?>
                     <br/><br/>
-					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageReqImport)){ echo $messageReqImport;}?></textarea>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageReqImport)){ echo $messageReqImport;}?></textarea>
 				</form>
 
                 <br/><br/>
+				
+				
+				</div> 
+				
+                <!-- ### Import Acronym List #################################################### -->
+				<div id="divImportAcr">
+				
 
 				<form id="formAcrGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
 
@@ -400,10 +515,17 @@ while ($row = $result->fetch_assoc()) {
                     <input type="submit" name="importAcrList" value="Import Acronym List" class="btn btn-success crud-submit-import-acrlist" disabled>
                     <?php } ?>
                     <br/><br/>
-					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageAcrImport)){ echo $messageAcrImport;}?></textarea>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageAcrImport)){ echo $messageAcrImport;}?></textarea>
 				</form>
 
                 <br/><br/>
+
+
+				</div> 
+				
+                <!-- ### Import Data Pool List ################################################## -->
+				<div id="divImportDat">
+
 
 <!--
 <form action="upload_DpList.php" method="post" enctype="multipart/form-data">
@@ -489,41 +611,52 @@ if ($result->num_rows > 0) {
                     <input type="submit" name="importDpList" value="Import Data Pool List" class="btn btn-success crud-submit-import-dplist" disabled>
                     <?php } ?>
                     <br/><br/>
-					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpImport)){ echo $messageDpImport;}?></textarea>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpImport)){ echo $messageDpImport;}?></textarea>
 				</form>
 
 				<br/><br/>
+				
 
-				<form  method="post" style="background-color: #d1d1d1; padding: 15px;">
+				</div> 
+
+                <!-- ### Build ################################################################## -->
+				<div id="divBuild">
+					
+
+
+
+				<form id="formBuildDpList" method="post" style="background-color: #d1d1d1; padding: 15px;">
                     <?php if ($idRole < 4) { ?>
-					<input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist">
+					<input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist" id="buttonBuildDpList">
                     <?php } else { ?>
                     <input type="submit" name="buildDpList" value="Build Data Pool CSV" class="btn btn-success crud-submit-build-dplist" disabled>
                     <?php } ?>
-                    <br/><br/>
-					<textarea rows="3" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpList)){ echo $messageDpList;}?></textarea>
+					<div id="progressBuildDpList" class="progress"></div>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageDpList)){ echo $messageDpList;}?></textarea>
 				</form>
+				<p id="log"></p>
+				<!--<div id="loader" style="position: fixed; top:0; left:0; width:100%; height: 100%; background: url('img/ajax-loader.gif') center center #efefef"></div>-->
 
 				<br/><br/>
 
 				<!--<button type="build" class="btn btn-success crud-submit-build" onclick="buildProject(<?php echo $idProject; ?>, <?php echo $idApplication; ?>);return false;">Build</button>-->
-				<form  method="post" style="background-color: #d1d1d1; padding: 15px;">
+				<form  id="formBuild" method="post" style="background-color: #d1d1d1; padding: 15px;">
 					<!--<input type="text" name="txt" value="<?php if(isset($message)){ echo $message;}?>" >
 					<!--<input type="submit" name="insert" value="insert">
 					<input type="submit" name="select" value="select" >-->
                     <?php if ($idRole < 4) { ?>
-					<input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build">
+					<input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build" id="buttonBuild">
                     <?php } else { ?>
                     <input type="submit" name="build" value="Build" class="btn btn-success crud-submit-build" disabled>
                     <?php } ?>
-                    <br/><br/>
-					<textarea rows="25" cols="150" style="background-color: #e1e1e1;" readonly ><?php if(isset($message)){ echo $message;}?></textarea>
+					<div id="progressBuild" class="progress"></div>
+					<textarea rows="25" class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($message)){ echo $message;}?></textarea>
 				</form>
 				
 				<br/><br/>
 				
 				
-				
+				</div> 
 				
 
 

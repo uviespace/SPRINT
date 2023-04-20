@@ -430,6 +430,7 @@ $.ajax({
         if(id == '' && setting != ''){
             
             url = '/dbeditor/api/update_view-component-setting.php';
+            //url = '/SPRINT/api/update_view-component-setting.php';
             var posting = $.post( url, { setting: setting2, idApplication: idApplication, idComponent: idComponent } );
             //alert('You are sending ...: (posting = '+posting+')');
             

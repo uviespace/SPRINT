@@ -88,6 +88,7 @@ $.ajax({
         if(id == '' && setting != ''){
             
             url = '/dbeditor/api/update_view-standard-setting.php';
+            //url = '/SPRINT/api/update_view-standard-setting.php';
             var posting = $.post( url, { setting: setting2, idStandard: idStandard, idProject: idProject } );
             //alert('You are sending ...: (posting = '+posting+')');
             

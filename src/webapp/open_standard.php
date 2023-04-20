@@ -508,7 +508,14 @@ echo " (".$nmbOfRowsLimits." parameters with limits and ".$nmbOfRowsNoLimits." p
 				<div style="background-color:#EEEEEE;padding:2px;">
 					<a href="open_standard_editor.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Settings...</a>
 				</div>
+				
+                <br/>
 
+				<div style="background-color:#EEEEEE;padding:2px;">
+					<a href="open_standard_check.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Check Standard...</a>
+				</div>
+
+<!--
 				<br/><br/>
 
 				<hr>
@@ -518,7 +525,7 @@ echo " (".$nmbOfRowsLimits." parameters with limits and ".$nmbOfRowsNoLimits." p
 				</div>
 
 				<hr>
-
+-->
 				<br/><br/>
 
 				<div class="topcorner_left">

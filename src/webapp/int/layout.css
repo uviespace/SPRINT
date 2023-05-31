@@ -4,8 +4,8 @@
     right: 10px;
   }
   
-   .topcorner_left{
-   position:absolute;
+  .topcorner_left{
+    position: fixed;
     top:10px;
     left: 10px;
   }
@@ -384,5 +384,67 @@ a[target="_blank"]:after {
 input:focus + label {
   outline: 2px solid;
 }*/
+
+         table {
+            /*font-family: arial, sans-serif;
+            border-collapse: collapse;
+            width: 30%;*/
+        }
+
+        td, th {
+            /*border: 1px solid #dddddd;
+            text-align: left;
+            padding: 8px;*/
+        }
+		
+		th {
+            background-color: #337AB7;
+			color: #D1E0FF;
+		}
+
+        tr:nth-child(even) {
+            background-color: #D1E0FF;
+        }
+
+@media print {
+     .topcorner, .topcorner_left {
+		 display: none !important;
+     }
+	 
+	 /*--------Hide first column header (th) ---------*/
+     /*table th:first-child  {display: none}*/
+     /*--------Hide first column rows (td) ---------*/
+     /*table td:first-child  {display: none}*/
+	 
+	 /*--------Hide last column header (th) ---------*/
+	 table th:last-child {display:none}
+	 /*--------Hide last column rows (td) ---------*/
+     table td:last-child {display:none}
+     	 
+	 /*--------Hide n-th column header (th) ---------*/
+     /*table th:nth-child(6) {display: none}
+	 table th:nth-child(7) {display: none}
+	 table th:nth-child(8) {display: none}*/
+	 /*--------Hide n-th column rows (td) ---------*/
+	 /*table td:nth-child(7) {display: none}
+	 table td:nth-child(8) {display: none}
+	 table td:nth-child(9) {display: none}*/
+	   
+	 .btn, .btn-success {
+		 display: none !important;
+     }
+	 
+	 .pagination-sm {
+		 display: none !important;
+     }
+	 
+	 /*.result_nmb_rows {
+		 display: none !important;
+     }*/
+	 
+	 .search {
+		 display: none !important;
+     }
+}
 
 

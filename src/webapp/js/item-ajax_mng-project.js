@@ -161,7 +161,7 @@ function manageRow(data) {
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var userid = $("#create-item").find("input[name='userid']").val();
     var name = $("#create-item").find("input[name='name']").val();

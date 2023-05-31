@@ -265,7 +265,7 @@ $(".crud-submit").click(function(e){
                 toastr.error('Database Operation Failed. ' + xhr.responseText, 'Failure Alert', {timeOut: 5000});
             }
         }).done(function(data){
-            $("#create-item").find("input[name='idStandard']").val('');
+            //$("#create-item").find("input[name='idStandard']").val('');
             $("#create-item").find("input[name='domain']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("input[name='shortDesc']").val('');

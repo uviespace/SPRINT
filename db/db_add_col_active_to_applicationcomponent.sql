@@ -4,7 +4,7 @@
 -- WITH VALUES
 
 ALTER TABLE `applicationcomponent`
-ADD `active2` TINYINT(4) NOT NULL 
+ADD `active` TINYINT(4) NOT NULL 
 DEFAULT 1 
 AFTER `idComponent`;
 

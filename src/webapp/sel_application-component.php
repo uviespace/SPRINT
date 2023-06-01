@@ -17,18 +17,32 @@ $application_name = "";
 $application_desc = "";
 
 if (isset($_GET["add_component_1"])) { addComp($mysqli, $idApplication, 1); };
+if (isset($_GET["act_component_1"])) { actComp($mysqli, $idApplication, 1); };
+if (isset($_GET["deact_component_1"])) { deactComp($mysqli, $idApplication, 1); };
 if (isset($_GET["del_component_1"])) { delComp($mysqli, $idApplication, 1); };
 if (isset($_GET["add_component_2"])) { addComp($mysqli, $idApplication, 2); };
+if (isset($_GET["act_component_2"])) { actComp($mysqli, $idApplication, 2); };
+if (isset($_GET["deact_component_2"])) { deactComp($mysqli, $idApplication, 2); };
 if (isset($_GET["del_component_2"])) { delComp($mysqli, $idApplication, 2); };
 if (isset($_GET["add_component_3"])) { addComp($mysqli, $idApplication, 3); };
+if (isset($_GET["act_component_3"])) { actComp($mysqli, $idApplication, 3); };
+if (isset($_GET["deact_component_3"])) { deactComp($mysqli, $idApplication, 3); };
 if (isset($_GET["del_component_3"])) { delComp($mysqli, $idApplication, 3); };
 if (isset($_GET["add_component_4"])) { addComp($mysqli, $idApplication, 4); };
+if (isset($_GET["act_component_4"])) { actComp($mysqli, $idApplication, 4); };
+if (isset($_GET["deact_component_4"])) { deactComp($mysqli, $idApplication, 4); };
 if (isset($_GET["del_component_4"])) { delComp($mysqli, $idApplication, 4); };
 if (isset($_GET["add_component_5"])) { addComp($mysqli, $idApplication, 5); };
+if (isset($_GET["act_component_5"])) { actComp($mysqli, $idApplication, 5); };
+if (isset($_GET["deact_component_5"])) { deactComp($mysqli, $idApplication, 5); };
 if (isset($_GET["del_component_5"])) { delComp($mysqli, $idApplication, 5); };
 if (isset($_GET["add_component_6"])) { addComp($mysqli, $idApplication, 6); };
+if (isset($_GET["act_component_6"])) { actComp($mysqli, $idApplication, 6); };
+if (isset($_GET["deact_component_6"])) { deactComp($mysqli, $idApplication, 6); };
 if (isset($_GET["del_component_6"])) { delComp($mysqli, $idApplication, 6); };
 if (isset($_GET["add_component_7"])) { addComp($mysqli, $idApplication, 7); };
+if (isset($_GET["act_component_7"])) { actComp($mysqli, $idApplication, 7); };
+if (isset($_GET["deact_component_7"])) { deactComp($mysqli, $idApplication, 7); };
 if (isset($_GET["del_component_7"])) { delComp($mysqli, $idApplication, 7); };
 
 $sql = "SELECT * FROM `project` WHERE `id` = ".$idProject;
@@ -98,6 +112,14 @@ function addComp($mysqli, $idApplication, $idComp) {
     $result = $mysqli->query($sql);
     //echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Result: ".$result."<br/>";
 }
+function actComp($mysqli, $idApplication, $idComp) {
+    $sql = 'UPDATE `applicationcomponent` SET `active` = 1 WHERE `idApplication` = '.$idApplication.' AND `idComponent` = '.$idComp;
+    $result = $mysqli->query($sql);
+}
+function deactComp($mysqli, $idApplication, $idComp) {
+    $sql = 'UPDATE `applicationcomponent` SET `active` = 0 WHERE `idApplication` = '.$idApplication.' AND `idComponent` = '.$idComp;
+    $result = $mysqli->query($sql);
+}
 function delComp($mysqli, $idApplication, $idComp) {
     $sql = 'DELETE FROM `applicationcomponent` WHERE idApplication = '.$idApplication.' AND idComponent = '.$idComp;
     //echo "Delete component ".$idComp."<br/>";
@@ -154,6 +176,7 @@ function delComp($mysqli, $idApplication, $idComp) {
 <?php
 
 $arr_comp = array();
+$act_comp = array();
 
 $sql = "SELECT * FROM `component` AS c, `applicationcomponent` AS ac WHERE c.id = ac.idComponent AND ac.idApplication = ".$idApplication." ORDER BY `idComponent` ASC";
 
@@ -166,6 +189,11 @@ if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
         $arr_comp[$row["id"]] = $row["name"];
+        if (array_key_exists('active', $row)) {
+            $act_comp[$row["id"]] = $row["active"];
+        } else {
+            $act_comp[$row["id"]] = 2;
+        }
     }
 }
 
@@ -190,7 +218,14 @@ if ($result->num_rows > 0) {
             echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
             echo "<a href='open_component_editor.php?id=".$row["id"]."&idProject=".$idProject."&idApplication=".$idApplication."'>".$row["id"]." <b>".$arr_comp[$row["id"]]."</b></a>";
             //echo "<span style='float:right;'>[DEL]&nbsp;</span>";
-            echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;' type='submit' class='btn btn-danger remove-item' name='del_component_".$row["id"]."' onclick='return confirm(\"Are you sure to delete this component?\")'>DEL</button>";
+            if ($act_comp[$row["id"]]==1) {
+                echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;' type='submit' class='btn btn-warning deactivate-item' name='deact_component_".$row["id"]."'>DEACT</button>";
+            } else if ($act_comp[$row["id"]]==2) {
+                echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;' type='submit' class='btn btn-danger remove-item' name='del_component_".$row["id"]."' onclick='return confirm(\"Are you sure to delete this component?\")'>DEL</button>";
+            } else {
+                echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;margin-left:5px;' type='submit' class='btn btn-warning activate-item' name='act_component_".$row["id"]."'>ACT</button>";
+                echo "<button style='float:right;height:20px;display:flex;justify-content:center;align-items:center;' type='submit' class='btn btn-danger remove-item' name='del_component_".$row["id"]."' onclick='return confirm(\"Are you sure to delete this component?\")'>DEL</button>";
+            }
             echo "</div>";
         } else {
             echo "<div style='height:30px; padding:5px; width:50%; background-color:lightgray;'>";
@@ -250,8 +285,6 @@ if ($result->num_rows > 0) {
 					<a class="a_btn" href="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>" target="_self">>> BACK <<</a>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
-				</div>
-
 				</div>
 
 	</div>

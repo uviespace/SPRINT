@@ -1,3 +1,9 @@
+ .container{
+  background-color: transparent;
+  position: relative;
+  left : 80px;
+ }
+ 
  .topcorner{
    position:absolute;
     top:10px;
@@ -342,9 +348,9 @@ a[target="_blank"]:after {
 	/*border: 3px dashed #F00;*/
 	height: auto;
 	padding: 10px;
-	position: absolute;
-	left: 33%;
-	top: 105px;
+	position: absolute; /* absolute *//* relative */
+	left: 30%; /* 33% *//* 25% */
+	top: 105px; /* 105px *//* -60px */
 	width: 70px;
 }
 

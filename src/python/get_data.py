@@ -1172,10 +1172,21 @@ def get_app_standards(db, app):
 # -------------------------------------------------------------------------------
 def get_app_components(db, app):
     cur = db.cursor()
-    db_execute(cur, """
-        SELECT s.idApplication, s.idComponent, s.setting, c.id, c.shortName, c.name FROM applicationcomponent s
-        JOIN component c ON s.idComponent=c.id 
-        WHERE s.idApplication={0}""".format(str(app["id"])))
+    # check if column `active` exists in table `applicationcomponent`
+    db_execute(cur, """SHOW COLUMNS FROM `applicationcomponent` LIKE 'active'""")
+    #print("COLUMN `active`: ", len(cur.fetchall()))
+    if len(cur.fetchall()) > 0:
+        # if column `active` exists
+        db_execute(cur, """
+            SELECT s.idApplication, s.idComponent, s.setting, c.id, c.shortName, c.name FROM applicationcomponent s
+            JOIN component c ON s.idComponent=c.id 
+            WHERE s.idApplication={0} AND s.active = 1""".format(str(app["id"])))
+    else:
+        # if column `active` not exists
+        db_execute(cur, """
+            SELECT s.idApplication, s.idComponent, s.setting, c.id, c.shortName, c.name FROM applicationcomponent s
+            JOIN component c ON s.idComponent=c.id 
+            WHERE s.idApplication={0}""".format(str(app["id"])))
 
     as_list = []
     as_hash = {}

@@ -13,7 +13,6 @@ require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
-if (isset($_GET["idParameter"])) { $idParameter  = $_GET["idParameter"]; } else { $idParameter=''; };
 $project_name = "";
 $standard_name = "";
 $standard_desc = "";
@@ -321,11 +320,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
-                    <?php if ($idParameter=='') { ?>
 					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
-                    <?php } else { ?>
-					<a class="a_btn" href="sel_parameter-calibration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
-                    <?php } ?>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

@@ -13,7 +13,6 @@ require 'int/global_functions.php';
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
-if (isset($_GET["idParameter"])) { $idParameter  = $_GET["idParameter"]; } else { $idParameter=''; };
 $project_name = "";
 $standard_name = "";
 $standard_desc = "";
@@ -51,6 +50,45 @@ if ($result->num_rows > 0) {
     //echo "0 results";
 }
 
+if (isset($_GET["idParameter"])) { $idParameter  = $_GET["idParameter"]; } else { $idParameter=0; };
+
+$sql = "SELECT * FROM `parameter` WHERE `id` = ".$idParameter;
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        $parameter_name = $row["name"];
+        $parameter_desc = $row["desc"];
+    }
+} else {
+    //echo "0 results";
+}
+
+$sql = "SELECT c.* FROM `parameter` p, `calibration` c WHERE JSON_VALUE(p.setting, '$.calcurve') = c.id AND p.id = ".$idParameter;
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+$calcurve = false;
+if ($result->num_rows > 0) {
+    $calcurve = true;
+    // output data of each row
+/*    while($row = $result->fetch_assoc()) {
+         echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["shortDesc"]. "<br/>";
+        $calibration_name = $row["name"];
+        $calibration_shortDesc = $row["shortDesc"];
+        
+    }*/
+} else {
+    //echo "0 results";
+}
+
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
  
@@ -67,7 +105,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 <!DOCTYPE html>
 <html>
 <head>
-	<title>CORDET Editor - Datapool</title>
+	<title>CORDET Editor - Calibrations for Parameter <?php echo $parameter_name; ?></title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -87,31 +125,21 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
-	<script type="text/javascript" src="js/item-ajax_view-datapool.js"></script>
+	<script type="text/javascript" src="js/item-ajax_view-parameter-calibration.js"></script>
 </head>
 <body>
-<!-- Back to top button -->
-<button
-        type="button"
-        class="btn btn-info btn-sm"
-        id="btn-back-to-top"
-        style="background-color: #337AB7; z-index: 1; ">
-  <!--<i class="fa fa-arrow-up" style="color:white;"></i>-->
-  <img width="22px;" src="img/6622853_rocket_space_icon_white.png" />
-  <!--TOP-->
-</button>
 
 	<div class="container">
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
 					<h4>Project <?php echo $project_name;?> - Standard <?php echo $standard_name;?></h4>
-		            <h2>Datapool</h2>
+		            <h2>Calibration for Parameter <?php echo $parameter_name; ?></h2>
 		        </div>
-                <?php if ($idRole < 4) { ?>
+                <?php if ($idRole < 4 && !$calcurve) { ?>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
-					  Create Item
+					  Add Calibration
 				</button>
 		        </div>
                 <?php } ?>
@@ -131,18 +159,15 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 			<input id="liveSearch" type="search" placeholder="Search...">
 		</div>
 
-		<table class="table table-bordered" style="word-break:break-all;">
+		<table class="table table-bordered">
 			<thead>
 			    <tr>
 				<th>ID</th>
-				<th>Domain</th>
-				<th>Name</th> 
-				<th width="250px">Short Description</th>
-				<th>Kind</th> <!-- Dropdown -->
-				<th>Datatype</th> <!-- Dropdown -->
-				<th>Multiplicity</th>
-				<th width="135px">Value</th>
-				<th>Unit</th>
+                <th>Parameter ID</th>
+				<th>Type</th>
+				<th>Name</th>
+				<th>Short Description</th>
+				<th>Setting</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
@@ -150,7 +175,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 			</tbody>
 		</table>
 
-		<!--<input type="text" name="idStandard" value="<?php echo $idStandard; ?>" />-->
+		<ul id="pagination" class="pagination-sm"></ul>
 
 		<!-- Create Item Modal -->
 		<div class="modal fade" id="create-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -158,93 +183,66 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 			<div class="modal-content">
 				<div class="modal-header">
 					<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-					<h4 class="modal-title" id="myModalLabel">Create Item</h4>
+					<h4 class="modal-title" id="myModalLabel">Add Item</h4>
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_view-datapool.php" method="POST">
-<!--
+					<form data-toggle="validator" action-data="api/create_view-parameter-calibration.php" method="POST">
+
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
+
 						<div class="form-group">
+							<input type="hidden" name="idParameter" value="<?php echo $idParameter; ?>" />
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Calibration Curve:</label>
+							<select id="sel_calcurve_create" name="calcurve" class="form-control" data-error="Please enter calibration curve." required>
+								<option value="select"></option>
+							</select>
+                            <br/>
+						</div>
+
+<!--
+						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
+-->
+						<!--<div class="form-group">
 							<label class="control-label" for="title">ID:</label>
 							<input type="text" name="id" class="form-control" data-error="Please enter id." required />
 							<div class="help-block with-errors"></div>
-						</div>
--->
-						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
-
-		      			<input type="hidden" name="idStandard" class="form-control" value="<?php echo $idStandard; ?>">
-
-						<div class="form-group">
-							<label class="control-label" for="title">Domain:</label>
-							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
-							<div class="help-block with-errors"></div>
-						</div>
+						</div>-->
 <!--
 						<div class="form-group">
-							<label class="control-label" for="title">Kind:</label>
-							<input type="text" name="kind" class="form-control" data-error="Please enter kind." />
+							<label class="control-label" for="title">idParameter:</label>
+							<input type="text" name="idParameter" class="form-control" value="<?php echo $idParameter ?>" data-error="Please enter type." readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+
+
+						<div class="form-group">
+							<label class="control-label" for="title">Type:</label>
+							<input type="text" name="type" class="form-control" data-error="Please enter type." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Lower Value:</label>
+							<input type="text" name="lvalue" class="form-control" data-error="Please enter lower value." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Higher Value:</label>
+							<input type="text" name="hvalue" class="form-control" data-error="Please enter higher value." />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Setting:</label>
+							<textarea name="setting" class="form-control" data-error="Please enter setting."></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 -->
-						
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Kind:</label>
-							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." />-->
-<!--							<select name="kind" class="form-control" data-error="Please enter kind." required>
-								<option value="3">Par</option>
-								<option value="4">Var</option>
-							</select>-->
-							<select id="sel_kind_create" name="kind" class="form-control" data-error="Please enter kind." required>
-								<option value="select"></option>
-							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-<!--
-						<div class="form-group">
-							<label class="control-label" for="title">Datatype:</label>
-							<input type="text" name="idType" class="form-control" data-error="Please enter datatype." />
-							<div class="help-block with-errors"></div>
-						</div>
--->
-						<div class="form-group">
-							<label class="control-label" for="title">Datatype:</label>
-							<!--<input type="text" name="datatype" class="form-control" data-error="Please enter datatype." />-->
-							<select id="sel_datatype_create" name="idType" class="form-control" data-error="Please enter datatype." required>
-								<option value="select"></option>
-							</select>
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Multiplicity:</label>
-							<input type="text" name="multiplicity" class="form-control" data-error="Please enter multiplicity." />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Value:</label>
-							<input type="text" name="value" class="form-control" value="0" data-error="Please enter value." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Unit:</label>
-							<input type="text" name="unit" class="form-control" data-error="Please enter unit." />
-							<div class="help-block with-errors"></div>
-						</div>
-
 						<div class="form-group">
 							<button type="submit" class="btn crud-submit btn-success">Submit</button>
 						</div>
@@ -267,68 +265,52 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-datapool.php" method="put">
+					<form data-toggle="validator" action="api/update_view-parameter-calibration.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
 						<div class="form-group">
-							<label class="control-label" for="title">Domain:</label>
-							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required />
-							<div class="help-block with-errors"></div>
+							<input type="hidden" name="idParameter" value="<?php echo $idParameter; ?>" />
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Kind:</label>
-							<!--<input type="text" name="kind" class="form-control" data-error="Please enter kind." />-->
-							<!--<select name="kind" class="form-control" data-error="Please enter kind." required>
-								<option value="3">Par</option>
-								<option value="4">Var</option>
-							</select>-->
-							<select id="sel_kind" name="kind" class="form-control" data-error="Please enter kind." required>
+							<label class="control-label" for="title">Calibration Curve:</label>
+							<select id="sel_calcurve" name="calcurve" class="form-control" data-error="Please enter calibration curve." required>
 								<option value="select"></option>
 							</select>
+                            <br/>
+						</div>
+<!--
+						<div class="form-group">
+							<label class="control-label" for="title">idParameter:</label>
+							<input type="text" name="idParameter" class="form-control" value="<?php echo $idParameter ?>" data-error="Please enter type." readonly />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Datatype:</label>
-							<!--<input type="text" name="datatype" class="form-control" data-error="Please enter datatype." />-->
-							<select id="sel_datatype" name="idType" class="form-control" data-error="Please enter datatype." required>
-								<option value="select"></option>
-							</select>
+							<label class="control-label" for="title">Type:</label>
+							<input type="text" name="type" class="form-control" data-error="Please enter type." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+		      			<div class="form-group">
+							<label class="control-label" for="title">Lower Value:</label>
+							<input type="text" name="lvalue" class="form-control" data-error="Please enter lower value." required />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Multiplicity:</label>
-							<input type="text" name="multiplicity" class="form-control" data-error="Please enter multiplicity." />
+							<label class="control-label" for="title">Higher Value:</label>
+							<input type="text" name="hvalue" class="form-control" data-error="Please enter higher value." />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Value:</label>
-							<input type="text" name="value" class="form-control" data-error="Please enter value." required />
+							<label class="control-label" for="title">Setting:</label>
+							<textarea name="setting" class="form-control" data-error="Please enter setting."></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Unit:</label>
-							<input type="text" name="unit" class="form-control" data-error="Please enter unit." />
-							<div class="help-block with-errors"></div>
-						</div>
-
+-->
 						<div class="form-group">
 							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
 						</div>
@@ -348,11 +330,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						echo "<b>".$userName."</b><br/>";
 					?>
 					<br/><br/>
-                    <?php if ($idParameter=='') { ?>
-					<a class="a_btn" href="open_standard.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
-                    <?php } else { ?>
 					<a class="a_btn" href="sel_parameter-calibration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>" target="_self">>> BACK <<</a>
-                    <?php } ?>
 					<br/>
 					<a class="a_btn" href="index.php" target="_self">>> HOME <<</a>
 				</div>

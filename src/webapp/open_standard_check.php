@@ -82,11 +82,10 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 	<!-- //cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css -->
 	<link href="ext/ajax/libs/toastr.js/latest/css/toastr.min.css" rel="stylesheet">
     
-    
-    
     <!-- Foundation CSS framework (Bootstrap and jQueryUI also supported) -->
     <!--<link rel='stylesheet' href='//cdn.jsdelivr.net/bootstrap/3.2.0/css/bootstrap.css'>-->
     <!-- Font Awesome icons (Bootstrap, Foundation, and jQueryUI also supported) -->
+    <!-- Cheatsheet: http://btsai.github.io/font_awesome4_cheatsheet/index.html -->
     <link rel='stylesheet' href='//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.0.3/css/font-awesome.css'>
 
     <!--<link rel='stylesheet' href='//cdn.jsdelivr.net/sceditor/1.4.3/jquery.sceditor.default.min.css'>-->
@@ -96,10 +95,8 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
     <script src='//cdn.jsdelivr.net/sceditor/1.4.3/plugins/xhtml.js'></script>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/json-editor/0.7.28/jsoneditor.min.js"></script>
+
     <script src='int/json_editor_standard.js'></script>
-    
-    
-    
     
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
@@ -107,27 +104,24 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 		function buildProject(idProject, idApplication) {
 			toastr.success('Debug: Project: '+idProject+', Application: '+idApplication, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: START ...', 'Success Alert', {timeOut: 5000}); 
-
-
-
 			toastr.success('Debug: Output: '+$file, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: ... END', 'Success Alert', {timeOut: 5000}); 
 		}
 	</script>
 	<!--<script type="text/javascript" src="js/item-ajax.js"></script>-->
-<!--	<style type="text/css">
-@media (min-width: 40em) {
-.table { 
-   display: table;
-   border-spacing: 0.5em;
-}
-.table-row {display: table-row; }
-.table-cell {display: table-cell; }
-}
-	</style>-->
 </head>
 <body>
 <a id="Top"></a>
+<!-- Back to top button -->
+<button
+        type="button"
+        class="btn btn-info btn-sm"
+        id="btn-back-to-top"
+        style="background-color: #337AB7; z-index: 1; ">
+  <!--<i class="fa fa-arrow-up" style="color:white;"></i>-->
+  <img width="22px;" src="img/6622853_rocket_space_icon_white.png" />
+  <!--TOP-->
+</button>
 
 	<div class="container">
 

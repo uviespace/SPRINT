@@ -89,6 +89,16 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 	<script type="text/javascript" src="js/item-ajax_view-parameter.js"></script>
 </head>
 <body>
+<!-- Back to top button -->
+<button
+        type="button"
+        class="btn btn-info btn-sm"
+        id="btn-back-to-top"
+        style="background-color: #337AB7; z-index: 1; ">
+  <!--<i class="fa fa-arrow-up" style="color:white;"></i>-->
+  <img width="22px;" src="img/6622853_rocket_space_icon_white.png" />
+  <!--TOP-->
+</button>
 
 	<div class="container">
 		<div class="row">

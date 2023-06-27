@@ -84,6 +84,16 @@ $userEmail = $row["email"];
 	</style>
 </head>
 <body>
+<!-- Back to top button -->
+<button
+        type="button"
+        class="btn btn-info btn-sm"
+        id="btn-back-to-top"
+        style="background-color: #337AB7; z-index: 1; ">
+  <!--<i class="fa fa-arrow-up" style="color:white;"></i>-->
+  <img width="22px;" src="img/6622853_rocket_space_icon_white.png" />
+  <!--TOP-->
+</button>
 
 	<div class="container">
 
@@ -91,7 +101,7 @@ $userEmail = $row["email"];
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
 					<h4>Project <?php echo $project_name;?></h4>
-		            <h2>Requirement Management - Internal Requirements vs. Ext. Requ.</h2>
+		            <h2><b>Requirement Management</b> - Internal Requirements vs. Ext. Requ.</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">

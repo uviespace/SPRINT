@@ -51,6 +51,15 @@ if ($result->num_rows > 0) {
 
 $idApplication = 0;
 
+
+function doesTableExists($mysqli, $table) {
+    $res = mysqli_query($mysqli,"SHOW TABLES LIKE '$table'");
+    
+    if(isset($res->num_rows)) {
+        return $res->num_rows > 0 ? true : false;
+    } else return false;
+}
+
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
  
@@ -500,6 +509,40 @@ $sql =
 $result = $mysqli->query($sql);
 $nmbOfRowsNoLimits = mysqli_num_rows($result);
 echo " (".$nmbOfRowsLimits." parameters with limits and ".$nmbOfRowsNoLimits." parameters with no limits)";
+?>
+				</div>
+
+				<div style="background-color:#EEEEEE;padding:2px;">
+					&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    <?php if (doesTableExists($mysqli, "calibration")) { ?>
+                    ==> <a href="sel_parameter-calibration.php?idProject=<?php echo $idProject; ?>&idStandard=<?php echo $idStandard; ?>">Parameters (Calibration Curves)</a>
+                    <?php } else { ?>
+                    ==> <font color=#337ab7>Parameters (Calibration Curves)</font>
+                    <?php } ?>
+<?php
+$sql = 
+  "SELECT t.* FROM `parameter` t WHERE JSON_CONTAINS_PATH(t.setting, 'one', '$.calcurve') AND t.idStandard = ".$idStandard." ";
+$result = $mysqli->query($sql);
+$nmbOfRowsCalCurves = mysqli_num_rows($result);
+//$sql =
+//  "SELECT t.*, JSON_CONTAINS_PATH(t.setting, 'one', '$.calcurve') AS cal FROM `parameter` t WHERE t.idStandard = ".$idStandard." ";
+$sql = 
+  "SELECT t.* FROM `parameter` t WHERE (JSON_CONTAINS_PATH(t.setting, 'one', '$.calcurve') IS NULL OR JSON_CONTAINS_PATH(t.setting, 'one', '$.calcurve') = '' OR t.setting = '' OR t.setting = '{}') AND t.idStandard = ".$idStandard." ";
+$result = $mysqli->query($sql);
+$nmbOfRowsNoCalCurves = mysqli_num_rows($result);
+//while($row = $result->fetch_assoc()) {
+//    echo $row["name"].": ".$row["cal"]."<br/>";
+//}
+
+if (doesTableExists($mysqli, "calibration")) {
+    $sql =
+      "SELECT * FROM `calibration` WHERE idStandard = ".$idStandard." ";
+    $result = $mysqli->query($sql);
+    $nmbOfRowsNmbOfCalCurves = mysqli_num_rows($result);
+    echo " (".$nmbOfRowsCalCurves." parameters with calibration curves and ".$nmbOfRowsNoCalCurves." parameters with no calibration curves; ".$nmbOfRowsNmbOfCalCurves." calibration curves)";
+} else {
+    echo " (<font color=red>no table for calibration curves found in the database!</font>)";
+}
 ?>
 				</div>
 

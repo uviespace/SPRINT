@@ -170,7 +170,7 @@ if ($result->num_rows == 1) {
 <?php
 $sql = 
   "SELECT ".
-  "p.id, p.domain, p.name, t.name AS tname, (SELECT COUNT(*) FROM `enumeration` e WHERE e.idType = p.idType) AS ecnt, p.kind, p.idType ".
+  "p.id, p.domain, p.name, t.name AS tname, (SELECT COUNT(*) FROM `enumeration` e WHERE e.idType = p.idType) AS ecnt, p.kind, p.idType, JSON_VALUE(p.setting, '$.calcurve') AS cc ".
   "FROM ".
   "`parameter` p, `type` t ".
   "WHERE ".
@@ -187,7 +187,7 @@ echo $num_rows." Parameter found.<br/><br/>\n";
 
 echo "<table id='tabcheck' border=1>\n";
 echo "<thead style='font-weight: bold;'>\n";
-echo "<tr><td>#</td><td>domain / name</td><td width='200px'>datatype</td><td width='100px'>enumeration</td><td width='100px'>kind</td><td width='400px'>packet</td></tr>\n";
+echo "<tr><td>#</td><td>domain / name</td><td width='200px'>datatype</td><td width='100px'>calibration</td><td width='100px'>kind</td><td width='400px'>packet</td></tr>\n";
 echo "</thead>\n";
 echo "<tbody>\n";
 
@@ -206,8 +206,13 @@ if ($result->num_rows > 0) {
 		echo"<td>" . $row["tname"] . "</td>";
 		if ($row["ecnt"] > 0) {  // enumeration
 		    echo"<td bgcolor='#87CEFA'>";
-			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$row["idType"]."'>#</a> ";
+			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$row["idType"]."'>enum</a> ";
 			echo $row["ecnt"];
+			echo "</td>";
+        } else if ($row["cc"] != '') {  // calibration curve
+		    echo"<td bgcolor='lightgreen'>";
+			echo "<a href='open_calibration_editor.php?id=".$row["cc"]."&idProject=".$idProject."&idStandard=".$idStandard."'>calcurv</a> ";
+			echo $row["cc"];
 			echo "</td>";
 		} else {
 			echo"<td></td>";
@@ -326,7 +331,7 @@ if ($resultpredef->num_rows > 0) {
 		echo "<td>" . $rowpredef["nativeType"] . "</td>";
 		if ($rowpredef["ecnt"] > 0) {  // enumeration
 		    echo"<td bgcolor='#87CEFA'>";
-			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$rowpredef["id"]."'>#</a> ";
+			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$rowpredef["id"]."'>enum</a> ";
 			echo $rowpredef["ecnt"];
 			echo "</td>";
 		} else {
@@ -363,7 +368,7 @@ if ($result->num_rows > 0) {
 		echo "<td>" . $row["nativeType"] . "</td>";
 		if ($row["ecnt"] > 0) {  // enumeration
 		    echo"<td bgcolor='#87CEFA'>";
-			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$row["id"]."'>#</a> ";
+			echo "<a href='view_type-enumeration.php?idProject=".$idProject."&idStandard=".$idStandard."&idType=".$row["id"]."'>enum</a> ";
 			echo $row["ecnt"];
 			echo "</td>";
 		} else {

@@ -79,6 +79,18 @@ def get_prf_name(limit_id):
     s = f.format(preamble, settings["prf"]["offset"] + limit_id, "_L")
     return s
 
+def get_caf_number(setting):
+    preamble = "{0}{1}".format(settings["general"]["preamble"], settings["caf"]["preamble"])
+    jsonlength = settings["caf"]["length"] if "length" in settings["caf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for CAF_NUMBR
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
+    s = f.format(preamble, settings["caf"]["offset"] + setting["calcurve"])
+    return s
+
 def get_tcp_name(standard):
     # As we only support having a single TC header, a fixed name can be given.
     #return 'NOM_TC'
@@ -397,6 +409,11 @@ def gen_pcf(app, path):
                                 ptc, pfc, width, repetition = get_ptc_pfc(param)
                                 #ptc2,pfc2,width2,repetition2 = get_ptc_pfc_NEW(param)
                                 hasTextualCalibration = (len(param["type"]["enums"]) > 0)
+                                if param["setting"] is not None and "calcurve" in param["setting"]:
+                                    hasNumericalCalibration = True
+                                    #print("CAF: ", get_caf_number(param["setting"]))
+                                else:
+                                    hasNumericalCalibration = False
 
                                 writeln(f, [
                                     get_pcf_name(param),                                   # PCF_NAME
@@ -410,7 +427,9 @@ def gen_pcf(app, path):
                                     '',                                                    # PCF_RELATED
                                     'S' if hasTextualCalibration else 'N',                 # PCF_CATEG
                                     'R',                                                   # PCF_NATUR
-                                    get_txf_name(param["type"]) if hasTextualCalibration else '',  # PCF_CURTX
+                                    get_txf_name(param["type"]) if hasTextualCalibration else
+                                    get_caf_number(param["setting"]) if hasNumericalCalibration else
+                                    '',                                                    # PCF_CURTX
                                     'F',                                                   # PCF_INTER
                                     'N',                                                   # PCF_USCON
                                     pcf_decim(param["_size"]),                             # PCF_DECIM
@@ -418,10 +437,10 @@ def gen_pcf(app, path):
                                     '',                                                    # PCF_SUBSYS
                                     '',                                                    # PCF_VALPAR
                                     '',                                                    # PCF_SPTYPE
-                                    'Y',
-                                    '',
-                                    '',
-                                    'B'
+                                    'Y',                                                   # PCF_CORR
+                                    '',                                                    # PCF_OBTID
+                                    '',                                                    # PCF_DARC
+                                    'B'                                                    # PCF_ENDIAN
                                 ])
                                 written = 1
                                 break
@@ -433,6 +452,12 @@ def gen_pcf(app, path):
                                     #print(param["id"], param["name"])
                                     ptc, pfc, width, repetition = get_ptc_pfc(param)
                                     hasTextualCalibration = (len(param["type"]["enums"]) > 0)
+                                    if param["setting"] is not None and "calcurve" in param["setting"]:
+                                        hasNumericalCalibration = True
+                                        #print("CAF: ", get_caf_number(param["setting"]))
+                                    else:
+                                        hasNumericalCalibration = False
+
                                     writeln(f, [
                                         get_pcf_name(param),                                   # PCF_NAME
                                         outp(param["name"], 24, True),                         # PCF_DESCR
@@ -445,7 +470,9 @@ def gen_pcf(app, path):
                                         '',                                                    # PCF_RELATED
                                         'S' if hasTextualCalibration else 'N',                 # PCF_CATEG
                                         'R',                                                   # PCF_NATUR
-                                        get_txf_name(param["type"]) if hasTextualCalibration else '',  # PCF_CURTX
+                                        get_txf_name(param["type"]) if hasTextualCalibration else
+                                        get_caf_number(param["setting"]) if hasNumericalCalibration else
+                                        '',                                                    # PCF_CURTX
                                         'F',                                                   # PCF_INTER
                                         'N',                                                   # PCF_USCON
                                         pcf_decim(param["_size"]),                             # PCF_DECIM
@@ -453,10 +480,10 @@ def gen_pcf(app, path):
                                         '',                                                    # PCF_SUBSYS
                                         '',                                                    # PCF_VALPAR
                                         '',                                                    # PCF_SPTYPE
-                                        'Y',
-                                        '',
-                                        '',
-                                        'B'
+                                        'Y',                                                   # PCF_CORR
+                                        '',                                                    # PCF_OBTID
+                                        '',                                                    # PCF_DARC
+                                        'B'                                                    # PCF_ENDIAN
                                     ])
                                     written = 1
                                     break
@@ -502,27 +529,27 @@ def gen_ccf(app, path):
                         # !!! naming convention !!!
                         ccf_descr = "SASW "+outp(derived["name"], 19, True)
                         writeln(f, [
-                            get_ccf_name(derived),  # CCF_NAME
-                            ccf_descr,  # CCF_DESCR; was: outp(packet["name"], 24, True),
-                            outp(derived["shortDesc"], 64),  # CCF_DESCR2
-                            '',  # CCF_CTYPE
-                            'N',  # CCF_CRITICAL
-                            outp(standard["name"], 8, True),  # CCF_PKTID
-                            outp(packet["type"], 3),  # CCF_TYPE
-                            outp(packet["subtype"], 3),  # CCF_STYPE
+                            get_ccf_name(derived),                  # CCF_NAME
+                            ccf_descr,                              # CCF_DESCR; was: outp(packet["name"], 24, True),
+                            outp(derived["shortDesc"], 64),         # CCF_DESCR2
+                            '',                                     # CCF_CTYPE
+                            'N',                                    # CCF_CRITICAL
+                            outp(standard["name"], 8, True),        # CCF_PKTID
+                            outp(packet["type"], 3),                # CCF_TYPE
+                            outp(packet["subtype"], 3),             # CCF_STYPE
                             outp(packet["process"]["address"], 5),  # CCF_APID
-                            outp(npars, 3),  # CCF_NPARS: Number of elements
-                            'A',
-                            'Y',
-                            'N',
-                            'C',
-                            '',  # CCF_SUBSYS
-                            'N',
-                            '',
-                            '',
-                            '',
-                            '9',
-                            ''
+                            outp(npars, 3),                         # CCF_NPARS: Number of elements
+                            'A',                                    # CCF_PLAN
+                            'Y',                                    # CCF_EXEC
+                            'N',                                    # CCF_ILSCOPE
+                            'C',                                    # CCF_ILSTAGE
+                            '',                                     # CCF_SUBSYS
+                            'N',                                    # CCF_HIPRI
+                            '',                                     # CCF_MAPID
+                            '',                                     # CCF_DEFSET
+                            '',                                     # CCF_RAPID
+                            '9',                                    # CCF_ACK
+                            ''                                      # CCF_SUBSCHEDID
                         ])
                 else:
                     npars = 0
@@ -582,17 +609,17 @@ def gen_ccf(app, path):
                         outp(packet["subtype"], 3),             # CCF_STYPE
                         outp(packet["process"]["address"], 5),  # CCF_APID
                         outp(npars, 3),                         # CCF_NPARS: Number of elements
-                        'A',
-                        'Y',
-                        'N',
-                        'C',
+                        'A',                                    # CCF_PLAN
+                        'Y',                                    # CCF_EXEC
+                        'N',                                    # CCF_ILSCOPE
+                        'C',                                    # CCF_ILSTAGE
                         '',                                     # CCF_SUBSYS
-                        'N',
-                        '',
-                        '',
-                        '',
-                        '9',
-                        ''
+                        'N',                                    # CCF_HIPRI
+                        '',                                     # CCF_MAPID
+                        '',                                     # CCF_DEFSET
+                        '',                                     # CCF_RAPID
+                        '9',                                    # CCF_ACK
+                        ''                                      # CCF_SUBSCHEDID
                     ])
     close_file(f)
 
@@ -640,16 +667,16 @@ def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
             'F' if value != None or int(param_i["role"]) == 3 else \
             'E'
         writeln(f, [
-            ccf_name,  # CDF_CNAME
-            eltype,  # CDF_ELTYPE:  'A' for Spares, 'F' for Fixed
-            'SPARE' if int(param_i["role"]) == 8 else '',  # CDF_DESCR  # TODO: or CPC_DESCR
-            size,  # CDF_ELLEN
+            ccf_name,                                                         # CDF_CNAME
+            eltype,                                                           # CDF_ELTYPE:  'A' for Spares, 'F' for Fixed
+            'SPARE' if int(param_i["role"]) == 8 else '',                     # CDF_DESCR  # TODO: or CPC_DESCR
+            size,                                                             # CDF_ELLEN
             outp(param_i["_offset"]+offset, 4) if param_i["_offset"] is not None else outp(offset, 4),  # CDF_BIT ... TODO: check exception
             outp(param_i["group"], 2) if int(param_i["group"]) != 0 else '',  # CDF_GRPSIZE
-            '' if int(param_i["role"]) == 8 else get_cpc_name(param),  # CDF_PNAME:  '' for Spare
+            '' if int(param_i["role"]) == 8 else get_cpc_name(param),         # CDF_PNAME:  '' for Spare
             # NOTE: if text/numeric calibrated (CPC_CATEG = T/C) then 'E'
             'E' if (param_i["value"] != '' and not param_i["value"].isdigit()) or (len(param["type"]["enums"]) > 0 and int(param_i["role"]) == 3) else 'R',  # CDF_INTER
-            value if value != None else '',  # CDF_VALUE
+            value if value != None else '',                                   # CDF_VALUE
             ''
         ])
 
@@ -1045,6 +1072,42 @@ def gen_pas(app, path):
                             get_paf_name(type_),
                             outp(enum["Name"], 16),   # TODO: limit 16 characters
                             outp(enum["_dec"], 17)
+                        ])
+    close_file(f)
+
+def gen_caf(app, path):
+    f = new_file(path, "caf")
+    for relation in app["standards"]:
+        if relation["relation"] == 1:
+            standard = relation["standard"]
+            for cal_ in standard["calibrations"].values():
+                if int(cal_["type"]) == 0:  # Numerical Calibration
+                    dict = {'calcurve': int(cal_["id"])}
+                    writeln(f, [
+                        get_caf_number(dict),                # CAF_NUMBR
+                        outp(cal_["name"], 32),              # CAF_DESCR
+                        outp(cal_["setting"]["engfmt"], 1),  # CAF_ENGFMT
+                        outp(cal_["setting"]["rawfmt"], 1),  # CAF_RAWFMT
+                        outp(cal_["setting"]["radix"], 1),   # CAF_RADIX
+                        outp(cal_["setting"]["unit"], 4),    # CAF_UNIT
+                        outp(cal_["setting"]["ncurve"], 3),  # CAF_NCURVE
+                        outp(cal_["setting"]["inter"], 1)    # CAF_INTER
+                    ])
+    close_file(f)
+
+def gen_cap(app, path):
+    f = new_file(path, "cap")
+    for relation in app["standards"]:
+        if relation["relation"] == 1:
+            standard = relation["standard"]
+            for cal_ in standard["calibrations"].values():
+                if int(cal_["type"]) == 0:  # Numerical Calibration
+                    dict = {'calcurve': int(cal_["id"])}
+                    for val_ in cal_["setting"]["values"]:
+                        writeln(f, [
+                            get_caf_number(dict),    # CAP_NUMBR
+                            outp(val_["xval"], 14),  # CAP_XVALS
+                            outp(val_["yval"], 14)   # CAP_YVALS
                         ])
     close_file(f)
 
@@ -1505,8 +1568,10 @@ def gen_mib(path, comp):
     # Monitoring
     gen_pcf(app, path) # parameter characteristics file
     empty_file(path, "cur") # calibration definitions conditional selection
-    empty_file(path, "caf") # calibration curve file, defining the numerical calibration curves
-    empty_file(path, "cap") # calibration curve definition file, defining all the raw/engineering value couples for each numerical calibration curves
+    #empty_file(path, "caf") # calibration curve file, defining the numerical calibration curves
+    #empty_file(path, "cap") # calibration curve definition file, defining all the raw/engineering value couples for each numerical calibration curves
+    gen_caf(app, path)  # calibration curve file, defining the numerical calibration curves
+    gen_cap(app, path)  # calibration curve definition file, defining all the raw/engineering value couples for each numerical calibration curves
     gen_txf(app, path) # text strings calibration curve file, defining the textual calibration curves
     gen_txp(app, path) # text strings calibration curve definition file, defining all the raw/string value couples for each textual calibration curve
     empty_file(path, "mcf") # polynomial calibration curve definitions, defining the coefficients of the polynomial function used for calibration

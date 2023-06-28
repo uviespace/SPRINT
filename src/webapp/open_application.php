@@ -143,6 +143,23 @@ if ($result->num_rows > 0) {
 	if(isset($_POST['importDpList'])){
 		$messageDpImport = "The Import Data Pool List function is called.\n\n";
 	}
+    
+    //print_r(array_keys($_POST));
+    
+	if(isset($_POST['sel_calCurve'])){
+        $idCalCurve = $_POST['sel_calCurve'];
+        //echo $idCalCurve."<br/>";
+    } else {
+        $idCalCurve = 0;
+    }
+
+function doesTableExists($mysqli, $table) {
+    $res = mysqli_query($mysqli,"SHOW TABLES LIKE '$table'");
+    
+    if(isset($res->num_rows)) {
+        return $res->num_rows > 0 ? true : false;
+    } else return false;
+}
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
@@ -187,8 +204,6 @@ while ($row = $result->fetch_assoc()) {
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
 	
-
-	
 	
       $(document).ready(function () {
         console.log("Document ready event handler");
@@ -203,7 +218,19 @@ while ($row = $result->fetch_assoc()) {
 		const formBuild = document.getElementById("formBuild");
 		const buttonBuild = document.getElementById("buttonBuild");
 		formBuild.addEventListener("submit", logSubmitBuild);
-	
+		
+		const queryString = window.location.search;
+        console.log(queryString);
+		const urlParams = new URLSearchParams(queryString);
+        
+        // let divImportCal open, if selCalCurve is selected
+		const calopen = urlParams.get('selCalCurve')
+        console.log(calopen);
+		if (calopen=="1") {
+			var x = document.getElementById("divImportCal");
+			x.style.display = "block";
+		}
+
         //document.getElementById("buttonBuildDpList").style.visibility = "hidden"; // show: "visible"; hide: "hidden"
 		//$("#buttonBuildDpList").hide();
 		
@@ -254,7 +281,7 @@ while ($row = $result->fetch_assoc()) {
 		}
 		
 	function myFunction(divName) {
-		let divs = ["divBuild", "divImportAcr", "divImportDat", "divImportReq"];
+		let divs = ["divBuild", "divImportAcr", "divImportDat", "divImportReq", "divImportCal"];
 		
 		for (div of divs) {
 			//var x = document.getElementById(div);
@@ -289,6 +316,30 @@ while ($row = $result->fetch_assoc()) {
 }
 .table-row {display: table-row; }
 .table-cell {display: table-cell; }
+}
+
+.tooltipCal {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltipCal .tooltipCalText {
+  visibility: hidden;
+  width: 250px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltipCal:hover .tooltipCalText {
+  visibility: visible;
 }
 	</style>
 </head>
@@ -374,10 +425,241 @@ while ($row = $result->fetch_assoc()) {
 				<button class="btn btn-primary edit-item" onclick="myFunction('divImportDat')">Import Data Pool List</button>
 				&nbsp;&nbsp;&nbsp;
 				<button class="btn btn-primary edit-item" onclick="myFunction('divImportReq')">Import Requirement List</button>
+				<?php if (doesTableExists($mysqli, "calibration")) { ?>
+				&nbsp;&nbsp;&nbsp;
+				<button class="btn btn-primary edit-item" onclick="myFunction('divImportCal')">Import Calib. Curve</button>
+				<?php } ?>
 				
 				<br/><br/><br/>
 
 
+
+                <!-- ### Import Calibration Curve ################################################ -->
+                <div id="divImportCal">
+
+                <?php if (doesTableExists($mysqli, "calibration")) { ?>
+                <form id="formCalGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;" method="POST" action="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>&selCalCurve=1">
+                  <div class="table" style="margin-bottom:0px;">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Calibration Curve Type
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <?php if ($idCalCurve == 0) { ?>
+                          <select name="sel_calCurve" class="form-control" onchange="this.form.submit()">
+                              <option value="0" selected>--- Please select ---</option>
+                              <option value="1">Numerical</option>
+                              <option value="2">Polynomial</option>
+                              <option value="3">Logarithmical</option>
+                          </select>
+                          <!--<input type="hidden"  name="selCalCurve" class="form-control" value="1" required />-->
+                          <?php } else if ($idCalCurve == 1) { ?>
+                          <select name="sel_calCurve" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1" selected>Numerical</option>
+                              <option value="2">Polynomial</option>
+                              <option value="3">Logarithmical</option>
+                          </select>
+                          <?php } else if ($idCalCurve == 2) { ?>
+                          <select name="sel_calCurve" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1">Numerical</option>
+                              <option value="2" selected>Polynomial</option>
+                              <option value="3">Logarithmical</option>
+                          </select>
+                          <?php } else if ($idCalCurve == 3) { ?>
+                          <select name="sel_calCurve" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1">Numerical</option>
+                              <option value="2">Polynomial</option>
+                              <option value="3" selected>Logarithmical</option>
+                          </select>
+                          <?php    
+                                } ?>
+                              
+                     </div>
+                  </div>
+                  </div>
+                </form>
+                <?php if ($idCalCurve > 0) { ?>
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_calibration-import.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+                
+                  <input type="hidden" name="idCalCurve" class="form-control" value="<?php echo $idCalCurve; ?>" required>
+                
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Standard
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <select id="sel_standard" name="idStandard" class="form-control" data-error="Please enter standard." required>
+<?php
+$sql = "SELECT * FROM `standard` WHERE idProject = $idProject";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+//echo "<h3>Standards</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        /*echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_standard.php?idProject=$id&idStandard=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b></a>";
+        echo "</div>";
+        echo "<br/>";*/
+        echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
+    }
+} else {
+    echo "0 results";
+}
+?>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Name
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="name" class="form-control" data-error="Please enter name." required />
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Short Description
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="shortDesc" class="form-control" data-error="Please enter short description." required />
+                      </div>
+                  </div>
+
+                  <?php if ($idCalCurve == 1) { ?>
+
+                  <div class="table-row">
+                  <div class="table-cell" style="width:20%;">
+                  <hr>
+                  </div>
+                  <div class="table-cell" style="width:80%;">
+                  <hr>
+                  </div>
+                  </div>
+
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Enigneering Format
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="text" name="engFmt" class="form-control" data-error="Please enter raw format." required />-->
+                          <select name="engFmt" class="form-control" required>
+                              <option value="I">signed Integer</option>
+                              <option value="U">unsigned Integer</option>
+                              <option value="R" selected>Real</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Raw Format
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="text" name="rawFmt" class="form-control" data-error="Please enter raw format." required />-->
+                          <select name="rawFmt" class="form-control" required>
+                              <option value="I">signed Integer</option>
+                              <option value="U" selected>unsigned Integer</option>
+                              <option value="R">Real</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Radix
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="text" name="radix" class="form-control" data-error="Please enter raw format." required />-->
+                          <select name="radix" class="form-control" required>
+                              <option value="D" selected>Decimal</option>
+                              <option value="H">Hexadecimal</option>
+                              <option value="O">Octal</option>
+                          </select>
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Unit
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="unit" class="form-control" data-error="Please enter raw format." />
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          N Curve
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="ncurve" class="form-control" data-error="Please enter raw format." required />
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Interpolation
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="text" name="inter" class="form-control" data-error="Please enter raw format." required />-->
+                          <select name="inter" class="form-control" required>
+                              <option value="P" selected>Interpolate / extrapolate</option>
+                              <option value="F">Disabled</option>
+                          </select>
+                      </div>
+                  </div>
+                  
+                  <?php } else if ($idCalCurve == 2) { ?>
+                  
+                  <?php } else if ($idCalCurve == 3) { ?>
+                  
+                  <?php } ?>
+
+                  <div class="table-row">
+                  <div class="table-cell" style="width:20%;">
+                  <hr>
+                  </div>
+                  <div class="table-cell" style="width:80%;">
+                  <hr>
+                  </div>
+                  </div>
+
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Select Calibration Curve to Upload
+                          <div class="tooltipCal">INFO
+                            <span class="tooltipCalText">Format: e.g. "X Value \t Y Value" with a CSV delimiter of "\t" </span>
+                          </div>
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
+                      </div>
+                  </div>
+                  
+                  
+                  </div>
+					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="importCalList" value="Import Calib. Curve" class="btn btn-success crud-submit-import-codlist">
+                    <?php } else { ?>
+                    <input type="submit" name="importCalList" value="Import Calib. Curve" class="btn btn-success crud-submit-import-codlist" disabled>
+                    <?php } ?>
+                    <br/><br/>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageCalImport)){ echo $messageCalImport;}?></textarea>
+				</form>
+                <?php } ?>
+                
+                <?php } ?>
+
+                </div>
 				
                 <!-- ### Import Requirement List ################################################ -->
 				<div id="divImportReq">

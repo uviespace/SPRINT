@@ -276,6 +276,7 @@ def get_standards(db, project):
         standard["headers"] = get_standard_header(db, standard)
         standard["services"] = get_services(db, standard)
         standard["packets"] = get_packets(db, standard)
+        standard["calibrations"] = get_calibrations(db, standard)
         standard["conforms"] = []
         standard["conforms_base"] = []
         standard["extends"] = []
@@ -393,6 +394,7 @@ def get_params(db, standard):
         param["size"] = int(row[9]) if row[9] is not None else None
         param["unit"] = row[10]
         param["multi"] = row[11]  # int(row[11]) if (row[11] is not None and row[11] != '') else None
+        param["setting"] = json.loads(row[12], object_pairs_hook=OrderedDict) if row[12] else None
         param["role"] = int(row[13]) if row[13] is not None else None
         # None := size unknown / undefined
         # -1 := variable size
@@ -600,8 +602,9 @@ def get_types(db, standard):
         #print("get_types: name = ", type_["name"])
         #print(" | schema: ", json.loads(row[9], object_pairs_hook=OrderedDict) if row[9] else None)
         # type_["setting"] = {}
-        # print("get_types: setting = ", json.loads(row[8]) if row[8] else None)
+        #print("get_types: setting = ", json.loads(row[8]) if row[8] else None)
         type_["datatype"] = get_datatype(db, row[8])
+        #print("type_: datatype = ", type_["datatype"])
         # type_["setting"] = json.loads(row[8], object_pairs_hook=OrderedDict) if row[8] else None
         type_["schema"] = json.loads(row[9], object_pairs_hook=OrderedDict) if row[9] else None
         type_["enums"] = get_enumerations(db, type_)
@@ -1037,6 +1040,26 @@ def get_packets(db, standard):
     res["hash"] = as_hash
     return res
 
+# -------------------------------------------------------------------------------
+def get_calibrations(db, standard):
+    cur = db.cursor()
+    db_execute(cur, """
+        SELECT c.* FROM calibration c
+        WHERE c.idStandard={0} or c.idStandard in 
+            (SELECT ss.idStandardParent FROM standardstandard ss WHERE ss.idStandardChild={0} and ss.relation=1)
+        ORDER BY c.name""".format(standard["id"]))
+
+    calibrations = {}
+    for row in cur.fetchall():
+        c = {}
+        c["id"] = row[0]
+        c["standard"] = standard if (row[1] is not None) else None
+        c["type"] = row[2]
+        c["name"] = row[3]
+        c["shortDesc"] = row[4]
+        c["setting"] = json.loads(row[5]) if row[5] else None
+        calibrations[c["name"]] = c
+    return calibrations
 
 # -------------------------------------------------------------------------------
 def get_param_sequence_length_(elements, i, info):

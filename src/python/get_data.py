@@ -26,6 +26,7 @@ from collections import OrderedDict
 import re
 import traceback
 
+enumid = 1
 
 def save_str(s):
     if s is not None:
@@ -253,6 +254,7 @@ def get_processes(db, project):
 
 # -------------------------------------------------------------------------------
 def get_standards(db, project):
+    global enumid
     cur = db.cursor()
     db_execute(cur, """
         SELECT s.id, s.name, s.setting FROM standard s 
@@ -262,6 +264,7 @@ def get_standards(db, project):
     as_hash = {}
     as_list = []
     for row in cur.fetchall():
+        enumid = 1
         standard = {}
         standard["datapool"] = {}
         standard["datapool"]["params"] = []
@@ -668,34 +671,82 @@ def get_datatype(db, row):
 # (or zero if the enumerated value cannot be converted to an integer)
 #
 def get_enumerations(db, type_):
-    cur = db.cursor()
-    db_execute(cur, """
-        SELECT e.* FROM `enumeration` e 
-        WHERE e.idType={0}""".format(type_["id"]))
-    # ORDER BY l.id
-
-    as_list = []
-    as_hash = {}
-    for row in cur.fetchall():
-        # print("Enumeration: ", row[2])
-        enum = {}
-        enum["id"] = row[0]
-        enum["idType"] = row[1]
-        enum["Name"] = row[2]
-        enum["Value"] = str(row[3])
-        enum["desc"] = row[4]
-        enum["setting"] = row[5]
-        enum["schema"] = row[6]
-        enum["_dec"] = None
-        as_list.append(enum)
-        as_hash[enum["id"]] = enum
+    global enumid
+    flagJson = False  # --- USE True TO GET THE DATA OUT OF THE JSON IN THE SETTINGS COLUMN ---
     enums = {}
-    enums["Enumerations"] = as_list
-    # enums["hash"] = as_hash
+    if flagJson:
+        settingDict = type_["datatype"][0]  # is 'dict'
+        #print(type_["name"], ": ", "Setting: ", settingDict)
+
+        as_list = []
+        as_hash = {}
+        if settingDict is not None:
+            if "PUS" in settingDict:
+                settingStrPus = settingDict["PUS"]
+                #print(type_["name"], ": ", settingStrPus)
+                enums = None
+            elif "Enumerations" in settingDict:
+                settingStrEnum = settingDict["Enumerations"]
+                #print(type_["name"], ": ", settingStrEnum)
+                for enumJson in settingStrEnum:
+                    enum = {}
+                    enum["id"] = enumid
+                    enum["idType"] = type_["id"]
+                    for key, value in enumJson.items():
+                        #print(key, '->', value)
+                        if key == "Name":
+                            enum["Name"] = value
+                        if key == "Value":
+                            enum["Value"] = value
+                        if key == "Description":
+                            enum["desc"] = value
+                        if key == "Setting":
+                            enum["setting"] = value
+                        if key == "Schema":
+                            enum["schema"] = value
+                        enum["_dec"] = None
+
+                    enumid += 1
+                    as_list.append(enum)
+                    as_hash[enum["id"]] = enum
+
+                enums["Enumerations"] = as_list
+                # enums["hash"] = as_hash
+            else:
+                #print("UNKNOWN KEY!")
+                enums = None
+        else:
+            enums = None
+    else:
+        cur = db.cursor()
+        db_execute(cur, """
+            SELECT e.* FROM `enumeration` e 
+            WHERE e.idType={0}""".format(type_["id"]))
+        # ORDER BY l.id
+
+        as_list = []
+        as_hash = {}
+        for row in cur.fetchall():
+            # print("Enumeration: ", row[2])
+            enum = {}
+            enum["id"] = row[0]
+            enum["idType"] = row[1]
+            enum["Name"] = row[2]
+            enum["Value"] = str(row[3])
+            enum["desc"] = row[4]
+            enum["setting"] = row[5]
+            enum["schema"] = row[6]
+            enum["_dec"] = None
+            as_list.append(enum)
+            as_hash[enum["id"]] = enum
+
+        enums["Enumerations"] = as_list
+        # enums["hash"] = as_hash
 
     # enum_t = {}
     # enum_t["Enumerations"] = enums
     type_["setting"] = enums
+    #print(type_["setting"])
 
     # s_enums = []
     if type_["setting"] != None:

@@ -318,6 +318,60 @@ while ($row = $result->fetch_assoc()) {
 .table-cell {display: table-cell; }
 }
 
+.tooltipAcr {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltipAcr .tooltipAcrText {
+  visibility: hidden;
+  width: 250px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltipAcr:hover .tooltipAcrText {
+  visibility: visible;
+}
+
+.tooltipDat {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltipDat .tooltipDatText {
+  visibility: hidden;
+  width: 450px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltipDat:hover .tooltipDatText {
+  visibility: visible;
+}
+
+.tooltipReq1 {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
 .tooltipCal {
   position: relative;
   display: inline-block;
@@ -764,7 +818,7 @@ if ($result->num_rows > 0) {
 
 				<form id="formAcrGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
 
-                  <div class="table">
+                  <div class="table" style="margin-bottom:0px;">
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           CSV delimiter
@@ -782,6 +836,9 @@ if ($result->num_rows > 0) {
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Select Acronym List to Upload
+						  <div class="tooltipAcr">INFO
+                            <span class="tooltipAcrText">Format: e.g. "Acronym ; Description" with a CSV delimiter of ";" </span>
+                          </div>
                       </div>
                       <div class="table-cell" style="width:80%;">
                           <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
@@ -820,7 +877,7 @@ if ($result->num_rows > 0) {
 				<!--<form  action="upload_DpList.php" method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px;">-->
 				<form id="formGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;"> <!-- padding: top right bottom left -->
 
-                  <div class="table">
+                  <div class="table" style="margin-bottom:0px;">
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Data Pool Domain
@@ -878,6 +935,9 @@ if ($result->num_rows > 0) {
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Select Data Pool List to Upload
+						  <div class="tooltipDat">INFO
+                            <span class="tooltipDatText">Format: e.g. "name | pid | datatype | bitsize |multiplicity | kind | value | description | domain" with a CSV delimiter of "|" </span>
+                          </div>
                       </div>
                       <div class="table-cell" style="width:80%;">
                           <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >

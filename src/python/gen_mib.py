@@ -35,13 +35,25 @@ def get_name(initial, nr):
 
 def get_txf_name(type_):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["txf"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))  # NOTE: 8 according to naming convention, could be longer according to SCOS
+    jsonlength = settings["txf"]["length"] if "length" in settings["txf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for TXF_NUMBR
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["txf"]["offset"] + type_["_nr"])
     return s
 
 def get_paf_name(type_):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["paf"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))  # NOTE: 8 according to naming convention, could be longer according to SCOS
+    jsonlength = settings["paf"]["length"] if "length" in settings["paf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for PAF_NUMBR
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["paf"]["offset"] + type_["_nr"])
     return s
 
@@ -50,32 +62,62 @@ def get_pid_name(packet):
 
 def get_pcf_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcf"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))
+    jsonlength = settings["pcf"]["length"] if "length" in settings["pcf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 8  # NOTE: 8 according to maximal length in SCOS2000 specification for PCF_NAME
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["pcf"]["offset"] + param["_nr"])
     return s
 
 def get_pcpc_name(standard, param_i):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcpc"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(6-len(preamble))  # maximum length reduced from 8 to 6, because prefix can be P or DF
+    jsonlength = settings["pcpc"]["length"] if "length" in settings["pcpc"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 8  # NOTE: 8 according to maximal length in SCOS2000 specification for PCPC_PNAME
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["pcpc"]["offset"] + param_i["_nr"])
     return s
 
 def get_ccf_name(packet):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["ccf"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))
+    jsonlength = settings["ccf"]["length"] if "length" in settings["ccf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 8  # NOTE: 8 according to maximal length in SCOS2000 specification for CCF_CNAME
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["ccf"]["offset"] + packet["_nr"])
     #print(packet['name'], settings["ccf"]["offset"] + packet["_nr"])
     return s
 
 def get_cpc_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["cpc"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}".format(8-len(preamble))
+    jsonlength = settings["cpc"]["length"] if "length" in settings["cpc"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 8  # NOTE: 8 according to maximal length in SCOS2000 specification for CPC_PNAME
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["cpc"]["offset"] + param["_nr"])
     return s
 
 def get_prf_name(limit_id):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["prf"]["preamble"])
-    f = "{{0}}{{1:0{0}d}}{{2}}".format(8-len(preamble))  # was 10-len(preamble)
+    jsonlength = settings["prf"]["length"] if "length" in settings["prf"] else 0  # NOTE: jsonlength according to naming convention
+    scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for PRF_NUMBR
+    if jsonlength == 0:
+        maxlength = scoslength
+    else:
+        maxlength = jsonlength
+    f = "{{0}}{{1:0{0}d}}{{2}}".format(maxlength-len(preamble))
     s = f.format(preamble, settings["prf"]["offset"] + limit_id, "_L")
     return s
 

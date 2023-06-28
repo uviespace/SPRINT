@@ -191,7 +191,8 @@ $.ajax({
                         "ccf",
                         "cpc",
                         "pid",
-                        "prf"
+                        "prf",
+                        "caf"
                     ],
                     patternProperties: {
                       // Self-referntial schema in patternProperties
@@ -200,6 +201,96 @@ $.ajax({
                       }
                     },
                     properties: {
+                        "general" : {
+                            "title": "general",
+                            "type": "object",
+                            "properties": {
+                                "release": { "type": "number" },
+                                "issue": { "type": "number" },
+                                "preamble": { "type": "string" }
+                            }
+                        },
+                        "txf" : {
+                            "title": "txf (textual calibration)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "paf" : {
+                            "title": "paf (textual (de-)calibrations)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "pcf" : {
+                            "title": "pcf (monitoring parameters characteristics)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "pcpc" : {
+                            "title": "pcpc (packet headers parameters)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "ccf" : {
+                            "title": "ccf (command characteristics)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "cpc" : {
+                            "title": "cpc (command parameters)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "pid" : {
+                            "title": "pid (telemetry packets identification)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "prf" : {
+                            "title": "prf (parameter range sets)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        },
+                        "caf" : {
+                            "title": "caf (numerical calibrations)",
+                            "type": "object",
+                            "properties": {
+                                "preamble": { "type": "string" },
+                                "offset": { "type": "number" },
+                                "length": { "type": "number" }
+                            }
+                        }
                     }
                 },
                 year: {

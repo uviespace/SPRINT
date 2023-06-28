@@ -1,8 +1,0 @@
-<?php
-	define ("DB_USER", "space");
-	define ("DB_PASSWORD", "pass");
-	define ("DB_DATABASE", "spacemysql1");
-	define ("DB_HOST", "spacemysql1.mysql.univie.ac.at");
-	mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
-	$mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
-?>

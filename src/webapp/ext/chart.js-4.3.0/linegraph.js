@@ -2,6 +2,8 @@ $(document).ready(function(){
 
 var idStandard = getUrlVars()["idStandard"];
 var idCalibration = getUrlVars()["id"];
+var showLine = getUrlVars()["showline"];
+if (showLine == "false") { confShowLine = false; } else { confShowLine = true; }
 
 /* get variables from URL */
 function getUrlVars() {
@@ -40,26 +42,33 @@ function getUrlVars() {
           yText = 'Y Value';
       }
 
-      var xval = [];
-      var yval = [];
+      //var xval = [];
+      //var yval = [];
+      var xyval = [];
 
       for(var i in values) {
-        xval.push(values[i].xval);
-        yval.push(values[i].yval);
+        //xval.push(values[i].xval);  // Array of x values
+        //yval.push(values[i].yval);  // Array of y values
+        let object = { "x": values[i].xval, "y": values[i].yval };
+        xyval.push(object);  // Array of objects 
       }
 
       var chartdata = {
-        labels: xval,
+        //labels: xval,
         datasets: [
           {
-            label: "Y Values",
+            label: "(X, Y) Values",
             fill: false,
             lineTension: 0.1,
             backgroundColor: "rgba(59, 89, 152, 0.75)",
             borderColor: "rgba(59, 89, 152, 1)",
             pointHoverBackgroundColor: "rgba(59, 89, 152, 1)",
             pointHoverBorderColor: "rgba(59, 89, 152, 1)",
-            data: yval
+            //data: yval
+            data: xyval,
+            showLine: confShowLine,
+            pointRadius: 5,
+            pointHoverRadius: 10
           }
         ]
       };
@@ -67,7 +76,8 @@ function getUrlVars() {
       var ctx = $("#mycanvas");
 
       var LineGraph = new Chart(ctx, {
-        type: 'line',
+        //type: 'line',
+        type: 'scatter',
         data: chartdata,
         options: {
             scales: {
@@ -75,13 +85,15 @@ function getUrlVars() {
                   title: {
                     display: true,
                     text: 'ADU'
-                  }
+                  },
+                  beginAtZero: false
                 },
                 y: {
                   title: {
                     display: true,
                     text: yText
-                  }
+                  },
+                  beginAtZero: false
                 }
             },
             plugins: {

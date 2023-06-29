@@ -2,6 +2,14 @@ $(document).ready(function(){
 
 var idStandard = getUrlVars()["idStandard"];
 var idCalibration = getUrlVars()["id"];
+var showLine = getUrlVars()["showline"];
+if (showLine == "false") { confShowLine = false; } else { confShowLine = true; }
+var maxy = getUrlVars()["maxy"];
+if (maxy == undefined || maxy == "") maxy = 100.0;
+var deltax = getUrlVars()["deltax"];
+if (deltax == undefined || deltax == "") deltax = 1.0;
+imax = maxy / deltax;
+console.log(imax); 
 
 /* get variables from URL */
 function getUrlVars() {
@@ -49,7 +57,7 @@ function getUrlVars() {
       if (json.Pol5 == undefined) {
           pol5 = 0.0;
       } else {
-          pol5 = json.Pol5;
+          pol5 = parseFloat(json.Pol5);
       }
       console.log(pol1);
       console.log(pol2);
@@ -60,9 +68,9 @@ function getUrlVars() {
       var xval = [];
       var yval = [];
       
-      for (var i=0; i<100; i++) {
-        x = i*1.0;
-        y = pol1 + pol2*x + pol3*Math.pow(2, x) + pol4*Math.pow(3, x) + pol5*Math.pow(4, x);
+      for (var i=0; i<imax; i++) {
+        x = i*deltax;
+        y = pol1 + pol2*x + pol3*Math.pow(x, 2) + pol4*Math.pow(x, 3) + pol5*Math.pow(x, 4);
         xval.push(x);
         yval.push(y);
       }
@@ -71,14 +79,17 @@ function getUrlVars() {
         labels: xval,
         datasets: [
           {
-            label: "Y Values",
+            label: "Y Value",
             fill: false,
             lineTension: 0.1,
             backgroundColor: "rgba(59, 89, 152, 0.75)",
             borderColor: "rgba(59, 89, 152, 1)",
             pointHoverBackgroundColor: "rgba(59, 89, 152, 1)",
             pointHoverBorderColor: "rgba(59, 89, 152, 1)",
-            data: yval
+            data: yval,
+            showLine: confShowLine,
+            pointRadius: 5,
+            pointHoverRadius: 10
           }
         ]
       };

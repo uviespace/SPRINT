@@ -199,7 +199,7 @@ $userEmail = $row["email"];
     
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
-	<script type="text/javascript">
+<!--	<script type="text/javascript">
 window.onload = function () {
  
 var chart = new CanvasJS.Chart("chartContainer", {
@@ -227,7 +227,7 @@ chart.render();
 			toastr.success('Debug: Output: '+$file, 'Success Alert', {timeOut: 5000}); 
 			toastr.success('Debug: ... END', 'Success Alert', {timeOut: 5000}); 
 		}
-	</script>
+	</script>-->
 	<!--<script type="text/javascript" src="js/item-ajax.js"></script>-->
 	<style type="text/css">
 @media (min-width: 40em) {
@@ -330,10 +330,13 @@ if ($result->num_rows == 1) {
     <script type="text/javascript" src="ext/chart.js-4.3.0/chart.umd.js"></script>
     <?php if ($calibration_type == "0") { ?>
     <script type="text/javascript" src="ext/chart.js-4.3.0/linegraph.js"></script>
+    <b>Parameters:</b> <b><font color=blue>showline</font></b>=false (otherwise true)
     <?php } else if ($calibration_type == "1") { ?>
     <script type="text/javascript" src="ext/chart.js-4.3.0/linegraphPol.js"></script>
+    <b>Parameters:</b> <b><font color=blue>showline</font></b>=false (otherwise true); <b><font color=blue>deltax</font></b> (default = 1.0); <b><font color=blue>maxy</font></b> (default = 100.0)
     <?php } else if ($calibration_type == "2") { ?>
     <script type="text/javascript" src="ext/chart.js-4.3.0/linegraphLog.js"></script>
+    <b>Parameters:</b> <b><font color=blue>showline</font></b>=false (otherwise true); <b><font color=blue>deltax</font></b> (default = 1.0); <b><font color=blue>maxy</font></b> (default = 100.0)
     <?php } ?>
     
     <hr/>

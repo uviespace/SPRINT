@@ -49,7 +49,7 @@ function getUrlVars() {
       if (json.Log5 == undefined) {
           log5 = 0.0;
       } else {
-          log5 = json.Log5;
+          log5 = parseFloat(json.Log5);
       }
       console.log(log1);
       console.log(log2);
@@ -60,9 +60,9 @@ function getUrlVars() {
       var xval = [];
       var yval = [];
       
-      for (var i=0; i<100; i++) {
-        x = i*1.0;
-        y = 1/(log1 + log2*Math.log(x) + log3*Math.pow(2, Math.log(x)) + log4*Math.pow(3, Math.log(x)) + log5*Math.pow(4, Math.log(x)));
+      for (var i=0; i<imax; i++) {
+        x = i*deltax;
+        y = 1/(log1 + log2*Math.log(x) + log3*Math.pow(Math.log(x), 2) + log4*Math.pow(Math.log(x), 3) + log5*Math.pow(Math.log(x), 4));
         xval.push(x);
         yval.push(y);
       }
@@ -71,14 +71,17 @@ function getUrlVars() {
         labels: xval,
         datasets: [
           {
-            label: "Y Values",
+            label: "Y Value",
             fill: false,
             lineTension: 0.1,
             backgroundColor: "rgba(59, 89, 152, 0.75)",
             borderColor: "rgba(59, 89, 152, 1)",
             pointHoverBackgroundColor: "rgba(59, 89, 152, 1)",
             pointHoverBorderColor: "rgba(59, 89, 152, 1)",
-            data: yval
+            data: yval,
+            showLine: confShowLine,
+            pointRadius: 5,
+            pointHoverRadius: 10
           }
         ]
       };
@@ -94,13 +97,15 @@ function getUrlVars() {
                   title: {
                     display: true,
                     text: 'ADU'
-                  }
+                  },
+                  beginAtZero: true
                 },
                 y: {
                   title: {
                     display: true,
                     text: 'Y Value'
-                  }
+                  },
+                  beginAtZero: true
                 }
             },
             plugins: {

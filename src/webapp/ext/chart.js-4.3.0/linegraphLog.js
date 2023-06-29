@@ -2,6 +2,14 @@ $(document).ready(function(){
 
 var idStandard = getUrlVars()["idStandard"];
 var idCalibration = getUrlVars()["id"];
+var showLine = getUrlVars()["showline"];
+if (showLine == "false") { confShowLine = false; } else { confShowLine = true; }
+var maxy = getUrlVars()["maxy"];
+if (maxy == undefined || maxy == "") maxy = 100.0;
+var deltax = getUrlVars()["deltax"];
+if (deltax == undefined || deltax == "") deltax = 1.0;
+imax = maxy / deltax;
+console.log(imax); 
 
 /* get variables from URL */
 function getUrlVars() {

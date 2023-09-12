@@ -86,6 +86,25 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 	<script type="text/javascript" src="ext/jquery.highlite.js"></script>
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
+    <script type="text/javascript">
+        
+        function txt_onfocus(txt){txt.style.backgroundColor='white';}
+
+        function myFunctionP(e,i) {
+            document.getElementById("values_"+i).value = e.target.value;
+            document.getElementById("values_"+i).style.backgroundColor='#DBF9DB';  // light rose green
+            select_box = document.getElementById("sel_consts_"+i);
+            select_box.selectedIndex = 0;  // -1 empty
+        }
+        
+        function myFunctionC(e,i) {
+            document.getElementById("values_"+i).value = e.target.value;
+            document.getElementById("values_"+i).style.backgroundColor='LightYellow';
+            select_box = document.getElementById("sel_params_"+i);
+            select_box.selectedIndex = 0;  // -1 empty
+        }
+
+    </script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
 	<script type="text/javascript" src="js/item-ajax_view-datapool.js"></script>
 </head>
@@ -134,16 +153,16 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 		<table class="table table-bordered" style="word-break:break-all;">
 			<thead>
 			    <tr>
-				<th>ID</th>
-				<th>Domain</th>
-				<th>Name</th> 
-				<th width="250px">Short Description</th>
-				<th>Kind</th> <!-- Dropdown -->
-				<th>Datatype</th> <!-- Dropdown -->
-				<th>Multiplicity</th>
-				<th width="135px">Value</th>
-				<th>Unit</th>
-				<th width="200px">Action</th>
+				<th style="min-width:50px;">ID</th>
+				<th style="min-width:120px;">Domain</th>
+				<th style="min-width:180px;">Name</th> 
+				<th>Short Description</th>
+				<th style="min-width:50px;">Kind</th> <!-- Dropdown -->
+				<th style="min-width:55px;">Data-<br>type</th> <!-- Dropdown -->
+				<th style="min-width:60px;">Multi-<br>plicity</th>
+				<th width="120px">Value</th>
+				<th style="min-width:60px;">Unit</th>
+				<th width="210px">Action</th>
 			    </tr>
 			</thead>
 			<tbody id="myTable">
@@ -331,6 +350,77 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 
 						<div class="form-group">
 							<button type="submit" class="btn btn-success crud-submit-edit">Submit</button>
+						</div>
+
+		      		</form>
+
+		      </div>
+		    </div>
+		  </div>
+		</div>
+
+		<!-- Edit Item Modal -->
+		<div class="modal fade" id="edit-values" tabindex="-1" role="dialog" aria-labelledby="myModalLabelValues">
+		  <div class="modal-dialog" role="document">
+		    <div class="modal-content">
+		      <div class="modal-header">
+		        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+		        <h4 class="modal-title" id="myModalLabelValues">Edit Values</h4>
+		      </div>
+
+		      <div class="modal-body">
+					<form data-toggle="validator" action="api/update_view-datapool-values.php" method="put">
+
+                <div class="form-group">
+                    for datapool item&nbsp;&nbsp;
+                    <input id="domain-val_id" type="text" name="domain-val" style="border: 0;background-color:white;font-weight:bold;" readonly /><b> / </b>
+                    <input id="name-val_id" type="text" name="name-val" style="border: 0;background-color:white;font-weight:bold;" readonly />
+                    &nbsp;&nbsp;(&nbsp;multiplicity: 
+                    <input id="multiplicity-val_id" type="text" name="multiplicity-val" style="border: 0;background-color:white;font-weight:bold;" readonly />
+                    )
+                </div>
+
+		      			<input type="hidden" name="id" class="edit-id">
+
+<!--
+						<div class="form-group">
+							<label class="control-label" for="title">Domain:</label>
+							<input type="text" name="domain-val" class="form-control" data-error="Please enter domain." required />
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Name:</label>
+							<input type="text" name="name-val" class="form-control" data-error="Please enter name." required />
+							<div class="help-block with-errors"></div>
+						</div>
+-->
+<!--
+						<div class="form-group">
+							<label class="control-label" for="title">Multiplicity:</label>
+							<input type="text" name="multiplicity-val" class="form-control" data-error="Please enter multiplicity." />
+							<div class="help-block with-errors"></div>
+						</div>
+-->
+<!--
+						<div class="form-group">
+							<label class="control-label" for="title">Value:</label>
+							<input type="text" name="value-val" class="form-control" data-error="Please enter value." readonly />
+							<div class="help-block with-errors"></div>
+						</div>
+-->
+
+						<div class="form-group">
+							<label class="control-label" for="title">Values:</label>
+                            <!--<div id='dat'></div>-->
+                            <div id='response'>Response:<br/></div>
+							<div class="help-block with-errors"></div>
+						</div>
+                        
+                        <div>&nbsp;</div>
+
+						<div class="form-group">
+							<button type="submit" class="btn btn-success crud-submit-edit-values">Submit</button>
 						</div>
 
 		      		</form>

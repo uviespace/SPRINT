@@ -216,6 +216,9 @@ function manageRow(data) {
 	  	rows = rows + '<td data-id="'+value.id+'">';
         if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
+        if (value.multiplicity > 1) {
+            rows = rows + '<button data-toggle="modal" data-target="#edit-values" class="btn btn-primary edit-values">Values</button> ';
+        }
         if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
         }
@@ -408,6 +411,176 @@ $(".crud-submit-edit").click(function(e){
     }
 	
 	}
+
+});
+
+/* Edit Values */
+$("body").on("click",".edit-values",function(){
+
+    var id = $(this).parent("td").data('id');
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var value = $(this).parent("td").prev("td").prev("td").text();
+    var unit = $(this).parent("td").prev("td").text();
+        
+    //var dat = "mult = "+multiplicity+" / value = "+value+"";
+    //$('#dat').text('dat: ' + dat );
+        
+    $.ajax({
+        type: 'POST',
+        url: url + 'api/getData_parameter-mult-values.php?idStandard='+idStandard,
+        data: {mult:multiplicity ,value:value},
+        success: function(response){
+            //$('#dat').append(response);
+            //$('#response').append(response);
+            //document.getElementById('response').insertAdjacentHTML('afterend', response);
+            document.getElementById('response').innerHTML = response;
+            //toastr.success('Data Transfered Successfully.', 'Success Alert', {timeOut: 5000});
+        }
+    }).done(function(data){
+        console.log("DONE");
+        $("#edit-values").find("input[name='domain-val']").val(domain);
+        $("#edit-values").find("input[name='domain-val']").width( ($('#domain-val_id').val().length) + "ch" ); 
+        $("#edit-values").find("input[name='name-val']").val(name);
+        $("#edit-values").find("input[name='name-val']").width( ($('#name-val_id').val().length) + "ch" ); 
+        $("#edit-values").find("input[name='multiplicity-val']").val(multiplicity);
+        $("#edit-values").find("input[name='multiplicity-val']").width( ($('#multiplicity-val_id').val().length) + "ch" );
+        $("#edit-values").find("input[name='value-val']").val(value);
+        $("#edit-values").find(".edit-id").val(id);
+    });
+    
+    
+    //window.location = '?idProject='+idProject+'&idStandard='+idStandard+'&mult=' + multiplicity; //redirect page with para ,here do redirect current page so not added file name .    
+ 
+ /*
+     $.ajax({
+        type: 'post',
+        data: {ajax: 1,name: name},
+        success: function(response){
+           $('#response').text('name: ' + response );
+        }
+     });
+     */
+    
+    /*
+    $.ajax({
+      type: "POST",
+      data: { mult: multiplicity },
+      success: function(data) {
+        $("#test").html(data);
+        toastr.success('Data Transfered Successfully.', 'Success Alert', {timeOut: 5000});
+      }
+    });
+    */
+    
+    /*
+    var userdata = {'mult':multiplicity,'value':value};
+    console.log(url + "view_datapool.php?idProject="+idProject+"&idStandard="+idStandard);
+    $.ajax({
+        type: "POST",
+        //url: url + "view_datapool.php?idProject="+idProject+"&idStandard="+idStandard,
+        data:userdata,
+        success: function(data){
+            //console.log(data);
+            toastr.success('Data Transfered Successfully.', 'Success Alert', {timeOut: 5000});
+        }
+    }).done(function(data){
+        console.log("DONE");
+        $("#edit-values").find("input[name='multiplicity-val']").val(multiplicity);
+        $("#edit-values").find("input[name='value-val']").val(value);
+        $("#edit-values").find(".edit-id").val(id);
+    });
+    */
+    
+    /* Cookies only work for one shot */
+    /*
+    var date = new Date();
+    var seconds = 15;
+    date.setTime(date.getTime()+(seconds*1000));
+    var expires = "; expires="+date.toGMTString();
+    
+    document.cookie = "name="+name;
+    document.cookie = "mult"+name+"="+multiplicity;
+    document.cookie = "value"+name+"="+value;
+    
+    //document.cookie = "name="+name+expires;
+    //document.cookie = "mult_"+name+"="+multiplicity+expires;
+    //document.cookie = "value_"+name+"="+value+expires;
+    
+    console.log("name="+name+expires);
+    console.log("mult_"+name+"="+multiplicity+expires);
+    console.log("value_"+name+"="+value+expires);
+    
+    const values = value.split(",");
+    if (values.length > 1) {
+        values[0] = values[0].substring(1);
+        values[values.length-1] = values[values.length-1].substring(0,values[values.length-1].length-1);
+    }
+    console.log("values: "+values);
+    
+    $("#edit-values").find("input[name='domain-val']").val(domain);
+    $("#edit-values").find("input[name='name-val']").val(name);
+    $("#edit-values").find("input[name='multiplicity-val']").val(multiplicity);
+    $("#edit-values").find("input[name='value-val']").val(value);
+    
+    for (let i = 0; i < values.length; i++) {
+        $("#edit-values").find("input[name='values["+i+"]']").val(values[i]);
+    }
+
+    
+    //$("#edit-values").find("input[name='values[]']").val(values);
+    $("#edit-values").find(".edit-id").val(id);
+    */
+
+});
+
+/* Updated new Item */
+$(".crud-submit-edit-values").click(function(e){
+
+    e.preventDefault();
+    var form_action = $("#edit-values").find("form").attr("action");
+    var valueVal = $("#edit-values").find("input[name='value-val']").val();
+    var values = $("#edit-values").find("input[name='values[]']").map(function(){return $(this).val();}).get();
+    var id = $("#edit-values").find(".edit-id").val();
+    
+    console.log("valueVal: "+valueVal);
+    values = "{"+values+"}";
+    console.log("values: "+values);
+
+    if(id != '' && values != ''){
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + form_action,
+            data:{id:id, values:values}
+        }).done(function(data){
+            getPageData();
+            $(".modal").modal('hide');
+            toastr.success('Item Updated Successfully.', 'Success Alert', {timeOut: 5000});
+            //location.reload();
+            // Refresh the page after a delay of 3 seconds
+            /*setTimeout(function(){
+                location.reload();
+            }, 5000);*/ // 5000 milliseconds = 5 seconds
+            /*toastr.success(
+              'Have fun!',
+              'Miracle Max Says',
+              {
+                timeOut: 1000,
+                fadeOut: 1000,
+                onHidden: function () {
+                    window.location.reload(true);  // true: lädt Seite nicht aus dem Cache
+                  }
+              }
+            );*/
+        });
+    } else {
+        alert('You are missing something.')
+    }
 
 });
 

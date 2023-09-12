@@ -217,6 +217,9 @@ function manageRow(data) {
 	  	rows = rows + '<td data-id="'+value.id+'">';
         if (userrole.value < 4) {
         rows = rows + '<button data-toggle="modal" data-target="#edit-item" class="btn btn-primary edit-item">Edit</button> ';
+        if (value.multiplicity > 1) {
+            rows = rows + '<button data-toggle="modal" data-target="#edit-values" class="btn btn-primary edit-values">Values</button> ';
+        }
         if (userrole.value < 3) {
         rows = rows + '<button class="btn btn-danger remove-item">Delete</button>';
         }
@@ -392,6 +395,71 @@ $(".crud-submit-edit").click(function(e){
     }
 	
 	}
+
+});
+
+/* Edit Values */
+$("body").on("click",".edit-values",function(){
+
+    var id = $(this).parent("td").data('id');
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var value = $(this).parent("td").prev("td").prev("td").text();
+    var unit = $(this).parent("td").prev("td").text();
+        
+    $.ajax({
+        type: 'POST',
+        url: url + 'api/getData_parameter-mult-values.php?idStandard='+idStandard,
+        data: {mult:multiplicity ,value:value},
+        success: function(response){
+            document.getElementById('response').innerHTML = response;
+            //toastr.success('Data Transfered Successfully.', 'Success Alert', {timeOut: 5000});
+        }
+    }).done(function(data){
+        console.log("DONE");
+        $("#edit-values").find("input[name='domain-val']").val(domain);
+        $("#edit-values").find("input[name='domain-val']").width( ($('#domain-val_id').val().length) + "ch" ); 
+        $("#edit-values").find("input[name='name-val']").val(name);
+        $("#edit-values").find("input[name='name-val']").width( ($('#name-val_id').val().length) + "ch" ); 
+        $("#edit-values").find("input[name='multiplicity-val']").val(multiplicity);
+        $("#edit-values").find("input[name='multiplicity-val']").width( ($('#multiplicity-val_id').val().length) + "ch" ); 
+        $("#edit-values").find("input[name='value-val']").val(value);
+        $("#edit-values").find(".edit-id").val(id);
+    });
+
+});
+
+/* Updated new Item */
+$(".crud-submit-edit-values").click(function(e){
+
+    e.preventDefault();
+    var form_action = $("#edit-values").find("form").attr("action");
+    var valueVal = $("#edit-values").find("input[name='value-val']").val();
+    var values = $("#edit-values").find("input[name='values[]']").map(function(){return $(this).val();}).get();
+    var id = $("#edit-values").find(".edit-id").val();
+    
+    console.log("valueVal: "+valueVal);
+    values = "{"+values+"}";
+    console.log("values: "+values);
+
+    if(id != '' && values != ''){
+        $.ajax({
+            dataType: 'json',
+            type:'POST',
+            url: url + form_action,
+            data:{id:id, values:values}
+        }).done(function(data){
+            getPageData();
+            $(".modal").modal('hide');
+            toastr.success('Item Updated Successfully.', 'Success Alert', {timeOut: 5000});
+        });
+    } else {
+        alert('You are missing something.')
+    }
 
 });
 

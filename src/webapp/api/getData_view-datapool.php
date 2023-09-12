@@ -6,6 +6,7 @@ $num_rec_per_page = 5;
 
 if (isset($_GET["page"])) { $page  = $_GET["page"]; } else { $page=1; };
 if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
+if (isset($_GET["idParameter"])) { $idParameter  = $_GET["idParameter"]; } else { $idParameter=''; };
 if (isset($_GET["showAll"])) { $showAll  = $_GET["showAll"]; } else { $showAll=0; };
 
 if ($showAll == 1) {
@@ -19,6 +20,11 @@ if ($idStandard==0) {
 $sqlTotal = "SELECT * FROM `parameter`";
 $sql = "SELECT * FROM `parameter` ORDER BY id DESC LIMIT $start_from, $num_rec_per_page"; 
 } else {
+$searchParam = false;
+if ($idParameter != '' AND $idParameter != 'undefined') {
+    $searchParam = true;
+}
+/*
 $sqlTotal = 
   "SELECT * FROM (".
   "SELECT ".
@@ -35,7 +41,63 @@ $sqlTotal =
   "FROM ".
   "    `parameter` AS p, ".
   "    `type` AS t ".
-  "WHERE ".
+  "WHERE ";
+if ($searchParam) $sqlTotal .= 
+  "    p.id = ".$idParameter." AND ";
+$sqlTotal .=
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType = t.id AND ";
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  "UNION ".
+  "SELECT ".
+  "    p.id, ".
+  "    p.domain, ".
+  "    p.name, ".
+  "    p.kind, ".
+  "    p.shortDesc, ".
+  "    p.idType, ".
+  "    concat('None / None') AS datatype, ".
+  "    p.multiplicity, ".
+  "    p.value, ".
+  "    p.unit ".
+  "FROM ".
+  "    `parameter` AS p ".
+  "WHERE ";
+if ($searchParam) $sqlTotal .= 
+  "    p.id = ".$idParameter." AND ";
+$sqlTotal .=
+  "    p.idStandard = ".$idStandard." AND ".
+  "    p.idType IS NULL AND ".
+  "    (p.kind = 3 OR ".
+  "    p.kind = 4 OR ".
+  "    p.kind = 5 OR ".
+  "    p.kind = 6) ".
+  ") AS u ";
+  */
+  
+$sqlTotal = 
+  "SELECT * FROM (".
+  "SELECT ".
+  "    p.id, ".
+  "    p.domain, ".
+  "    p.name, ".
+  "    p.kind, ".
+  "    p.shortDesc, ".
+  "    p.idType, ".
+  "    concat(t.domain, ' / ', t.name) AS datatype, ".
+  "    p.multiplicity, ".
+  "    p.value, ".
+  "    p.unit ".
+  "FROM ".
+  "    `parameter` AS p, ".
+  "    `type` AS t ".
+  "WHERE ";
+if ($searchParam) $sqlTotal .= 
+  "    p.id = ".$idParameter." AND ";
+$sqlTotal .=
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType = t.id AND ".
   "    (p.kind = 3 OR ".
@@ -56,7 +118,10 @@ $sqlTotal =
   "    p.unit ".
   "FROM ".
   "    `parameter` AS p ".
-  "WHERE ".
+  "WHERE ";
+if ($searchParam) $sqlTotal .= 
+  "    p.id = ".$idParameter." AND ";
+$sqlTotal .=
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType IS NULL AND ".
   "    (p.kind = 3 OR ".
@@ -64,6 +129,9 @@ $sqlTotal =
   "    p.kind = 5 OR ".
   "    p.kind = 6) ".
   ") AS u ";
+  
+  
+  
 $sql = 
   "SELECT * FROM (".
   "SELECT ".
@@ -80,7 +148,10 @@ $sql =
   "FROM ".
   "    `parameter` AS p, ".
   "    `type` AS t ".
-  "WHERE ".
+  "WHERE ";
+if ($searchParam) $sql .= 
+  "    p.id = ".$idParameter." AND ";
+$sql .=
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType = t.id AND ".
   "    (p.kind = 3 OR ".
@@ -101,7 +172,10 @@ $sql =
   "    p.unit ".
   "FROM ".
   "    `parameter` AS p ".
-  "WHERE ".
+  "WHERE ";
+if ($searchParam) $sql .= 
+  "    p.id = ".$idParameter." AND ";
+$sql .=
   "    p.idStandard = ".$idStandard." AND ".
   "    p.idType IS NULL AND ".
   "    (p.kind = 3 OR ".

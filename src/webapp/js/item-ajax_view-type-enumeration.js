@@ -129,7 +129,7 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var idType = $("#create-item").find("input[name='idType']").val();
     var name = $("#create-item").find("input[name='name']").val();
@@ -154,7 +154,7 @@ $(".crud-submit").click(function(e){
             if (data['status'] == 3001 | data['status'] == 3002) {
                 toastr.warning('Item can not be created! ' + data['statusText'], 'Failure Alert', {timeOut: 5000});
             } else {
-            $("#create-item").find("input[name='idType']").val('');
+            //$("#create-item").find("input[name='idType']").val('');
             $("#create-item").find("input[name='name']").val('');
             $("#create-item").find("input[name='value']").val('');
             $("#create-item").find("textarea[name='desc']").val('');

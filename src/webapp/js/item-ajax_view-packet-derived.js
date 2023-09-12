@@ -187,7 +187,7 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var idStandard = $("#create-item").find("input[name='idStandard']").val();
     var idParent = $("#create-item").find("input[name='idParent']").val();
@@ -210,7 +210,7 @@ $(".crud-submit").click(function(e){
                   discriminant:discriminant, name:name, shortDesc:shortDesc, desc:desc,
                   descParam:descParam, descDest:descDest, code:code}
         }).done(function(data){
-            $("#create-item").find("input[name='idStandard']").val('');
+            //$("#create-item").find("input[name='idStandard']").val('');
             $("#create-item").find("input[name='idParent']").val('');
             $("#create-item").find("input[name='kind']").val('');
             $("#create-item").find("input[name='subtype']").val('');

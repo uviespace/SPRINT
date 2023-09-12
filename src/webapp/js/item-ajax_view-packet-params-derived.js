@@ -118,9 +118,9 @@ function manageOptionParameter(data, parameter) {
 	$("#sel_parameter").empty();
 	$.each( data, function( key, value ) {
 		if (parameter==''+value.domain+' / '+value.name+'') {
-			$("#sel_parameter").append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+'</option>');
+			$("#sel_parameter").append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+' ('+value.id+')</option>');
 		} else {
-			$("#sel_parameter").append('<option value="'+value.id+'">'+value.domain+' / '+value.name+'</option>');
+			$("#sel_parameter").append('<option value="'+value.id+'">'+value.domain+' / '+value.name+' ('+value.id+')</option>');
 		}
 		
 	});
@@ -226,7 +226,7 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
     var id = $("#create-item").find("input[name='id']").val();
     var idStandard = $("#create-item").find("input[name='idStandard']").val();
@@ -247,9 +247,9 @@ $(".crud-submit").click(function(e){
             data:{id:id, idStandard:idStandard, idPacket:idPacket, parameter:parameter, order:order, role:role,
             group:group, repetition:repetition, value:value, desc:desc}
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
-            $("#create-item").find("input[name='idStandard']").val('');
-            $("#create-item").find("input[name='idPacket']").val('');
+            //$("#create-item").find("input[name='id']").val('');
+            //$("#create-item").find("input[name='idStandard']").val('');
+            //$("#create-item").find("input[name='idPacket']").val('');
             $("#create-item").find("select[name='parameter']").val('');
             $("#create-item").find("input[name='order']").val('');
             $("#create-item").find("select[name='role']").val('');
@@ -260,6 +260,27 @@ $(".crud-submit").click(function(e){
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
+        }).fail(function (Response) {
+            console.log("-> FAIL ");
+            //console.log("FAIL: "+JSON.stringify(Response));
+            var obj = Response;
+            if (obj.status == 200) {
+                //$("#create-item").find("input[name='id']").val('');
+                //$("#create-item").find("input[name='idStandard']").val('');
+                //$("#create-item").find("input[name='idPacket']").val('');
+                $("#create-item").find("select[name='parameter']").val('');
+                $("#create-item").find("input[name='order']").val('');
+                $("#create-item").find("select[name='role']").val('');
+                $("#create-item").find("input[name='group']").val('');
+                $("#create-item").find("input[name='repetition']").val('');
+                $("#create-item").find("input[name='value']").val('');
+                $("#create-item").find("textarea[name='desc']").val('');
+                getPageData();
+                $(".modal").modal('hide');
+                toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});
+            } else {
+                alert("Failure occured: "+obj.status);
+            }
         });
     }else{
         alert('You are missing title or description.')

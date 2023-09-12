@@ -9,6 +9,7 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/config.php';
 
 if (isset($_GET["id"])) { $id  = $_GET["id"]; } else { $id=0; };
 if (isset($_GET["action"])) { $action  = $_GET["action"]; } else { $action=""; };
@@ -280,6 +281,144 @@ while ($row = $result->fetch_assoc()) {
     if ($idRoleRead < $idRole) { $idRole = $idRoleRead; };
 }
 
+if(isset($_POST['import'])){
+    //echo "IMPORT<br/>";
+
+   if(isset($_FILES['importfile'])){
+	   
+	  $files = array_filter($_FILES['importfile']['name']); //Use something similar before processing files.
+	  // Count the number of uploaded files in array
+      $total_count = count($_FILES['importfile']['name']);
+	  $message = "count: ".$total_count;
+	  
+	  $timestamp = time();
+      $datum = date("YmdHis", $timestamp);
+	  $dir_of_imported_project = $path_to_imports."Standard_".$datum;
+	  mkdir($dir_of_imported_project, 0700);
+	  
+	  $extensions = array("csv","txt");
+			  
+	  // Loop through every file
+      for( $i=0 ; $i < $total_count ; $i++ ) {
+          //The temp file path is obtained
+          $tmpFilePath = $_FILES['importfile']['tmp_name'][$i];
+		  //Check 
+          $file_name = $_FILES['importfile']['name'][$i];
+          $file_size =$_FILES['importfile']['size'][$i];
+          $file_tmp =$_FILES['importfile']['tmp_name'][$i];
+          $file_type=$_FILES['importfile']['type'][$i];
+          $file_name_explode = explode('.',$_FILES['importfile']['name'][$i]);
+          $file_ext=strtolower(end($file_name_explode));
+      
+	      if(!file_exists($file_tmp)) {
+              $errors[]="No file selected. Please choose the file first!";
+	      } else {
+              if(in_array($file_ext,$extensions)=== false){
+                 $errors[]=$file_name.": extension not allowed, please choose a CSV or TXT file.";
+              }
+	      }
+		  
+          //A file path needs to be present
+          if ($tmpFilePath != ""){
+              //Setup our new file path
+              $newFilePath = $dir_of_imported_project."/" . $_FILES['importfile']['name'][$i];
+              //File is uploaded to temp dir
+              if(move_uploaded_file($tmpFilePath, $newFilePath)) {
+                  //Other code goes here
+			  }
+          }
+      }
+	  
+      if(empty($errors)==true){
+          //echo "Success";
+          
+          $cmd = $path_to_python.$python_cmd." ".$path_to_pyscripts."import_csv.py standard ".$idProject." ".$path."Standard_".$datum." 2>&1";
+          
+          $res = shell_exec($cmd);
+          //$message = $res;
+		  $message .= " | Import successful";
+ 
+      }else{
+          //print_r($errors);
+      }
+      
+   }
+
+}
+
+if(isset($_POST['export'])){
+    //echo "EXPORT<br/>";
+	//$message = "The build function is called.";
+
+	$cmd = $path_to_python.$python_cmd." ".$path_to_pyscripts."export_csv.py project ".$idProject." 2>&1";
+
+	$file = shell_exec($cmd);
+    $fileToDelete = substr($file, 0, strpos($file, '\\'));   // TODO: works only with Windows
+	$file = substr($file, 0, strlen($file)-1);
+	$message = $file;
+
+	if (file_exists($file)) {
+		lib_dwnFile(true, $file);
+		//system('rm -rf ' . escapeshellarg(dirname($file)));
+		rmdirr($fileToDelete);
+	} else {
+		$message = "Error: Consistency check failed!\n";
+		$message .= "Please correct the errors as listed hereafter:\n";
+		$message .= $file;
+	}
+}
+
+function lib_dwnFile($clean, $file) {
+	//$_SESSION['scriptcase']['form_Application_mob']['contr_erro'] = 'on';
+	if (file_exists($file)) {
+		$size = filesize($file);
+		header('Content-Description: File Transfer');
+		header('Content-Type: application/zip');
+		header('Content-Disposition: attachment; filename='.basename($file));
+		header('Content-Length: ' . $size);
+		header('Content-Transfer-Encoding: binary');
+		header('Expires: 0');
+		header('Cache-Control: no-cache, no-store, must-revalidate');
+		header('Pragma: public');
+		header('Connection: Keep-Alive');
+		if ($clean) {
+			@ob_end_clean();
+			@ob_end_clean();
+		}
+		flush();
+		readfile($file);
+	}
+}
+
+function rmdirr($dirname)
+{
+    // Sanity check
+    if (!file_exists($dirname)) {
+        return false;
+    }
+
+    // Simple delete for a file
+    if (is_file($dirname)) {
+        return unlink($dirname);
+    }
+
+    // Loop through the folder
+    $dir = dir($dirname);
+    while (false !== $entry = $dir->read()) {
+        // Skip pointers
+        if ($entry == '.' || $entry == '..') {
+            continue;
+        }
+
+        // Recurse
+        rmdirr("$dirname/$entry");
+    }
+
+    // Clean up
+    $dir->close();
+    return rmdir($dirname);
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -335,6 +474,34 @@ while ($row = $result->fetch_assoc()) {
 				-->
 		    </div>
 		</div>
+
+		<form  method="post" style="background-color: #d1d1d1; padding: 15px;" enctype="multipart/form-data">
+            <?php if ($idRole < 4) { ?>
+			    <input type="submit" name="export" value="Export Project" class="btn btn-success crud-submit-export">
+            <?php } else { ?>
+                <input type="submit" name="export" value="Export Project" class="btn btn-success crud-submit-export" disabled>
+            <?php } ?>
+			<?php if ($idRole < 4) { ?>
+                <input type="file" id="file-upload" name="importfile[]" multiple="multiple" style="display:none" />
+                <label for="file-upload" class="btn btn-primary browse-file">Choose File</label>
+                <input type="submit" name="import" value="Import Standard" class="btn btn-success crud-submit-import">
+                <div id="file-upload-filename"></div>
+            <?php } else { ?>
+                <input type="submit" name="import" value="Import Standard" class="btn btn-success crud-submit-import" disabled>
+            <?php } ?>
+            <?php
+                if(empty($errors)==false){
+                    echo "<font color='red'>";
+                    print_r($errors);
+                    echo "</font><br/>";
+                }
+                if(empty($message)==false){
+                    echo "<font color='green'>";
+                    print_r($message);
+                    echo "</font><br/>";
+                }
+            ?>
+		</form>
 
 <?php
 

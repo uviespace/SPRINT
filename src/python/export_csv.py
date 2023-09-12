@@ -72,17 +72,21 @@ def export_datapool(path, standard_id, kind):
     cur = db.cursor()
     kind_a = kind
     kind_b = kind
+    kind_c = kind
+    kind_d = kind
     if kind == "100":
         # Special: Export both, datapool parameters and variables
-        kind_a = 3
-        kind_b = 4
+        kind_a = 3  # PAR
+        kind_b = 4  # VAR
+        kind_c = 5  # PAR IMP
+        kind_d = 6  # VAR IMP
 
     export_data(path, "Datapool.csv", cur, """
-        SELECT if(p.kind=0, "predefined", if(p.kind=1, "header", if(p.kind=2, "body", if(p.kind=3, "par", "var")))) as kind, p.domain, p.name, p.shortDesc, p.`desc`, p.value, p.size, p.unit, p.multiplicity, CONCAT(t.domain, '/', t.name) FROM Parameter p
+        SELECT if(p.kind=0, "predefined", if(p.kind=1, "header", if(p.kind=2, "body", if(p.kind=3 or p.kind=5, "par", "var")))) as kind, p.domain, p.name, p.shortDesc, p.`desc`, p.value, p.size, p.unit, p.multiplicity, CONCAT(t.domain, '/', t.name) FROM Parameter p
         JOIN Type t ON p.idType=t.id
-        WHERE (p.kind={1} OR p.kind={2}) AND p.idStandard={0}
+        WHERE (p.kind={1} OR p.kind={2} OR p.kind={3} OR p.kind={4}) AND p.idStandard={0}
         ORDER BY p.kind, p.domain, p.name
-        """.format(standard_id, kind_a, kind_b),
+        """.format(standard_id, kind_a, kind_b, kind_c, kind_d),
         ["Kind", "Domain", "Name", "ShortDesc", "Desc", "Value", "Size", "Unit", "Multiplicity", "Type"])
     return gen_zip(path)
 

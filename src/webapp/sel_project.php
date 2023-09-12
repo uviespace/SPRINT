@@ -9,6 +9,7 @@ if(!isset($_SESSION['userid'])) {
     die('');
 }
 require 'api/db_config.php';
+require 'int/config.php';
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
@@ -20,6 +21,73 @@ $row = $result->fetch_assoc();
 
 $userName = $row["name"];
 $userEmail = $row["email"];
+
+if(isset($_POST['import'])){
+    //echo "IMPORT<br/>";
+
+   if(isset($_FILES['importfile'])){
+      $errors= array();
+	  
+	  $files = array_filter($_FILES['importfile']['name']); //Use something similar before processing files.
+	  // Count the number of uploaded files in array
+      $total_count = count($_FILES['importfile']['name']);
+	  $message = "count: ".$total_count;
+	  
+	  $timestamp = time();
+      $datum = date("YmdHis", $timestamp);
+	  $dir_of_imported_project = $path_to_imports."Project_".$datum;
+	  mkdir($dir_of_imported_project, 0700);
+	  
+	  $extensions = array("csv","txt");
+			  
+	  // Loop through every file
+      for( $i=0 ; $i < $total_count ; $i++ ) {
+          //The temp file path is obtained
+          $tmpFilePath = $_FILES['importfile']['tmp_name'][$i];
+		  //Check 
+          $file_name = $_FILES['importfile']['name'][$i];
+          $file_size =$_FILES['importfile']['size'][$i];
+          $file_tmp =$_FILES['importfile']['tmp_name'][$i];
+          $file_type=$_FILES['importfile']['type'][$i];
+          $file_name_explode = explode('.',$_FILES['importfile']['name'][$i]);
+          $file_ext=strtolower(end($file_name_explode));
+      
+	      if(!file_exists($file_tmp)) {
+              $errors[]="No file selected. Please choose the file first!";
+	      } else {
+              if(in_array($file_ext,$extensions)=== false){
+                 $errors[]=$file_name.": extension not allowed, please choose a CSV or TXT file.";
+              }
+	      }
+		  
+          //A file path needs to be present
+          if ($tmpFilePath != ""){
+              //Setup our new file path
+              $newFilePath = $dir_of_imported_project."/" . $_FILES['importfile']['name'][$i];
+              //File is uploaded to temp dir
+              if(move_uploaded_file($tmpFilePath, $newFilePath)) {
+                  //Other code goes here
+			  }
+          }
+      }
+	  
+      if(empty($errors)==true){
+          //echo "Success";
+          
+          $cmd = $path_to_python.$python_cmd." ".$path_to_pyscripts."import_csv.py project ".$userid." ".$path."Project_".$datum." 2>&1";
+          
+          $res = shell_exec($cmd);
+          //$message = $res;
+		  $message .= " | Import successful";
+ 
+      }else{
+          //print_r($errors);
+      }
+      
+   }
+
+}
+
 ?>
 <!DOCTYPE html>
 <html>
@@ -42,9 +110,34 @@ $userEmail = $row["email"];
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
-	<style type="text/css">
+	<script type="text/javascript">
+        
+        var infoarea;
+        
+        window.onload=function(){
+            var el = document.getElementById( 'file-upload' );
+            infoArea = document.getElementById( 'file-upload-filename' );
+            
+            if(el){
+                el.addEventListener( 'change', showFileName );
+            }
+            
+        }
+        
+        function showFileName( event ) {
 
-	</style>
+            // the change event gives us the input it occurred in 
+            var input = event.srcElement;
+            
+            // the input has an array of files in the `files` property, each one has a name that you can use. We're just using the name here.
+            var fileName = input.files[0].name;
+            
+            // use fileName however fits your app best, i.e. add it into a div
+            infoArea.textContent = 'File name: ' + fileName;
+			
+        }
+        
+	</script>
 </head>
 <body>
 
@@ -65,6 +158,27 @@ $userEmail = $row["email"];
 				-->
 		    </div>
 		</div>
+
+		<form  method="post" style="background-color: #d1d1d1; padding: 15px;" enctype="multipart/form-data">
+            <input type="file" id="file-upload" name="importfile[]" multiple="multiple" style="display:none" />
+            <label for="file-upload" class="btn btn-primary browse-file">Choose File</label>
+            <input type="submit" name="import" value="Import" class="btn btn-success crud-submit-import">
+            <div id="file-upload-filename"></div>
+            <?php
+                if(empty($errors)==false){
+                    echo "<font color='red'>";
+                    print_r($errors);
+                    echo "</font><br/>";
+                }
+                if(empty($message)==false){
+                    echo "<font color='green'>";
+                    print_r($message);
+                    echo "</font><br/>";
+                }
+            ?>
+		</form>
+		
+		<br/>
 
 <?php
 

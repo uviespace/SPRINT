@@ -21,7 +21,7 @@ $result = $mysqli->query($sql);
 
 $data = $result->fetch_assoc();
 
-//echo json_encode($data);
-header('Location: ../index.php');
+echo json_encode($data);
+//header('Location: ../index.php');
 
 ?>

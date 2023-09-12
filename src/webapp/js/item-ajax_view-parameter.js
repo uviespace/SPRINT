@@ -9,6 +9,7 @@ var dropdown = "";
 var userrole = document.getElementById("user_role");
 
 var idStandard = getUrlVars()["idStandard"];
+var idParameter = getUrlVars()["idParameter"];
 
     getDropdownDataKindCreate();
     getDropdownDataParameterDatatypeCreate();
@@ -28,7 +29,7 @@ function getUrlVars() {
 function manageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-parameter.php?idStandard='+idStandard,
+		url: url+'api/getData_view-parameter.php?idStandard='+idStandard+'&idParameter='+idParameter,
 		data: {page:page}
 	}).done(function(data){
 		total_page = Math.ceil(data.total/5);
@@ -64,7 +65,7 @@ function manageDataAll() {
 
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-parameter.php?idStandard='+idStandard+'&showAll=1',
+		url: url+'api/getData_view-parameter.php?idStandard='+idStandard+'&idParameter='+idParameter+'&showAll=1',
 		data: {page:page}
 	}).done(function(data){
 		total_page = 1;
@@ -92,7 +93,7 @@ function manageDataAll() {
 function getPageData() {
 	$.ajax({
 		dataType: 'json',
-		url: url+'api/getData_view-parameter.php?idStandard='+idStandard,
+		url: url+'api/getData_view-parameter.php?idStandard='+idStandard+'&idParameter='+idParameter,
 		data: {page:page}
 	}).done(function(data){
 		manageRow(data.data);

@@ -152,6 +152,16 @@ if ($result->num_rows > 0) {
     } else {
         $idCalCurve = 0;
     }
+    
+	if(isset($_POST['sel_action'])){
+        $idAction = $_POST['sel_action'];
+        $idCalCurve = $_POST['idCalCurve'];
+        $idStandard = $_POST['idStandard'];
+        //echo $idCalCurve."<br/>";
+    } else {
+        $idAction = 0;
+    }
+
 
 function doesTableExists($mysqli, $table) {
     $res = mysqli_query($mysqli,"SHOW TABLES LIKE '$table'");
@@ -492,7 +502,7 @@ while ($row = $result->fetch_assoc()) {
                 <div id="divImportCal">
 
                 <?php if (doesTableExists($mysqli, "calibration")) { ?>
-                <form id="formCalGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;" method="POST" action="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>&selCalCurve=1">
+                <form id="formTypGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;" method="POST" action="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>&selCalCurve=1">
                   <div class="table" style="margin-bottom:0px;">
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
@@ -535,13 +545,70 @@ while ($row = $result->fetch_assoc()) {
                   </div>
                   </div>
                 </form>
+                
                 <?php if ($idCalCurve > 0) { ?>
-				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
-				onsubmit="this.action='view_calibration-import.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+                <form id="formActGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;" method="POST" action="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>&selCalCurve=1&selAction=1">
                 
                   <input type="hidden" name="idCalCurve" class="form-control" value="<?php echo $idCalCurve; ?>" required>
-                
-                  <div class="table">
+                  
+                  <input type="hidden" name="idAction" class="form-control" value="<?php echo $idAction; ?>" required>
+                  
+                  <div class="table" style="margin-bottom:0px;">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Action
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <?php if ($idAction == 0) { ?>
+                          <select name="sel_action" class="form-control" onchange="this.form.submit()">
+                              <option value="0" selected>--- Please select ---</option>
+                              <option value="1">Add new calibration</option>
+                              <?php if ($idCalCurve=="1") { ?>
+                              <option value="2">Add new points</option>
+                              <?php } else { ?>
+                              <option value="2">Add new coefficients</option>
+                              <?php } ?>
+                              <option value="3">Replace calibration</option>
+                          </select>
+                          <!--<input type="hidden"  name="selCalCurve" class="form-control" value="1" required />-->
+                          <?php } else if ($idAction == 1) { ?>
+                          <select name="sel_action" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1" selected>Add new calibration</option>
+                              <?php if ($idCalCurve=="1") { ?>
+                              <option value="2">Add new points</option>
+                              <?php } else { ?>
+                              <option value="2">Add new coefficients</option>
+                              <?php } ?>
+                              <option value="3">Replace calibration</option>
+                          </select>
+                          <?php } else if ($idAction == 2) { ?>
+                          <select name="sel_action" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1">Add new calibration</option>
+                              <?php if ($idCalCurve=="1") { ?>
+                              <option value="2" selected>Add new points</option>
+                              <?php } else { ?>
+                              <option value="2" selected>Add new coefficients</option>
+                              <?php } ?>
+                              <option value="3">Replace calibration</option>
+                          </select>
+                          <?php } else if ($idAction == 3) { ?>
+                          <select name="sel_action" class="form-control" onchange="this.form.submit()">
+                              <!--<option value="0">--- Please select ---</option>-->
+                              <option value="1">Add new calibration</option>
+                              <?php if ($idCalCurve=="1") { ?>
+                              <option value="2">Add new points</option>
+                              <?php } else { ?>
+                              <option value="2">Add new coefficients</option>
+                              <?php } ?>
+                              <option value="3" selected>Replace calibration</option>
+                          </select>
+                           <?php    
+                                } ?>
+                              
+                     </div>
+                  </div>
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Standard
@@ -574,6 +641,72 @@ if ($result->num_rows > 0) {
                           </select>
                       </div>
                   </div>
+                  </div>
+                </form>
+                <?php } ?>  <!-- END idCalCurve > 0 -->
+                
+                <?php if ($idCalCurve > 0 AND $idAction > 0) { ?>
+
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_calibration-import.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>'"> <!-- action="view_acronym-import.php" --> <!-- padding: top right bottom left -->
+                
+                  <input type="hidden" name="idCalCurve" class="form-control" value="<?php echo $idCalCurve; ?>" required>
+                  
+                  <input type="hidden" name="idAction" class="form-control" value="<?php echo $idAction; ?>" required>
+                  
+                  <input type="hidden" name="idStandard" class="form-control" value="<?php echo $idStandard; ?>" required>
+                
+                  <div class="table">
+                  
+                  <?php if ($idAction > 1) { ?>
+                  
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Existing Calibration Curve
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <select name="sel_calId" class="form-control" required>
+                              <option value="">--- Please select ---</option>
+<?php
+$type = $idCalCurve - 1;
+$sql = "SELECT * FROM `calibration` WHERE idStandard = $idStandard AND type = $type";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+//echo "<h3>Standards</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        /*echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_standard.php?idProject=$id&idStandard=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b></a>";
+        echo "</div>";
+        echo "<br/>";*/
+        echo "<option value='".$row["id"]."'>".$row["name"]." / ".$row["shortDesc"]."</option>";
+    }
+} else {
+    echo "0 results";
+}
+?>
+                          </select>
+                     </div>
+                  </div>
+                  <?php } ?>  <!-- END idAction > 1 -->
+                  
+                  <?php if ($idAction == 1) { ?>
+
+                  <div class="table-row">
+                  <div class="table-cell" style="width:20%;">
+                  <hr>
+                  </div>
+                  <div class="table-cell" style="width:80%;">
+                  <hr>
+                  </div>
+                  </div>
+                  
                   <div class="table-row">
                       <div class="table-cell" style="width:20%;">
                           Name
@@ -674,7 +807,9 @@ if ($result->num_rows > 0) {
                   
                   <?php } else if ($idCalCurve == 3) { ?>
                   
-                  <?php } ?>
+                  <?php } ?> <!-- END idCalCurve == 1 -->
+                  
+                  <?php } ?> <!-- END idAction == 1 -->
 
                   <div class="table-row">
                   <div class="table-cell" style="width:20%;">
@@ -689,7 +824,15 @@ if ($result->num_rows > 0) {
                       <div class="table-cell" style="width:20%;">
                           Select Calibration Curve to Upload
                           <div class="tooltipCal">INFO
-                            <span class="tooltipCalText">Format: e.g. "X Value \t Y Value" with a CSV delimiter of "\t" </span>
+                            <span class="tooltipCalText">
+                            <?php if ($idCalCurve=="1") { ?>
+                            Format: e.g. "[X Value] \t [Y Value]" with a CSV delimiter of "\t"
+                            <?php } else if ($idCalCurve=="2") { ?>
+                            Format: e.g. "Pol1 \t [Pol1 Value]" with a CSV delimiter of "\t"
+                            <?php } else if ($idCalCurve=="3") { ?>
+                            Format: e.g. "Log1 \t [Log1 Value]" with a CSV delimiter of "\t"
+                            <?php } ?>
+                            </span>
                           </div>
                       </div>
                       <div class="table-cell" style="width:80%;">
@@ -709,9 +852,9 @@ if ($result->num_rows > 0) {
                     <br/><br/>
 					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageCalImport)){ echo $messageCalImport;}?></textarea>
 				</form>
-                <?php } ?>
+                <?php } ?> <!-- END idCalCurve > 0 AND idAction > 0 -->
                 
-                <?php } ?>
+                <?php } ?> <!-- END doesTableExists($mysqli, "calibration") -->
 
                 </div>
 				

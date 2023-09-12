@@ -155,7 +155,7 @@ if ($result->num_rows > 0) {
         }
         echo $row["id"]." ";
         echo "<a href='open_calibration_editor.php?id=".$row["id"]."&type=".$row["type"]."&idProject=".$idProject."&idStandard=".$idStandard."'><b>".$row["name"]."</b></a>";
-        echo " (".$row["shortDesc"].")";
+        echo " (".$row["shortDesc"].") ... ".json_decode($row["setting"])->unit;
         if ($row["type"] == "0") { $calType = "NUM";  $bgcolor = "yellow";
         } else if ($row["type"] == "1") { $calType = "POL"; $bgcolor = "orange";
         } else if ($row["type"] == "2") { $calType = "LOG"; $bgcolor = "#C4A484";

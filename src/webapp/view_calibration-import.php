@@ -115,7 +115,9 @@ if(isset($_POST["importCalList"])) {
 // Check if file already exists
 if (file_exists($target_file)) {
   //echo "Sorry, file already exists.<br/>";
-  $uploadOk = 0;
+  //$uploadOk = 0;
+  //echo "File already exists, and will be overwritten.<br/>";
+  $uploadOk = 1;
 }
 
 // Allow certain file formats
@@ -212,15 +214,18 @@ $userEmail = $row["email"];
 <?php
 
 // read CSV file
-if($imageFileType == "dat") {
+if($imageFileType == "dat" OR $imageFileType == "csv") {
   //echo "Read CSV file...<br/>";
   $rowNmb = 0;
   $exit = false;
+  if ($_POST["idAction"]=="1") {  // Add new calibration
   if ($_POST["idCalCurve"]=="1") {  // Numerical Calibration Curve
+      //$exit = true;
       echo "<h3>Numerical Calibration Curve</h3>";
       echo "<b>Name:</b> ".$_POST["name"]."<br/>";
       echo "<b>Short Description:</b> ".$_POST["shortDesc"]."<br/>";
       echo "<br/>";
+      if ($exit) echo "<b><font color=red>Polynomial Calibration Curve not supported!</font></b><br/>";
       echo "<b>Engineering Format:</b> ".$_POST["engFmt"]."<br/>";
       echo "<b>Raw Format:</b> ".$_POST["rawFmt"]."<br/>";
       echo "<b>Radix:</b> ".$_POST["radix"]."<br/>";
@@ -230,21 +235,28 @@ if($imageFileType == "dat") {
       $json0 = "{\"engfmt\":\"R\",\"rawfmt\":\"U\",\"radix\":\"D\",\"unit\":\"\",";
       $json2 = "\"values\":[";
       $json3 = "";
-    
-  } else if ($_POST["idCalCurve"]=="2") {
-      $exit = true;
+  } else if ($_POST["idCalCurve"]=="2") {  // Polynomial Calibration Curve
+      //$exit = true;
       echo "<h3>Polynomial Calibration Curve</h3>";
       echo "<b>Name:</b> ".$_POST["name"]."<br/>";
       echo "<b>Short Description:</b> ".$_POST["shortDesc"]."<br/>";
       echo "<br/>";
-      echo "<b><font color=red>Polynomial Calibration Curve not supported!</font></b><br/>";
-  } else if ($_POST["idCalCurve"]=="3") {
-      $exit = true;
+      if ($exit) echo "<b><font color=red>Polynomial Calibration Curve not supported!</font></b><br/>";
+      $json0 = "{";
+      $json1 = "";
+      $json2 = "";
+      $json3 = "";
+  } else if ($_POST["idCalCurve"]=="3") {  // Logarithmical Calibration Curve
+      //$exit = true;
       echo "<h3>Logarithmical Calibration Curve</h3>";
       echo "<b>Name:</b> ".$_POST["name"]."<br/>";
       echo "<b>Short Description:</b> ".$_POST["shortDesc"]."<br/>";
       echo "<br/>";
-      echo "<b><font color=red>Logarithmical Calibration Curve not supported!</font></b><br/>";
+      if ($exit) echo "<b><font color=red>Logarithmical Calibration Curve not supported!</font></b><br/>";
+      $json0 = "{";
+      $json1 = "";
+      $json2 = "";
+      $json3 = "";
   } else {
       $exit = true;
       echo "<b><font color=red>Invalid Type of Calibration Curve!</font></b><br/>";
@@ -278,20 +290,33 @@ if($imageFileType == "dat") {
           $array = explode(" ", $output);
           $num = count($array);
           echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
-          $json3 .= "{\"xval\":\"".$array[0]."\",\"yval\":\"".$array[1]."\"},";
+          if ($_POST["idCalCurve"]=="1") {
+              $json3 .= "{\"xval\":\"".$array[0]."\",\"yval\":\"".$array[1]."\"},";
+          } else if ($_POST["idCalCurve"]=="2") {
+              $json3 .= "\"".$array[0]."\":\"".$array[1]."\",";
+          } else if ($_POST["idCalCurve"]=="3") {
+              $json3 .= "\"".$array[0]."\":\"".$array[1]."\",";
+          }
       }
-	  
     }
     
     echo "<br/>";
-    if ($rowNmb <> intval($_POST["ncurve"])) {
-        echo "<font color=red>ncurve differs:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
-    } else {
-        echo "<font color=blue>ncurve is correct:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+    if ($_POST["idCalCurve"]=="1") {
+        if ($rowNmb <> intval($_POST["ncurve"])) {
+            echo "<font color=red>ncurve differs:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+        } else {
+            echo "<font color=blue>ncurve is correct:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+        }
+        $json1 = "\"ncurve\":\"".$rowNmb."\",\"inter\":\"".$_POST["inter"]."\",";
+        $json3 = rtrim($json3, ",");
+        $json4 = "]}";
+    } else if ($_POST["idCalCurve"]=="2") {
+        $json3 = rtrim($json3, ",");
+        $json4 = "}";
+    } else if ($_POST["idCalCurve"]=="3") {
+        $json3 = rtrim($json3, ",");
+        $json4 = "}";
     }
-    $json1 = "\"ncurve\":\"".$rowNmb."\",\"inter\":\"".$_POST["inter"]."\",";
-    $json3 = rtrim($json3, ",");
-    $json4 = "]}";
     $json = $json0.$json1.$json2.$json3.$json4;
     
     $cal = intval($_POST["idCalCurve"]) - 1;
@@ -306,13 +331,527 @@ if($imageFileType == "dat") {
     $result = $mysqli->query($sql);
     echo "<br/><b>Result:</b> ".$result."<br/>";
     
-    
     fclose($handle);
   }
   
   }  // END: else of if ($result->num_rows > 0)
   }  // END: if (!$exit)
-}  // END: if($imageFileType == "dat")
+
+  } else {  // use existing calibration
+      echo "<br/>... <b>use existing calibration</b> ...<br/>";
+      // get existing calibration curve
+      $sql = "SELECT * FROM `calibration` WHERE id = ".$_POST["sel_calId"];
+      $result = $mysqli->query($sql);
+      $num_rows = mysqli_num_rows($result);
+      if ($result->num_rows != 1) {
+          echo "<br/><b><font color=red>WE HAVE A PROBLEM!</font></b> Calibration Curve with same name (".$_POST["name"].") already exists.<br/>";
+      } else {
+          $row = $result->fetch_assoc();
+          echo "<br/><b>FOUND:</b> ".$row["name"]." / ".$row["shortDesc"]." (".$row["setting"].")<br/>";
+          
+          if ($_POST["idAction"]=="2") {  // Add new points/coefficients
+              echo "<br/><b>Add new points/coefficients for Calibration Curve Type ".$_POST["idCalCurve"]."</b><br/><br/>";
+              
+              if ($_POST["idCalCurve"]=="1") {  // Numerical
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Numerical Calibration Curve not supported!</font></b><br/>";
+              
+                  $setting = substr($row["setting"], 0, -2);
+                  $json3 = "";
+
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          $json3 .= "{\"xval\":\"".$array[0]."\",\"yval\":\"".$array[1]."\"},";
+      }
+	  
+    }
+    
+    echo "<br/>";
+    /*if ($rowNmb <> intval($_POST["ncurve"])) {
+        echo "<font color=red>ncurve differs:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+    } else {
+        echo "<font color=blue>ncurve is correct:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+    }*/
+    //$json1 = "\"ncurve\":\"".$rowNmb."\",\"inter\":\"".$_POST["inter"]."\",";
+    
+    // increase ncurve
+    $obj = json_decode($row["setting"]);
+    $ncurve_old = $obj->{'ncurve'};
+    echo "ncurve old: ".$ncurve_old."<br/>";
+    $ncurve = $ncurve_old + $rowNmb;
+    echo "ncurve new: ".$ncurve."<br/>";
+    $setting = str_replace("\"ncurve\":\"".$ncurve_old."\"", "\"ncurve\":\"".$ncurve."\"", $setting);
+    
+    $json3 = rtrim($json3, ",");
+    $json4 = "]}";
+    //$json = $json0.$json1.$json2.$json3.$json4;
+    $json = $setting.",".$json3.$json4;
+    
+    //$cal = intval($_POST["idCalCurve"]) - 1;
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    $result = $mysqli->query($sql);
+    echo "<br/><b>Result:</b> ".$result."<br/>";
+    
+    fclose($handle);
+  }
+
+
+              } else if ($_POST["idCalCurve"]=="2") {  // Polynomial
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Polynomial Calibration Curve not supported!</font></b><br/>";
+              
+                  $obj = json_decode($row["setting"], TRUE);
+                  foreach($obj as $key => $value) 
+                    {
+                      echo 'key: '.$key.' / value: '.$value.'<br/>';
+                      $arr[$key] = $value;
+                    }
+                  print_r($arr);
+                  echo "<br/>";
+                  /*if (in_array('Pol1', $arr, true)) {
+                      echo "'Pol1' found with strict check<br/>";
+                  }*/
+                  if (array_key_exists('Pol1', $arr)) {
+                      echo "'Pol1' key found \n";
+                  }
+                  echo "<br/>";
+
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    $rowNmb = 0;
+    $update = false;
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          echo "{\"key\":\"".$array[0]."\",\"value\":\"".$array[1]."\"}<br/>";
+          
+          // check if new coefficient already exists
+          //if (in_array($array[0], $arr, true)) {
+          if (array_key_exists($array[0], $arr)) {
+              echo "<font color=red><b>Sorry, coefficient already exists!</b></font><br/>";
+          } else {
+              echo "<font color=blue><b>Coefficient will be added</b></font><br/>";
+              $arr[$array[0]] = $array[1];
+              $update = true;
+          }
+          
+      }
+
+    }
+    echo $rowNmb." data found<br/>";
+    
+    echo "<br/>";
+    print_r($arr);
+    echo "<br/>";
+    
+    $json = "{";
+    foreach($arr as $key => $value) {
+        $json .= "\"$key\":\"$value\",";
+    }
+    $json = rtrim($json, ",");
+    $json .= "}";
+    echo "<font color=blue><b>".$json."</b></font><br/>";
+    
+    if ($update) {
+    echo "<br/>";
+    echo "<b>Database Manipulation: </b><br/>";
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    //$result = $mysqli->query($sql);
+    //echo "<br/><b>Result:</b> ".$result."<br/>";
+    }
+    
+    fclose($handle);
+  }
+
+              
+              } else if ($_POST["idCalCurve"]=="3") {  // Logarithmical
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Logarithmical Calibration Curve not supported!</font></b><br/>";
+              
+                  $obj = json_decode($row["setting"], TRUE);
+                  foreach($obj as $key => $value) 
+                    {
+                      echo 'key: '.$key.' / value: '.$value.'<br/>';
+                      $arr[$key] = $value;
+                    }
+                  print_r($arr);
+                  echo "<br/>";
+                  /*if (in_array('Log1', $arr, true)) {
+                      echo "'Log1' found with strict check\n";
+                  }*/
+                  if (array_key_exists('Log1', $arr)) {
+                      echo "'Log1' key found \n";
+                  }
+                  echo "<br/>";
+
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    $rowNmb = 0;
+    $update = false;
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          echo "{\"key\":\"".$array[0]."\",\"value\":\"".$array[1]."\"}<br/>";
+          
+          // check if new coefficient already exists
+          //if (in_array($array[0], $arr, true)) {
+          if (array_key_exists($array[0], $arr)) {
+              echo "<font color=red><b>Sorry, coefficient already exists!</b></font><br/>";
+          } else {
+              echo "<font color=blue><b>Coefficient will be added</b></font><br/>";
+              $arr[$array[0]] = $array[1];
+              $update = true;
+          }
+          
+      }
+
+    }
+    echo $rowNmb." data found<br/>";
+    
+        echo "<br/>";
+    print_r($arr);
+    echo "<br/>";
+    
+    $json = "{";
+    foreach($arr as $key => $value) {
+        $json .= "\"$key\":\"$value\",";
+    }
+    $json = rtrim($json, ",");
+    $json .= "}";
+    echo "<font color=blue><b>".$json."</b></font><br/>";
+    
+    if ($update) {
+    echo "<br/>";
+    echo "<b>Database Manipulation: </b><br/>";
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    //$result = $mysqli->query($sql);
+    //echo "<br/><b>Result:</b> ".$result."<br/>";
+    }
+    
+    fclose($handle);
+  }
+  
+              
+              
+              }
+          } else if ($_POST["idAction"]=="3") {  // Replace calibration
+              echo "<br/><b>Replace calibration for Calibration Curve Type ".$_POST["idCalCurve"]."</b><br/><br/>";
+              
+              if ($_POST["idCalCurve"]=="1") {  // Numerical
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Numerical Calibration Curve not supported!</font></b><br/>";
+      
+                  $setting = explode("\"values\":", $row["setting"]);
+                  $json3 = "";
+              
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          $json3 .= "{\"xval\":\"".$array[0]."\",\"yval\":\"".$array[1]."\"},";
+      }
+	  
+    }
+    
+    echo "<br/>";
+    /*if ($rowNmb <> intval($_POST["ncurve"])) {
+        echo "<font color=red>ncurve differs:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+    } else {
+        echo "<font color=blue>ncurve is correct:</font> calculated: ".$rowNmb.", given: ".$_POST["ncurve"]."<br/>";
+    }*/
+    //$json1 = "\"ncurve\":\"".$rowNmb."\",\"inter\":\"".$_POST["inter"]."\",";
+    
+    // increase ncurve
+    $obj = json_decode($row["setting"]);
+    $ncurve_old = $obj->{'ncurve'};
+    echo "ncurve old: ".$ncurve_old."<br/>";
+    $ncurve = $rowNmb;
+    echo "ncurve new: ".$ncurve."<br/>";
+    $setting = str_replace("\"ncurve\":\"".$ncurve_old."\"", "\"ncurve\":\"".$ncurve."\"", $setting[0]);
+    
+    $json3 = rtrim($json3, ",");
+    $json4 = "]}";
+    //$json = $json0.$json1.$json2.$json3.$json4;
+    $json = $setting."\"values\":[".$json3.$json4;
+    
+    //$cal = intval($_POST["idCalCurve"]) - 1;
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    $result = $mysqli->query($sql);
+    echo "<br/><b>Result:</b> ".$result."<br/>";
+    
+    fclose($handle);
+  }
+              
+              
+              } else if ($_POST["idCalCurve"]=="2") {  // Polynomial
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Polynomial Calibration Curve not supported!</font></b><br/>";
+              
+                  echo "<br/>";
+                  echo "<b>Database: </b><br/>";
+                  $obj = json_decode($row["setting"], TRUE);
+                  foreach($obj as $key => $value) 
+                    {
+                      echo 'key: '.$key.' / value: '.$value.'<br/>';
+                      $arr[$key] = $value;
+                    }
+                  print_r($arr);
+                  echo "<br/>";
+                  /*if (in_array('Pol1', $arr, true)) {
+                      echo "'Pol1' found with strict check\n";
+                  }*/
+                  if (array_key_exists('Pol1', $arr)) {
+                      echo "'Pol1' key found \n";
+                  }
+                  echo "<br/>";
+                  
+                  echo "<br/>";
+                  echo "<b>File: </b><br/>";
+
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    $rowNmb = 0;
+    $update = false;
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          echo "{\"key\":\"".$array[0]."\",\"value\":\"".$array[1]."\"}<br/>";
+          
+          // check if new coefficient already exists
+          //if (in_array($array[0], $arr, true)) {
+          if (array_key_exists($array[0], $arr)) {
+              echo "<font color=blue><b>Coefficient will be replaced</b></font><br/>";
+              $arr[$array[0]] = $array[1];
+              $update = true;
+          } else {
+              echo "<font color=red><b>Sorry, coefficient does not exist!</b></font><br/>";
+          }
+          
+      }
+
+    }
+    echo $rowNmb." data found<br/>";
+    
+    echo "<br/>";
+    print_r($arr);
+    echo "<br/>";
+    
+    $json = "{";
+    foreach($arr as $key => $value) {
+        $json .= "\"$key\":\"$value\",";
+    }
+    $json = rtrim($json, ",");
+    $json .= "}";
+    echo "<font color=blue><b>".$json."</b></font><br/>";
+    
+    if ($update) {
+    echo "<br/>";
+    echo "<b>Database Manipulation: </b><br/>";
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    //$result = $mysqli->query($sql);
+    //echo "<br/><b>Result:</b> ".$result."<br/>";
+    }
+    
+    fclose($handle);
+  }
+
+              
+              
+              } else if ($_POST["idCalCurve"]=="3") {  // Logarithmical
+              
+      echo "<br/>";
+      if ($exit) echo "<b><font color=red>Logarithmical Calibration Curve not supported!</font></b><br/>";
+              
+                  $obj = json_decode($row["setting"], TRUE);
+                  foreach($obj as $key => $value) 
+                    {
+                      echo 'key: '.$key.' / value: '.$value.'<br/>';
+                      $arr[$key] = $value;
+                    }
+                  print_r($arr);
+                  echo "<br/>";
+                  /*if (in_array('Log1', $arr, true)) {
+                      echo "'Log1' found with strict check\n";
+                  }*/
+                  if (array_key_exists('Log1', $arr)) {
+                      echo "'Log1' key found \n";
+                  }
+                  echo "<br/>";
+
+  if (($handle = fopen($target_file, "r")) !== FALSE) {
+    //while (($data = fgetcsv($handle, 1024, $csvDelimiter)) !== FALSE) {
+    $rowNmb = 0;
+    $update = false;
+    while (($data = fgets($handle)) !== FALSE) {
+      //$num = count($data);
+      //echo "Nr.: ".$num."<br/>";
+      //echo "dat[0]: ".$data[0]."<br/>";
+      echo "<b>row:</b> ".$data."<br/>";
+      if (substr($data, 0, 1) == "#") {
+          echo "&nbsp;&nbsp;=> comment found<br/>";
+      } else {
+          $rowNmb += 1;
+          $output = preg_replace('/\s+/', ' ',trim($data));
+          $array = explode(" ", $output);
+          $num = count($array);
+          echo "&nbsp;&nbsp;=> Nr.: ".$num."<br/>";
+          echo "{\"key\":\"".$array[0]."\",\"value\":\"".$array[1]."\"}<br/>";
+          
+          // check if new coefficient already exists
+          //if (in_array($array[0], $arr, true)) {
+          if (array_key_exists($array[0], $arr)) {
+              echo "<font color=blue><b>Coefficient will be replaced</b></font><br/>";
+              $arr[$array[0]] = $array[1];
+              $update = true;
+          } else {
+              echo "<font color=red><b>Sorry, coefficient does not exist!</b></font><br/>";
+          }
+          
+      }
+
+    }
+    echo $rowNmb." data found<br/>";
+
+    echo "<br/>";
+    print_r($arr);
+    echo "<br/>";
+    
+    $json = "{";
+    foreach($arr as $key => $value) {
+        $json .= "\"$key\":\"$value\",";
+    }
+    $json = rtrim($json, ",");
+    $json .= "}";
+    echo "<font color=blue><b>".$json."</b></font><br/>";
+    
+    if ($update) {
+    echo "<br/>";
+    echo "<b>Database Manipulation: </b><br/>";
+    $sql =
+      "UPDATE ".
+      "`calibration` ".
+      "SET ".
+      "`setting` = '".$json."' ".
+      "WHERE ".
+      "id = ".$_POST["sel_calId"];
+    echo "<font color=blue>".$sql."</font><br/>";
+    
+    //$result = $mysqli->query($sql);
+    //echo "<br/><b>Result:</b> ".$result."<br/>";
+    }
+
+    fclose($handle);
+  }
+  
+              
+              
+              }
+          } else {
+              echo "<b><font color=red>Invalid Action: </font></b> ".$_POST["idAction"]."<br/>";
+          }
+      }
+  }  // END: use existing calibration
+
+}  // END: if($imageFileType == "dat" OR $imageFileType == "csv")
 
 ?>
 

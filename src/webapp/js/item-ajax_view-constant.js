@@ -127,26 +127,26 @@ $(".crud-submit-show").click(function(e){
 
 /* Create new Item */
 $(".crud-submit").click(function(e){
-    //e.preventDefault();
+    e.preventDefault();
     var form_action = $("#create-item").find("form").attr("action-data");
-    var id = $("#create-item").find("input[name='id']").val();
-    var domain = $("#create-item").find("input[name='domain']").val();
-    var name = $("#create-item").find("input[name='name']").val();
-    var value = $("#create-item").find("input[name='value']").val();
-    var desc = $("#create-item").find("textarea[name='desc']").val();
+    var idStandard = $("#create-item").find("input[name='idStandard']").val();
+    var domain = $("#create-item").find("input[name='domain_create']").val();
+    var name = $("#create-item").find("input[name='name_create']").val();
+    var value = $("#create-item").find("input[name='value_create']").val();
+    var desc = $("#create-item").find("textarea[name='desc_create']").val();
 
-    if(id != '' && domain != '' && name != '' && value != '' && desc != ''){
+    if(idStandard != '' && domain != '' && name != '' && value != '' && desc != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
-            data:{id:id, domain:domain, name:name, value:value, desc:desc}
+            data:{idStandard:idStandard, domain:domain, name:name, value:value, desc:desc}
         }).done(function(data){
-            $("#create-item").find("input[name='id']").val('');
-            $("#create-item").find("input[name='domain']").val('');
-            $("#create-item").find("input[name='name']").val('');
-            $("#create-item").find("input[name='value']").val('');
-            $("#create-item").find("textarea[name='desc']").val('');
+            //$("#create-item").find("input[name='id']").val('');
+            $("#create-item").find("input[name='domain_create']").val('');
+            $("#create-item").find("input[name='name_create']").val('');
+            $("#create-item").find("input[name='value_create']").val('');
+            $("#create-item").find("textarea[name='desc_create']").val('');
             getPageData();
             $(".modal").modal('hide');
             toastr.success('Item Created Successfully.', 'Success Alert', {timeOut: 5000});

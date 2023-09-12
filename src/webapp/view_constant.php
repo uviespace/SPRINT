@@ -153,27 +153,31 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 
 						<input id="user_role" type="hidden" name="role" value="<?php echo $idRole; ?>" />
 
+                        <div class="form-group">
+							<input type="hidden" name="idStandard" value="<?php echo $idStandard; ?>" />
+						</div>
+
 						<div class="form-group">
 							<label class="control-label" for="title">Domain:</label>
-							<input type="text" name="domain" class="form-control" data-error="Please enter domain." required />
+							<input type="text" name="domain_create" class="form-control" data-error="Please enter domain." required />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Name:</label>
-							<input type="text" name="name" class="form-control" data-error="Please enter name." required />
+							<input type="text" name="name_create" class="form-control" data-error="Please enter name." required />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Value:</label>
-							<input type="text" name="value" class="form-control" data-error="Please enter value." required />
+							<input type="text" name="value_create" class="form-control" data-error="Please enter value." required />
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
 							<label class="control-label" for="title">Description:</label>
-							<textarea name="desc" class="form-control" data-error="Please enter description." ></textarea>
+							<textarea name="desc_create" class="form-control" data-error="Please enter description." ></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 

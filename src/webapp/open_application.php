@@ -19,6 +19,7 @@ $message .= "\npython_cmd: ".$python_cmd;
 
 if (isset($_GET["idProject"])) { $idProject  = $_GET["idProject"]; } else { $idProject=0; };
 if (isset($_GET["idApplication"])) { $idApplication  = $_GET["idApplication"]; } else { $idApplication=0; };
+if (isset($_GET["idStandard"])) { $idStandard  = $_GET["idStandard"]; } else { $idStandard=0; };
 $project_name = "";
 $application_name = "";
 $application_desc = "";
@@ -143,9 +144,20 @@ if ($result->num_rows > 0) {
 	if(isset($_POST['importDpList'])){
 		$messageDpImport = "The Import Data Pool List function is called.\n\n";
 	}
-    
+
+	if(isset($_POST['importEnuList'])){
+		$messageAcrImport = "The Import Enumeration List function is called.\n\n";
+	}
+
     //print_r(array_keys($_POST));
-    
+
+	if(isset($_POST['sel_standard'])){
+        $idStandard = $_POST['sel_standard'];
+        //echo $idStandard."<br/>";
+    } else {
+        $idStandard = 0;
+    }
+
 	if(isset($_POST['sel_calCurve'])){
         $idCalCurve = $_POST['sel_calCurve'];
         //echo $idCalCurve."<br/>";
@@ -214,7 +226,7 @@ while ($row = $result->fetch_assoc()) {
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript">
 	
-	
+    
       $(document).ready(function () {
         console.log("Document ready event handler");
 		
@@ -232,9 +244,16 @@ while ($row = $result->fetch_assoc()) {
 		const queryString = window.location.search;
         console.log(queryString);
 		const urlParams = new URLSearchParams(queryString);
-        
+		
+        // let divImportEnu open, if selStandard is selected
+		const enuopen = urlParams.get('selStandard');
+		if (enuopen=="1") {
+			var x = document.getElementById("divImportEnu");
+			x.style.display = "block";
+		}
+
         // let divImportCal open, if selCalCurve is selected
-		const calopen = urlParams.get('selCalCurve')
+		const calopen = urlParams.get('selCalCurve');
         console.log(calopen);
 		if (calopen=="1") {
 			var x = document.getElementById("divImportCal");
@@ -291,7 +310,7 @@ while ($row = $result->fetch_assoc()) {
 		}
 		
 	function myFunction(divName) {
-		let divs = ["divBuild", "divImportAcr", "divImportDat", "divImportReq", "divImportCal"];
+		let divs = ["divBuild", "divImportAcr", "divImportDat", "divImportReq", "divImportEnu", "divImportCal"];
 		
 		for (div of divs) {
 			//var x = document.getElementById(div);
@@ -310,6 +329,16 @@ while ($row = $result->fetch_assoc()) {
 		}
 		
 	}
+    
+    function showHide(hidden_div) {
+        var div = document.getElementById(hidden_div);
+        if (div.style.display == 'none') {
+          div.style.display = 'block';
+        }
+        else {
+          div.style.display = 'none';
+        }
+    }
 	</script>
 	<script type="text/javascript" src="js/item-ajax.js"></script>
 	<style type="text/css">
@@ -380,6 +409,30 @@ while ($row = $result->fetch_assoc()) {
   position: relative;
   display: inline-block;
   border-bottom: 1px dotted black;
+}
+
+.tooltipEnu {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltipEnu .tooltipEnuText {
+  visibility: hidden;
+  width: 250px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 5px;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+
+.tooltipEnu:hover .tooltipEnuText {
+  visibility: visible;
 }
 
 .tooltipCal {
@@ -489,6 +542,8 @@ while ($row = $result->fetch_assoc()) {
 				<button class="btn btn-primary edit-item" onclick="myFunction('divImportDat')">Import Data Pool List</button>
 				&nbsp;&nbsp;&nbsp;
 				<button class="btn btn-primary edit-item" onclick="myFunction('divImportReq')">Import Requirement List</button>
+				&nbsp;&nbsp;&nbsp;
+				<button class="btn btn-primary edit-item" onclick="myFunction('divImportEnu')">Import Enumeration List</button>
 				<?php if (doesTableExists($mysqli, "calibration")) { ?>
 				&nbsp;&nbsp;&nbsp;
 				<button class="btn btn-primary edit-item" onclick="myFunction('divImportCal')">Import Calib. Curve</button>
@@ -497,6 +552,141 @@ while ($row = $result->fetch_assoc()) {
 				<br/><br/><br/>
 
 
+
+                <!-- ### Import Enumeration List ################################################ -->
+                <div id="divImportEnu">
+
+				<form id="formEnuGET" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 15px 15px 1px 15px;" method="POST" " action="open_application.php?idProject=<?php echo $idProject; ?>&idApplication=<?php echo $idApplication; ?>&selStandard=1">
+                <!-- padding: top right bottom left -->
+
+                  <div class="table" style="margin-bottom:0px;">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Standard
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <select name="sel_standard" class="form-control" onchange="this.form.submit()" data-error="Please enter standard." required>
+<?php
+$sql = "SELECT * FROM `standard` WHERE idProject = $idProject";
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+//echo "<h3>Standards</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    if ($result->num_rows > 1) {
+        echo "<option value='0'>--- Please select a Standard ---</option>";
+    }
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        /*echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_standard.php?idProject=$id&idStandard=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b></a>";
+        echo "</div>";
+        echo "<br/>";*/
+        if ($result->num_rows == 1) {
+            $idStandard = $row["id"];
+            echo "<option value='".$row["id"]."' selected>".$row["name"]."</option>";
+        } else {
+            if ($row["id"] == $idStandard) {
+                echo "<option value='".$row["id"]."' selected>".$row["name"]."</option>";
+            } else {
+                echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
+            }
+        }
+    }
+} else {
+    echo "0 results";
+}
+?>
+                          </select>
+                      </div>
+                  </div>
+                  
+                  <?php if ($idStandard > 0) { ?>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          CSV delimiter
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="text" name="csvDelimiter" class="form-control" data-error="Please enter CSV delimiter." required />
+                      </div>
+                  </div>
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Data Type
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <!--<input type="hidden"  name="selDataType" class="form-control" value="1" required />-->
+                          <select name="sel_dataType" class="form-control">
+                              <!--<option value="0">--- Please select ---</option>-->
+<?php
+$sql = "SELECT * FROM `type` WHERE idStandard = ".$idStandard;
+
+$result = $mysqli->query($sql);
+
+$num_rows = mysqli_num_rows($result);
+
+//echo "<h3>Standards</h3> $num_rows hits<br/><br/>";
+
+if ($result->num_rows > 0) {
+    // output data of each row
+    while($row = $result->fetch_assoc()) {
+        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        /*echo "<div style='height:30px; padding:5px; width:50%; background-color:lightblue;'>";
+        echo "<a href='open_standard.php?idProject=$id&idStandard=".$row["id"]."' >".$row["id"]." <b>".$row["name"]."</b></a>";
+        echo "</div>";
+        echo "<br/>";*/
+        echo "<option value='".$row["id"]."'>".$row["name"]."</option>";
+    }
+} else {
+    echo "0 results";
+}
+?>
+                          </select>
+                      </div>
+                  </div>
+                  <?php } ?>
+                  </div>
+					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+
+                </form>
+                <?php if ($idStandard > 0) { ?>
+				<form method="post" enctype="multipart/form-data" style="background-color: #d1d1d1; padding: 1px 15px 15px 15px;"
+				onsubmit="this.action='view_enumeration-import.php?idProject=<?php echo $idProject; ?>&'+Array.prototype.slice.call(formEnuGET.elements).map(function(val){return val.name + '=' + val.value}).join('&');"> <!-- action="view_enumeration-import.php" --> <!-- padding: top right bottom left -->
+                  <div class="table">
+                  <div class="table-row">
+                      <div class="table-cell" style="width:20%;">
+                          Select Enumeration List to Upload
+						  <div class="tooltipEnu">INFO
+                            <span class="tooltipEnuText">Format: e.g. "Enumeration Name ; [Value]" with a CSV delimiter of ";" </span>
+                          </div>
+                      </div>
+                      <div class="table-cell" style="width:80%;">
+                          <input type="file" name="fileToUpload" id="fileToUpload" class="form-control" required >
+                      </div>
+                  </div>
+                  </div>
+					
+					<input type="hidden" name="idProject" class="edit-id" value="<?php echo $idProject; ?>">
+					<input type="hidden" name="idApplication" class="edit-id" value="<?php echo $idApplication; ?>">
+                    <?php if ($idRole < 4) { ?>
+					<input type="submit" name="importEnuList" value="Import Enumeration List" class="btn btn-success crud-submit-import-enulist">
+                    <?php } else { ?>
+                    <input type="submit" name="importEnuList" value="Import Enumeration List" class="btn btn-success crud-submit-import-enulist" disabled>
+                    <?php } ?>
+                    <br/><br/>
+					<textarea class="form-control" style="background-color: #e1e1e1;" readonly ><?php if(isset($messageEnuImport)){ echo $messageEnuImport;}?></textarea>
+				</form>
+                <?php } ?>
+
+                <br/><br/>
+
+
+				</div> 
 
                 <!-- ### Import Calibration Curve ################################################ -->
                 <div id="divImportCal">

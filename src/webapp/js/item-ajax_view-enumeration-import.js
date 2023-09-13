@@ -226,7 +226,7 @@ $("body").on("click",".update-item",function(){
 	$.ajax({
 		//dataType: 'json',
 		type:'POST',
-		url: url + 'api/create_view-enumeration-import.php?action=link&idType='+idType,
+		url: url + 'api/update_view-enumeration-import.php?idType='+idType,
 		data:{id:id, name:name, value:value, desc:desc},
 		success: function(result) { // we got the response
 			//alert('Successfully called');
@@ -238,7 +238,7 @@ $("body").on("click",".update-item",function(){
 		c_obj.remove();
 		toastr.success('Item Linked Successfully.', 'Success Alert', {timeOut: 5000});
 		getPageData();
-	});*/
+	});
 	//toastr.success('B) Item Linked Successfully.', 'Success Alert', {timeOut: 5000});
 
 });

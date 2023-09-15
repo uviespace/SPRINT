@@ -99,5 +99,24 @@ Password:<br>
 
 </div>
 
+<div style="font-size:x-small;color:white;cursor:default;">
+<?php 
+if(isset($mysqli)) {
+    echo "<br/><br/><br/><br/><br/>";
+    //print_r($mysqli);
+    echo "<b>SPRINT version:</b> 1.2<br/>";
+    echo "<b>PHP version:</b> " . phpversion() . "<br/>";
+    echo "<b>DB-Server Info:</b> " . $mysqli->server_info . "<br/>";
+    echo "<b>DB-Server Version:</b> " . $mysqli->server_version . "<br/>";
+    
+    /* get the name of the current default database */
+    $result = $mysqli->query("SELECT DATABASE()");
+    $row = $result->fetch_row();
+    printf("<b>DB-Name:</b> %s \n", $row[0]);
+
+}
+?>
+</div>
+
 </body>
 </html>

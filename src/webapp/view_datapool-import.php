@@ -113,7 +113,7 @@ if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
         //echo "found: ".$row["name"]."<br/>";
-        $arrNames[] = $row["name"];
+        $arrNames[] = $row["name"]."|".$row["value"]."|".$row["shortDesc"];
     }
 } else {
     //echo "0 results";
@@ -293,18 +293,9 @@ if($imageFileType == "csv") {
 	    $domain = $dpDomain;
 	  }
 	  
-	  // name
+      // name
 	  $name = $data[0];
-	  // check if name exists already in Data Pool
-	  $foundName = false;
-	  foreach ($arrNames as $arrName) {
-	    if($arrName == $dpNamePrefix.$name) {
-				//echo "Value: ".$arrName."<br/>";
-				$foundName = true;
-			break;
-		}
-	  }
-	  
+
 	  // kind
 	  if($data[5]=="PAR") {
 	    $kind = 5; // PAR IMP
@@ -364,7 +355,25 @@ if($imageFileType == "csv") {
 	  
 	  // unit
 	  $unit = ""; // "bitsize: ".$data[3];
-	  
+
+	  // check if name exists already in Data Pool
+	  $foundName = false;
+      $foundValue = false;
+      $foundDesc = false;
+	  foreach ($arrNames as $arrName) {
+          if(explode("|", $arrName)[0] == $dpNamePrefix.$name) {
+				//echo "Value: ".$arrName."<br/>";
+				$foundName = true;
+                if (explode("|", $arrName)[1] == $value) {
+                    $foundValue = true;
+                }
+                if (explode("|", $arrName)[2] == $shortDesc) {
+                    $foundDesc = true;
+                }
+                break;
+		}
+	  }
+
 	echo "<tr>";
 	echo "<td style=\"color: #fff;\">".$idStandard."</td>"; // id = idStandard (hidden)
 	echo "<td>".$domain."</td>"; // domain
@@ -376,12 +385,27 @@ if($imageFileType == "csv") {
 	echo "<td class=\"td-hover-break\">".$value."</td>"; // value
 	echo "<td>".$unit."</td>"; // unit
 	echo "<td data-id=\"'+value.id+'\">";
-	if ($foundName) {
-		echo "Item already found in Data Pool!";
-	} else {
-		echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
-		echo "<button class=\"btn btn-success add-item\">Add</button>";
-	}
+    
+    if ($foundName) {
+        if ($foundValue) {
+            if ($foundDesc) {  // found: name, value, desc
+                echo "<p style='font-size:x-small;word-break:normal;color:blue;'>Item already found in Database and is identical!</p>";
+            } else {  // found: name, value
+                echo "<p style='font-size:x-small;word-break:normal;color:red;'>Item already found in Database, but description differs!</p>";
+                echo "<button class=\"btn btn-secondary update-item\">Update</button>";
+            }
+        } else if ($foundDesc) {  // found: name, desc
+            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Item already found in Database, but value differs!</p>";
+            echo "<button class=\"btn btn-secondary update-item\">Update</button>";
+        } else {  // found: name
+            echo "<p style='font-size:x-small;word-break:normal;color:red;'>Item already found in Database, but value and description differs!</p>";
+            echo "<button class=\"btn btn-secondary update-item\">Update</button>";
+        }
+    } else {  // found nothing
+        //echo "<button data-toggle=\"modal\" data-target=\"#show-item\" class=\"btn btn-primary show-item\">Show</button> ";
+        echo "<button class=\"btn btn-success add-item\">Add</button>";
+    }
+    
 	echo "</td>";
 	echo "</tr>";
 	  

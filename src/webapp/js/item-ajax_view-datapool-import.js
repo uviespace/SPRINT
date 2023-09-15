@@ -320,6 +320,41 @@ $("body").on("click",".add-item",function(){
 
 });
 
+/* Update Item */
+$("body").on("click",".update-item",function(){
+    var id = $(this).parent("td").data('id');
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
+    var value = $(this).parent("td").prev("td").prev("td").text();
+    var unit = $(this).parent("td").prev("td").text();
+    
+	toastr.success('Item ['+name+' / '+value+' ('+shortDesc+')] for '+domain+' Linked Successfully.', 'Success Alert', {timeOut: 5000});
+	
+	var c_obj = $(this).parents("tr");
+	$.ajax({
+		//dataType: 'json',
+		type:'POST',
+		url: url + 'api/update_view-datapool-import.php',
+		data:{id:id, domain:domain, name:name, value:value, shortDesc:shortDesc},
+		success: function(result) { // we got the response
+			//alert('Successfully called');
+		},
+		error: function(jqxhr, status, exception) {
+			alert(status + ' | '+jqxhr+' | Exception:', exception);
+		}
+	}).done(function(data){
+		c_obj.remove();
+		toastr.success('Item Linked Successfully.', 'Success Alert', {timeOut: 5000});
+		getPageData();
+	});
+	//toastr.success('B) Item Linked Successfully.', 'Success Alert', {timeOut: 5000});
+
+});
+
 /* Remove Item */
 $("body").on("click",".remove-item",function(){
 	var id = $(this).parent("td").data('id');

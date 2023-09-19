@@ -170,11 +170,27 @@ if ($result->num_rows > 0) {
 
         $result_sub = $mysqli->query($sql_sub);
 
+        $idParent = $row["id"];
+        $sql_params = 
+          "SELECT ".
+          "ps.id, ps.type, ps.idParameter, ps.order, ps.role, ps.group, ps.repetition, ps.desc, p.name, p.idType, t.size ".
+          "FROM `parametersequence` AS ps, `parameter` AS p, `type` AS t ".
+          "WHERE ps.idPacket = ".$idParent." AND ps.idParameter = p.id AND p.idType = t.id ".
+          "ORDER BY ps.order ASC";
+        $result_params = $mysqli->query($sql_params);
+        $num_rows_params = mysqli_num_rows($result_params);
+
         echo "<div class='content'>";
 
         while($row_sub = $result_sub->fetch_assoc()) {
+            
+            $sql_sub_params =
+              "SELECT * FROM `parametersequence` AS ps WHERE ps.idPacket IN (SELECT id FROM `packet` AS p WHERE p.idParent = ".$idParent." AND p.discriminant = '".$row_sub["discriminant"]."')";
+            $result_sub_params = $mysqli->query($sql_sub_params);
+            $num_rows_sub_params = mysqli_num_rows($result_sub_params);
+            
             echo "<div style='height:24px; padding:2px; margin-bottom: 2px; width:45%; background-color:#dbe4f0;margin-left:40px;'>";
-                echo "<a href='view_packet-params-derived.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."&idPacket=".$row_sub["id"]."' >".$row_sub["discriminant"]."</a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."&idPacket=".$row_sub["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a>";
+                echo "<a href='view_packet-params-derived.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."&idPacket=".$row_sub["id"]."' >".$row_sub["discriminant"]."</a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idParent=".$row["id"]."&idPacket=".$row_sub["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a> ... <b>".$num_rows_params."</b> + <b>".$num_rows_sub_params."</b> parameter(s)";
             echo "</div>";
         }
 

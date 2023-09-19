@@ -134,6 +134,8 @@ $sql =
   "(p.discriminant = '' OR ".
   "p.discriminant IS NULL) ".
   "ORDER BY p.domain, p.subtype";
+  
+
 
 $result = $mysqli->query($sql);
 
@@ -145,11 +147,22 @@ if ($result->num_rows > 0) {
     // output data of each row
     while($row = $result->fetch_assoc()) {
         // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+        
+        $idPacket = $row["id"];
+        $sql_params = 
+          "SELECT ".
+          "ps.id, ps.type, ps.idParameter, ps.order, ps.role, ps.group, ps.repetition, ps.desc, p.name, p.idType, t.size ".
+          "FROM `parametersequence` AS ps, `parameter` AS p, `type` AS t ".
+          "WHERE ps.idPacket = ".$idPacket." AND ps.idParameter = p.id AND p.idType = t.id ".
+          "ORDER BY ps.order ASC";
+        $result_params = $mysqli->query($sql_params);
+        $num_rows_params = mysqli_num_rows($result_params);
+        
         echo "<div style='height:24px; padding:2px; margin-bottom: 2px; width:50%; background-color:lightblue;'>";
         if ($row["kind"] == 1) {
-            echo "<a href='view_packet-params.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TM(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a>";
+            echo "<a href='view_packet-params.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TM(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a> ... <b>".$num_rows_params."</b> parameter(s)";
         } else {
-            echo "<a href='view_packet-params.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TC(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a>";
+            echo "<a href='view_packet-params.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."' >".$row["id"]." <b>".$row["domain"]." / TC(".$row["type"]."/".$row["subtype"].") ".$row["name"]."</b></a> <a href='packet-inspector.php?idProject=".$idProject."&idStandard=".$idStandard."&idPacket=".$row["id"]."'><img width='20px' src='img/datainspector-icon.png' /></a> ... <b>".$num_rows_params."</b> parameter(s)";
         }
         echo "</div>";
     }

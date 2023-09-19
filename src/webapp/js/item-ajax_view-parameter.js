@@ -13,6 +13,7 @@ var idParameter = getUrlVars()["idParameter"];
 
     getDropdownDataKindCreate();
     getDropdownDataParameterDatatypeCreate();
+    getDropdownDataRoleCreate();
 
 manageData();
 
@@ -127,6 +128,18 @@ function getDropdownDataParameterDatatype(idType) {
 	});
 }
 
+/* Get Dropdown Data for Role */
+function getDropdownDataRole(role) {
+    var data = { 
+        "data": [
+            { "role":"0", "name":"Default", "desc":"Default" }, 
+            { "role":"6", "name":"ParId", "desc":"Parameter ID" }, 
+            { "role":"7", "name":"ComId", "desc":"Command ID" }
+        ]
+    };
+    manageOptionRole(data.data, role);
+}
+
 /* Add new option to select */
 function manageOptionKind(data, kind) {
 	$("#sel_kind").empty();
@@ -147,6 +160,18 @@ function manageOptionParameterDatatype(data, idType) {
 			$("#sel_datatype").append('<option value="'+value.id+'" selected>'+value.domain+' / '+value.name+' ('+value.id+')</option>');
 		} else {
 			$("#sel_datatype").append('<option value="'+value.id+'">'+value.domain+' / '+value.name+' ('+value.id+')</option>');
+		}
+	});
+}
+
+/* Add new option to select */
+function manageOptionRole(data, role) {
+	$("#sel_role").empty();
+	$.each( data, function( key, value ) {
+		if (role==value.role) {
+			$("#sel_role").append('<option value="'+value.role+'" selected>'+value.desc+'</option>');
+		} else {
+			$("#sel_role").append('<option value="'+value.role+'">'+value.desc+'</option>');
 		}
 	});
 }
@@ -179,6 +204,18 @@ function getDropdownDataParameterDatatypeCreate() {
 	});
 }
 
+/* Get Dropdown Data for Role */
+function getDropdownDataRoleCreate() {
+    var data = { 
+        "data": [ 
+            { "role":"0", "name":"Default", "desc":"Default" }, 
+            { "role":"6", "name":"ParId", "desc":"Parameter ID" }, 
+            { "role":"7", "name":"ComId", "desc":"Command ID" }
+        ]
+    };
+    manageOptionRoleCreate(data.data);
+}
+
 /* Add new option to select */
 function manageOptionKindCreate(data) {
 	$("#sel_kind_create").empty();
@@ -200,6 +237,18 @@ function manageOptionParameterDatatypeCreate(data) {
 	});
 }
 
+/* Add new option to select */
+function manageOptionRoleCreate(data) {
+	$("#sel_role_create").empty();
+	$.each( data, function( key, value ) {
+		if (value.role=="0") {
+			$("#sel_role_create").append('<option value="'+value.role+'" selected>'+value.desc+'</option>');
+		} else {
+			$("#sel_role_create").append('<option value="'+value.role+'">'+value.desc+'</option>');
+		}
+	});
+}
+
 /* Add new Item table row */
 function manageRow(data) {
 	var	rows = '';
@@ -211,6 +260,7 @@ function manageRow(data) {
 	  	rows = rows + '<td>'+value.shortDesc+'</td>';
 	  	rows = rows + '<td>'+value.kind+'</td>';
 	  	rows = rows + '<td>'+value.idType+'</td>';
+	  	rows = rows + '<td>'+value.role+'</td>';
 	  	rows = rows + '<td>'+value.multiplicity+'</td>';
 	  	rows = rows + '<td>'+value.value+'</td>';
 	  	rows = rows + '<td>'+value.unit+'</td>';
@@ -319,17 +369,19 @@ $("body").on("click",".remove-item",function(){
 $("body").on("click",".edit-item",function(){
 
     var id = $(this).parent("td").data('id');
-    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var role = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
     var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
     var value = $(this).parent("td").prev("td").prev("td").text();
     var unit = $(this).parent("td").prev("td").text();
 
     getDropdownDataKind(kind);
     getDropdownDataParameterDatatype(idType);
+    getDropdownDataRole(role);
 
     $("#edit-item").find("input[name='domain']").val(domain);
     $("#edit-item").find("input[name='name']").val(name);
@@ -343,6 +395,11 @@ $("body").on("click",".edit-item",function(){
       $("#edit-item").find("input[name='idType']").val(idType);
     } else {
       $("#edit-item").find("select[name='idType']").val(idType);
+    }
+    if (!idStandard.length) {
+      $("#edit-item").find("input[name='role']").val(role);
+    } else {
+      $("#edit-item").find("select[name='role']").val(role);
     }
     $("#edit-item").find("input[name='multiplicity']").val(multiplicity);
     $("#edit-item").find("input[name='value']").val(value);
@@ -369,6 +426,11 @@ $(".crud-submit-edit").click(function(e){
     } else {
       var idType = $("#edit-item").find("select[name='idType']").val();
     }
+    if (!idStandard.length) {
+      var role = $("#edit-item").find("input[name='role']").val();
+    } else {
+      var role = $("#edit-item").find("select[name='role']").val();
+    }
     var multiplicity = $("#edit-item").find("input[name='multiplicity']").val();
     var value = $("#edit-item").find("input[name='value']").val();
     var unit = $("#edit-item").find("input[name='unit']").val();
@@ -378,13 +440,13 @@ $(".crud-submit-edit").click(function(e){
 		toastr.error('Multiplicity should not be zero!', 'Failure Alert', {timeOut: 5000});
 	} else {
 
-    if(id != '' && domain != '' && name != '' && idType != '' && kind != ''){
+    if(id != '' && domain != '' && name != '' && idType != '' && kind != '' && role != ''){
         $.ajax({
             dataType: 'json',
             type:'POST',
             url: url + form_action,
             data:{id:id, domain:domain, name:name, shortDesc:shortDesc,
-            idType:idType, kind:kind, multiplicity:multiplicity, value:value, unit:unit}
+            idType:idType, kind:kind, role:role, multiplicity:multiplicity, value:value, unit:unit}
         }).done(function(data){
             getPageData();
             $(".modal").modal('hide');
@@ -402,11 +464,12 @@ $(".crud-submit-edit").click(function(e){
 $("body").on("click",".edit-values",function(){
 
     var id = $(this).parent("td").data('id');
-    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
-    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
+    var domain = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var name = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var shortDesc = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var kind = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var idType = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").prev("td").text();
+    var role = $(this).parent("td").prev("td").prev("td").prev("td").prev("td").text();
     var multiplicity = $(this).parent("td").prev("td").prev("td").prev("td").text();
     var value = $(this).parent("td").prev("td").prev("td").text();
     var unit = $(this).parent("td").prev("td").text();

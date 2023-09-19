@@ -7,9 +7,9 @@ $post = $_POST;
 $sql = 
   "INSERT INTO ".
   "`parameter` ".
-  "(`idStandard`, `domain`, `name`, `shortDesc`, `idType`, `kind`, `multiplicity`, `value`, `unit`) ".
+  "(`idStandard`, `domain`, `name`, `shortDesc`, `idType`, `kind`, `role`, `multiplicity`, `value`, `unit`) ".
   "VALUES ".
-  "('".$post['idStandard']."','".$post['domain']."','".$post['name']."','".$post['shortDesc']."','".$post['idType']."','".$post['kind']."','".$post['multiplicity']."','".$post['value']."','".$post['unit']."')";
+  "('".$post['idStandard']."','".$post['domain']."','".$post['name']."','".$post['shortDesc']."','".$post['idType']."','".$post['kind']."','".$post['role']."','".$post['multiplicity']."','".$post['value']."','".$post['unit']."')";
 
 $result = $mysqli->query($sql);
 

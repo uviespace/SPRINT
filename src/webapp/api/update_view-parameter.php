@@ -16,6 +16,7 @@
 	"`shortDesc` = '".$post['shortDesc']."', ".
 	"`idType` = '".$post['idType']."', ".
 	"`kind` = '".$post['kind']."', ".
+	"`role` = '".$post['role']."', ".
 	"`multiplicity` = '".$post['multiplicity']."', ".
 	"`value` = '".$post['value']."', ".
 	"`unit` = '".$post['unit']."' ".

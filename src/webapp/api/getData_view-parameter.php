@@ -33,6 +33,7 @@ $sqlTotal =
   "    p.shortDesc, ".
   "    p.idType, ".
   "    concat(t.domain, ' / ', t.name) AS datatype, ".
+  "    p.role, ".
   "    p.multiplicity, ".
   "    p.value, ".
   "    p.unit ".
@@ -57,6 +58,7 @@ $sql =
   "    p.shortDesc, ".
   "    p.idType, ".
   "    concat(t.domain, ' / ', t.name) AS datatype, ".
+  "    p.role, ".
   "    p.multiplicity, ".
   "    p.value, ".
   "    p.unit ".

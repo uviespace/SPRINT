@@ -159,6 +159,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 				<th>Short Description</th>
 				<th style="min-width:50px;">Kind</th> <!-- Dropdown -->
 				<th style="min-width:55px;">Data-<br>type</th> <!-- Dropdown -->
+                <th style="min-width:50px;">Role</th> <!-- Dropdown -->
 				<th style="min-width:60px;">Multi-<br>plicity</th>
 				<th width="120px">Value</th>
 				<th style="min-width:60px;">Unit</th>
@@ -219,6 +220,15 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 							<label class="control-label" for="title">Datatype:</label>
 							<!--<input type="text" name="idType" class="form-control" data-error="Please enter type." required />-->
 						    <select id="sel_datatype_create" name="idType" class="form-control" data-error="Please enter datatype." required >
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Role:</label>
+							<!--<input type="text" name="idType" class="form-control" data-error="Please enter type." required />-->
+						    <select id="sel_role_create" name="role" class="form-control" data-error="Please enter role." required >
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
@@ -298,6 +308,15 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 							<label class="control-label" for="title">Datatype:</label>
 							<!--<input type="text" name="datatype" class="form-control" data-error="Please enter datatype." />-->
 							<select id="sel_datatype" name="idType" class="form-control" data-error="Please enter datatype." required >
+								<option value="select"></option>
+							</select>
+							<div class="help-block with-errors"></div>
+						</div>
+
+						<div class="form-group">
+							<label class="control-label" for="title">Role:</label>
+							<!--<input type="text" name="idType" class="form-control" data-error="Please enter type." required />-->
+						    <select id="sel_role" name="role" class="form-control" data-error="Please enter role." required >
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>

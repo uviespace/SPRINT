@@ -296,7 +296,7 @@ if($imageFileType == "csv") {
       } else if ($num==2) {
           // use values as given
           
-          // name, desc
+          // name, value, desc
           $name = $data[0];
           $value = $data[1];
           $desc = "";

@@ -468,7 +468,7 @@ $.ajax({
         if(id == '' && setting != ''){
             
             url = '/dbeditor/api/update_view-calibration-setting.php';
-            //url = '/SPRINT/api/update_view-component-setting.php';
+            //url = '/SPRINT/api/update_view-calibration-setting.php';
             var posting = $.post( url, { type:type, name:name, shortDesc:shortDesc, setting: setting2, idStandard: idStandard, idCalibration: idCalibration } );
             //alert('You are sending ...: (posting = '+posting+')');
             

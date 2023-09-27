@@ -21,7 +21,7 @@ function getUrlVars() {
 }
 
   $.ajax({
-    url : "http://localhost/dbeditor/api/getData_json-calibration-setting.php?idStandard="+idStandard+"&idCalibration="+idCalibration,
+    url : url + "api/getData_json-calibration-setting.php?idStandard="+idStandard+"&idCalibration="+idCalibration,
     type : "GET",
     success : function(data){
       console.log("Hello from AJAX! Logarithmic Calibration.");

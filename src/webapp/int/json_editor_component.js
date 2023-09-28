@@ -112,6 +112,7 @@ $.ajax({
                         "var_attr",
                         "max_line_length",
                         "indent",
+                        "dpid_offset",
                         "includes"
                     ],
                     patternProperties: {
@@ -414,6 +415,7 @@ $.ajax({
                         "var_attr",
                         "max_line_length",
                         "indent",
+                        "dpid_offset",
                         "includes"
                     ],
                     patternProperties: {

@@ -418,13 +418,15 @@ def gen_pcf(app, path):
         if relation["relation"] == 1:
             standard = relation["standard"]
 
-            dpid_offset = 345544320 - 0   # -1 because dpid starts with 0+1
+            comp_dp2 = app["components"]["hash"]["dp2"]
+            settings_dp2 = comp_dp2["setting"]
+            dpid_offset = settings_dp2["dpid_offset"] - 0   # -1 because dpid starts with 0+1
 
             #for tm in standard["packets"]["TM"]["list"]:
             #    for param_i in tm["body"]:
             #        print("gen_pcf: ", param_i["param"]["id"], param_i["param"]["name"])
 
-
+            # TODO: include also all other datapool items which are not used in TM and TC packets
             for param in standard["params"]["list"]:
 
                 # check if parameter is in header
@@ -704,6 +706,7 @@ def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
 
         # value = outp(param_i["repetition"], 17) if param_i["group"] > 0 and param_i["repetition"] > 0 else None
         size = outp(param["_size"], 4) if param["_size"] != None or param["_size"] == "" else '0'
+        # eltype: 'A' FIXED AREA / SPARE; 'F' FIXED PARAM / DISCRIMINANT; 'E' EDITABLE
         eltype = \
             'A' if int(param_i["role"]) == 8 else \
             'F' if value != None or int(param_i["role"]) == 3 else \

@@ -172,27 +172,27 @@ def gen_struct(f, dname, params, vars):
     def write_struct(f, name, params):
         if len(params) > 0:
             writeln(f, "/** Type description */")
-            writeln(f, "typedef struct {")
+            writeln(f, "struct Dp{0} {{".format(name))
             for param in params:
                 tname = param["type"]["name"] if param["type"] != None else "undefined"
                 pname = cname(param["name"])
                 multi = param["multi"]
-                writeln(f, "/** {0} */".format(param["_desc"]), 1)
-                if multi != None:
+                writeln(f, "/* {0} */".format(param["_desc"]), 1)
+                if multi is not None and int(multi) > 1:
                     writeln(f, u"{0} {1}[{2}];".format(tname, pname, multi), 1)
                 else:
                     writeln(f, u"{0} {1};".format(tname, pname), 1)
-            writeln(f, "}} Dp{0}_t;".format(name))
+            writeln(f, "};")
             writeln(f, "")
 
     write_struct(f, dname + "Params", params)
     write_struct(f, dname + "Vars", vars)
     if len(params) > 0:
         writeln(f, "/** Extern declaration for structure holding data pool variables in service {0} */".format(dname))
-        writeln(f, "extern Dp{0}_t dp{0};".format(dname + "Params"))
+        writeln(f, "extern struct Dp{0} dp{0};".format(dname + "Params"))
     if len(vars) > 0:
         writeln(f, "/** Extern declaration for structure holding data pool parameters in service {0} */".format(dname))
-        writeln(f, "extern Dp{0}_t dp{0};".format(dname + "Vars"))
+        writeln(f, "extern struct Dp{0} dp{0};".format(dname + "Vars"))
     writeln(f, "")
 
 def gen_file_name(dname):
@@ -213,11 +213,11 @@ def gen_files(path, domain, params, vars):
             pname = cname(param["name"])
             value = param["value"]
             if (param["multi"] != None) and not ("{" in value):
-                value = "{"+value+"}"
+                value = ""+value+""
             if param == params[-1]:
-                writeln(f, "{0} /* {1} */ \\".format(value, pname), 1)
+                writeln(f, "{0} /* {1} */".format(value, pname), 1)
             else:
-                writeln(f, "{0}, /* {1} */ \\".format(value, pname), 1)
+                writeln(f, "{0}, /* {1} */".format(value, pname), 1)
 
     dname = cname(domain)
     h_name = gen_file_name_h("Dp" + dname)
@@ -237,12 +237,12 @@ def gen_files(path, domain, params, vars):
     writeln(f, "#include \"{0}\"".format(h_name))
     writeln(f, "")
     if len(params) > 0:
-        writeln(f, "Dp{0}_t dp{0} {1} = {2}".format(dname+"Params", settings["param_attr"],"{ \\"))
+        writeln(f, "struct Dp{0} dp{0} {1} = {2}".format(dname+"Params", settings["param_attr"],"{ \\"))
         multi_params = write_init_val(f, params, "Params")
         writeln(f,"};")
     writeln(f, "")
     if len(vars) > 0:
-        writeln(f, "Dp{0}_t dp{0} {1} = {2}".format(dname+"Vars", settings["var_attr"],"{ \\"))
+        writeln(f, "struct Dp{0} dp{0} {1} = {2}".format(dname+"Vars", settings["var_attr"],"{ \\"))
         multi_params = write_init_val(f, vars, "Vars")
         writeln(f,"};")
     writeln(f, "")

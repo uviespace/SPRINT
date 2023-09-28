@@ -414,6 +414,38 @@ def getDatatype(ptc, pfc, width):
 
     return dt
 
+def gen_dp_enum_list(app, path):
+    f = new_file(path, "dp_enum")
+
+    delimiter = "|"
+
+    writeln(f, ['# IASW Version: _._ p_; commit hash: ____; MIB Version: _._._'])
+    writeln(f, [
+        'DP item' + delimiter,  # DP item
+        'Enum type' + delimiter,  # Enum type
+        'Raw value' + delimiter,  # Raw value
+        'Calibration value (14 characters)' + delimiter,  # Calibration value (14 characters)
+        'meaning' + delimiter  # Meaning
+    ])
+    for relation in app["standards"]:
+        if int(relation["relation"]) == 1:
+            standard = relation["standard"]
+            types = standard["types"]
+            for type in standard["types"]:
+                #print("id: ", type, " | type: ", types[type]["enums"])
+                if len(types[type]["enums"]) > 0:
+                    for enum in types[type]["enums"]:
+                        #print("Type: ", types[type]["name"], "Name: ", enum["Name"], "", enum["Value"])
+                        writeln(f, [
+                            "" + delimiter,  # DP item
+                            types[type]["name"] + delimiter,  # Enum type
+                            enum["Value"] + delimiter,  # Raw value
+                            enum["Name"]  + delimiter,  # Calibration value (14 characters)
+                            enum["desc"] + delimiter  # Meaning
+                        ])
+
+    close_file(f)
+
 def gen_dp_list(app, path):
     def add_elem(d, param, type_):
         if param["domain"] not in d:
@@ -680,6 +712,7 @@ def gen_dp_csv(path, comp):
     # General
     gen_dp_pckt_list(app, path)
     gen_dp_list(app, path)
+    gen_dp_enum_list(app, path)
 
 if __name__ == '__main__':
 

@@ -259,19 +259,25 @@ def gen_datapool_h(path, domain_dict, params_list, vars_list):
     if len(params_list) > 0:
         writeln(f, "/* Parameters */", 1)
         # first entry, requires initialisation with lower number than any other id present;
-        # we assume ids are in order order and all are integers...
-        writeln(f, "DATAPOOL_ID_FIRST = {0},".format(params_list[0]["_dpid"] - 1), 1)
+        # OLD: we assume ids are in order and all are integers...
+        # OLD: print("DATAPOOL_ID_FIRST", params_list[0]["_dpid"] - 1)
+        #print("DATAPOOL_ID_FIRST", 0)
+        #print("DATAPOOL_ID_LAST_PARS", params_list[len(params_list) - 1]["_dpid"] + 1)
+        # OLD: writeln(f, "DATAPOOL_ID_FIRST = {0},".format(params_list[0]["_dpid"] - 1), 1)
+        writeln(f, "DATAPOOL_ID_FIRST = 0,", 1)
         #writeln(f, "DpIdParamsHighest = {0},".format(params_list[len(params_list)-1]["_dpid"] + 1), 1)
         for i, param in enumerate(params_list):
             pname = cname(param["name"])
-            writeln(f, "DpId{0}{1}".format(pname, "," if i < len(params_list)-1 or (len(vars_list) > 0) else ""), 1)
+            writeln(f, "DpId{0} = {1}{2}".format(pname,  param["_dpid"], "," if i < len(params_list)-1 or (len(vars_list) > 0) else ""), 1)
     if len(vars_list) > 0:
         writeln(f, "/* Variables */", 1)
+        #print("DATAPOOL_ID_FIRST_VARS", vars_list[0]["_dpid"] - 1)
+        #print("DATAPOOL_ID_LAST", vars_list[len(vars_list)-1]["_dpid"] + 1)
         for i, param in enumerate(vars_list):
             pname = cname(param["name"])
-            writeln(f, "DpId{0},".format(pname, param["_dpid"]), 1)
+            writeln(f, "DpId{0} = {1},".format(pname, param["_dpid"]), 1)
         # final entry (mandatory)
-        writeln(f, "DATAPOOL_ID_LAST", 1)
+        writeln(f, "DATAPOOL_ID_LAST = {0}".format(vars_list[len(vars_list)-1]["_dpid"] + 1), 1)
     writeln(f, "};")
     writeln(f, "")
 

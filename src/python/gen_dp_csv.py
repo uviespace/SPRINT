@@ -456,7 +456,9 @@ def gen_dp_list(app, path):
 
     f = new_file(path, "dp")
 
-    dpid_offset = 345544320 - 0  # -1 because dpid starts with 0+1
+    comp_dp2 = app["components"]["hash"]["dp2"]
+    settings_dp2 = comp_dp2["setting"]
+    dpid_offset = settings_dp2["dpid_offset"] - 0  # -1 because dpid starts with 0+1
     delimiter = "|"
     additionalInfo = True
 
@@ -550,7 +552,9 @@ def gen_dp_list(app, path):
 def gen_dp_pckt_list(app, path):
     f = new_file(path, "dp_pckt")
 
-    dpid_offset = 345544320 - 0  # -1 because dpid starts with 0+1
+    comp_dp2 = app["components"]["hash"]["dp2"]
+    settings_dp2 = comp_dp2["setting"]
+    dpid_offset = settings_dp2["dpid_offset"] - 0  # -1 because dpid starts with 0+1
     delimiter = ","
     additionalInfo = False
 

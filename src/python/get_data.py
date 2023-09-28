@@ -289,6 +289,7 @@ def get_standards(db, project):
         as_list.append(standard)
         as_hash[standard["id"]] = standard
 
+        '''
         if standard["setting"]:
             dpid_p = standard["setting"]["datapool"]["parameter"]["offset"]
         else:
@@ -313,6 +314,80 @@ def get_standards(db, project):
             # else:
             #    dpid_v += param["_multi"]
             # print("VAR - DP ID: ", dpid_v, " Param: ", param["name"])
+        '''
+
+    # get maximal number of datapool identifier from db
+    db_execute(cur, """
+        SELECT MAX(nrParameter) FROM datapoolidentifier WHERE idProject={0}""".format(project["id"]))
+    param_max_nr_fetch = cur.fetchall()
+    param_max_nr = param_max_nr_fetch[0][0]
+    if param_max_nr is None:
+        param_max_nr = 0
+    else:
+        param_max_nr = int(param_max_nr)
+    #print("Project ID = ", project["id"], ", Parameter Max Nr = ", param_max_nr)
+
+    # get all tupel (idParameter, nrParameter) from db
+    db_execute(cur, """
+        SELECT idParameter, nrParameter FROM datapoolidentifier WHERE idProject={0}""".format(project["id"]))
+    param_db = cur.fetchall()
+    #print("Number of params in DB: ", len(param_db))
+    #print("param in DB: ", param_db)
+
+    #print("=== PARS ======================================================================")
+    for param in standard["datapool"]["params"]:
+        param_id = param["id"]
+        value_found = [item for item in param_db if int(item[0]) == int(param_id)]
+        '''value_found = []
+        for item in param_db:
+            if int(item[0]) == int(param_id):
+                value_found.append(item)'''
+        #print("value_of_key: ", param["id"], param["name"], value_found)
+        if len(value_found) == 0:
+            # insert param in DB table
+            param_max_nr += 1
+            #print("new parameter (", param_id, ") found: insert param in DB table with new number: ", param_max_nr)
+            db_execute(cur, """
+                INSERT INTO datapoolidentifier (idProject, nrParameter, idParameter) VALUES ({0}, {1}, {2})""".format(
+                project["id"], param_max_nr, param_id))
+            db.commit()
+            param["_dpid"] = int(param_max_nr)
+        elif len(value_found) == 1:
+            # param found in DB table
+            #print("parameter (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+            param["_dpid"] = int(value_found[0][1])
+        else:
+            # error
+            print("error ", value_found)
+        #project["_nr_param"] = project["_nr_param"] + 1
+
+    #print("=== VARS ======================================================================")
+    for param in standard["datapool"]["vars"]:
+        param_id = param["id"]
+        value_found = [item for item in param_db if int(item[0]) == int(param_id)]
+        '''value_found = []
+        for item in param_db:
+            if int(item[0]) == int(param_id):
+                value_found.append(item)'''
+        #print("value_of_key: ", param["id"], param["name"], value_found)
+        if len(value_found) == 0:
+            # insert param in DB table
+            param_max_nr += 1
+            #print("new parameter (", param_id, ") found: insert param in DB table with new number: ", param_max_nr)
+            db_execute(cur, """
+                INSERT INTO datapoolidentifier (idProject, nrParameter, idParameter) VALUES ({0}, {1}, {2})""".format(
+                project["id"], param_max_nr, param_id))
+            db.commit()
+            param["_dpid"] = int(param_max_nr)
+        elif len(value_found) == 1:
+            # param found in DB table
+            #print("parameter (", value_found[0][0], ") found in DB: set number from DB table: ", value_found[0][1])
+            param["_dpid"] = int(value_found[0][1])
+        else:
+            # error
+            print("error ", value_found)
+        #project["_nr_param"] = project["_nr_param"] + 1
+    #print("===============================================================================")
 
     for standard in as_list:
         cur = db.cursor()
@@ -373,7 +448,7 @@ def get_params(db, standard):
         SELECT p.* FROM parameter p 
         WHERE p.idStandard={0} OR p.idStandard IS NULL or p.idStandard in 
             (SELECT ss.idStandardParent FROM standardstandard ss WHERE ss.idStandardChild={0} and ss.relation=1)
-        ORDER BY p.domain,p.name""".format(standard["id"]))
+            ORDER BY p.domain,p.name""".format(standard["id"]))
 
     as_list = []
     as_hash = {}

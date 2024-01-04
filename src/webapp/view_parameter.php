@@ -103,7 +103,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
             document.getElementById("values_"+i).value = e.target.value;
             document.getElementById("values_"+i).style.backgroundColor='LightYellow';
             select_box = document.getElementById("sel_params_"+i);
-            select_box.selectedIndex = 0;  // -1 empty
+3            select_box.selectedIndex = 0;  // -1 empty
         }
 
     </script>
@@ -228,7 +228,7 @@ $idRole = get_max_access_level($mysqli, $idProject, $userid, $userEmail);
 						<div class="form-group">
 							<label class="control-label" for="title">Role:</label>
 							<!--<input type="text" name="idType" class="form-control" data-error="Please enter type." required />-->
-						    <select id="sel_role_create" name="role" class="form-control" data-error="Please enter role." required >
+						    <select id="sel_role_create" name="param_role" class="form-control" data-error="Please enter role." required >
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>

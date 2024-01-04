@@ -1,0 +1,199 @@
+/*
+ * prop: Properties
+ *
+ * table_id: id of the table the data should be displayed
+ * template_id: id of the template of a new table row
+ * properties: array of properties in an object
+ * open_url: url when opening one item
+ * open_url_param_name: parameter_name for this item
+ * modal_id: id of the modal used for editing
+ * edit_dialog_ids: ids of the controls used for editing
+ * edit_properties: properties that are edited
+ * submit_button_id: id of the submit button
+ * end_point: endpoint for crud functions of this item
+ * create_button_id: id of the create item button
+ * empty_item: item template for new creations (allows filling of standard properties
+ */
+
+class TableHandler
+{
+		constructor(props)
+		{
+				this.props = props;
+				this.base_path = "";
+		}
+
+		async load_items()
+		{
+				const response = await fetch(this.props.end_point);
+				this.items = await response.json();
+
+				this.fill_table();
+		}
+
+		create_item()
+		{
+				const modal = document.getElementById(this.props.modal_id);
+
+				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+						document.getElementById(this.props.edit_dialog_ids[i]).value = "";
+				}
+				
+				document.getElementById(this.props.submit_button_id).textContent = "Create";
+				let instance = this;
+				document.getElementById(this.props.submit_button_id).onclick = function() { instance.create_item_async.call(instance); };
+
+				modal.style.display = "block";
+		}
+
+		async create_item_async()
+		{
+				var created_item = { ...this.props.empty_item }; 
+
+				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+						created_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+				}
+
+				var response = await fetch(this.props.end_point,
+															 { method: "POST", headers: { 'Content-Type': 'application/json' },
+																 body: JSON.stringify(created_item) });
+
+				const response_item = await response.json();
+
+				if (response.ok) {
+						iziToast.success({ title: 'Success', message: 'Standard successfully created' });
+
+						this.items.push(response_item);
+						const row = this.create_row(this.props.template_id, response_item, this.props.properties,
+																				[this.action_open, this.action_edit, this.action_delete]);
+ 
+						const table = document.getElementById(this.props.table_id);
+						const tbody = table.querySelector("tbody");
+						tbody.appendChild(row);
+
+						this.close_modal();
+				} else {
+						iziToast.error({title: 'Error', message: 'Standard could not be created'});
+				}
+		}
+
+		fill_table()
+		{
+				const table = document.getElementById(this.props.table_id);
+				const tbody = table.querySelector("tbody");
+				const template = document.getElementById(this.props.template_id);
+
+				for (let i = 0; i < this.items.length; i++) {		
+						tbody.appendChild(this.create_row(this.props.template_id, this.items[i], this.props.properties,
+																							[this.action_open, this.action_edit, this.action_delete]));
+				}
+
+
+				// Wire up button events
+				
+				let instance = this;
+				document.getElementById(this.props.create_button_id).onclick = function () { instance.create_item.call(instance);  }
+
+				const modal = document.getElementById(this.props.modal_id);
+				const close_button = modal.querySelector(".modal-close");
+				close_button.onclick = function() { instance.close_modal.call(instance);  }
+		}
+
+		create_row(template_id, data_row, properties, actions)
+		{
+				const template = document.getElementById(template_id);
+				const row = template.content.cloneNode(true);
+				let td = row.querySelectorAll("td");
+
+				const buttons = td[td.length  - 1].querySelectorAll("button")
+		
+				for (let j = 0; j < buttons.length; j++) {
+						let instance = this;
+						buttons[j].onclick = function() { actions[j].call(instance, data_row); }
+				}
+								
+				for (let j = 0; j < properties.length; j++) {
+						td[j].textContent = data_row[properties[j]];
+				}
+
+				return row;
+		}
+
+
+		action_open(item)
+		{
+				const url = this.props.open_url + "&" + this.props.open_url_param_name + "=" + item.id; 
+				window.open(url, "_self");
+		}
+
+		action_edit(item)
+		{
+				const modal = document.getElementById(this.props.modal_id);
+
+				this.edit_item = item;
+
+				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+						document.getElementById(this.props.edit_dialog_ids[i]).value = item[this.props.edit_properties[i]];
+				}
+
+				document.getElementById(this.props.submit_button_id).textContent = "Update";
+				let instance = this;
+				document.getElementById(this.props.submit_button_id).onclick = function() { instance.update_item.call(instance) };
+
+				modal.style.display = "block";
+		}
+
+		async action_delete(item)
+		{
+				var confirmation = confirm("Are you sure you want to delete this item?");
+
+				if (confirmation) {
+						const end_point = this.base_path + this.props.end_point + "/" + item.id;
+						var response = await fetch(end_point, { method: "DELETE" });
+
+						if (response.ok) {
+								iziToast.success({ title: 'Success', message: 'Item successfully deleted' });
+								const index = this.items.indexOf(item);
+								document.getElementById(this.props.table_id).deleteRow(index + 1);
+								this.items.splice(index, 1);
+
+								this.close_modal();
+						} else {
+								iziToast.error({ title: "Error", message: "Item could not be deleted"});
+						}
+				
+				}
+		}
+
+		async update_item()
+		{
+				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+						this.edit_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+				}
+
+				const end_point = this.base_path + this.props.end_point + "/" + this.edit_item.id;
+				var response = await fetch(end_point,
+																	 { method: 'put', headers: { 'Content-Type': 'application/json' },
+																		 body: JSON.stringify(this.edit_item) });
+				if (response.ok) {
+						iziToast.success({ title: "Success", message: "Item successfully updated" });
+				
+						const table = document.getElementById(this.props.table_id);
+						const row = table.rows[this.items.indexOf(this.edit_item) + 1];
+
+						for (var i = 0; i < this.props.edit_properties.length; i++) {
+								row.cells[i + 1].textContent = this.edit_item[this.props.edit_properties[i]];
+						}
+						
+						this.close_modal();
+				
+				} else {
+						iziToast.error({ title: "Error", message: "Item could not be updated" });
+				}
+		}
+
+		close_modal()
+		{
+				document.getElementById(this.props.modal_id).style.display = "none";
+		}
+}

@@ -183,7 +183,7 @@ def export_proj(path, id):
         )""".format(id),
         get_table_columns(db, "ApplicationStandard"))        
     export_data(path, "ApplicationPacket.csv", cur, """
-        SELECT * FROM applicationPacket ap
+        SELECT * FROM applicationpacket ap
         WHERE ap.idApplication in (
             SELECT id FROM application a
             WHERE a.idProject={0}

@@ -1,0 +1,24 @@
+.project-table {
+	width: 50%;
+	min-width: 500px;
+	padding: 5px;
+	background-color: lightblue;
+	border-radius: 6px;
+	box-shadow: 0 2px 1px -1px rgba(81, 108, 117, 26%),0 1px 1px 0 rgba(81, 108, 117, 26%),0 1px 3px 0 rgba(81, 108, 117, 26%);
+}
+
+.project-row {
+	padding: 6px 12px;
+}
+
+.project-row:not(:last-child) {
+	border-bottom: 1px solid #98BFCC;
+}
+
+.project-row > a {
+	color: #337ab7;
+}
+
+.project-icon {
+	float: right;
+}

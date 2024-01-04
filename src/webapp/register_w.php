@@ -155,7 +155,7 @@ if(isset($_GET['register'])) {
         $statement = $pdo->prepare("INSERT INTO users (email, passwort) VALUES (:email, :passwort)");
         $result = $statement->execute(array('email' => $email, 'passwort' => $passwort_hash));*/
 
-        $sql = "INSERT INTO `user` (`email`, `name`, `password`, `signedUp`) VALUES ('".$email."', '".$name."', '".$passwort_hash."', '".$dateSignedUp."')";
+        $sql = "INSERT INTO `user` (`email`, `name`, `password`,^ `signedUp`) VALUES ('".$email."', '".$name."', '".$passwort_hash."', '".$dateSignedUp."')";
         echo "SQL-Query: ".$sql."<br/>";
         $result = $mysqli->query($sql);
         $numAffectedRows = $mysqli->affected_rows;

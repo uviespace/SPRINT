@@ -1,0 +1,23 @@
+
+
+.button-grid {
+	display: flex;
+	justify-content: flex-start;
+	gap: 18px;
+	align-items: center;
+}
+
+.button-grid > a {
+	width: 180px;
+}
+
+.sub-grid {
+	display: flex;
+	gap: 6px;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.sub-grid > .btn {
+	width: 180px;
+}

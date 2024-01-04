@@ -295,6 +295,7 @@ $(".crud-submit").click(function(e){
     var name = $("#create-item").find("input[name='name']").val();
     var shortDesc = $("#create-item").find("input[name='shortDesc']").val();
     var idType = $("#create-item").find("select[name='idType']").val();
+		var role = $("#create-item").find("select[name='idType']").val();
     var kind = $("#create-item").find("select[name='kind']").val();
     var multiplicity = $("#create-item").find("input[name='multiplicity']").val();
     var value = $("#create-item").find("input[name='value']").val();
@@ -310,7 +311,7 @@ $(".crud-submit").click(function(e){
             type:'POST',
             url: url + form_action,
             data:{idStandard:idStandard, domain:domain, name:name, shortDesc:shortDesc,
-                  idType:idType, kind:kind, multiplicity:multiplicity, value:value, unit:unit},
+                  idType:idType, role:role, kind:kind, multiplicity:multiplicity, value:value, unit:unit},
             success: function(results, textStatus) {
                 toastr.success('Database Operation Successfully. ' + results, 'Success Alert', {timeOut: 5000});
             },
@@ -333,6 +334,7 @@ $(".crud-submit").click(function(e){
             } else {
               $("#create-item").find("select[name='kind']").val('');
             }
+						$("#create-item").find("input[name='role']").val();
             $("#create-item").find("input[name='multiplicity']").val('');
             $("#create-item").find("input[name='value']").val('');
             $("#create-item").find("input[name='unit']").val('');

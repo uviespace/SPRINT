@@ -1,4 +1,4 @@
-var url = "http://localhost/dbeditor/";
+var url = "http://localhost/SPRINT/";
 
 // When the user scrolls down 20px from the top of the document, show the button
 window.onscroll = function () {

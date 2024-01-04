@@ -1,0 +1,13 @@
+SPRINT_NEXT
+
+Version 1.99.0:
+
+- New API design in api/v2
+  * Secured with session cookie --> requires login now
+  * Routing handled in php to make the code more compact
+- Changes login, index, sel_project, open_project
+  * Templates
+  * Layout
+  * uses new API where appropriate
+- Database backend
+  * Avoids SQL Injections on the changed sites

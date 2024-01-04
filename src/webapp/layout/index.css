@@ -1,0 +1,24 @@
+.management-block {
+	display: flex;
+	padding: 24px 0;
+	border-top: 1px solid #ccc;
+	justify-content: flex-start;
+}
+
+
+.menu-button {
+	border: 1px solid #777;
+	border-radius: 4px;
+	background: #eee;
+	width: 220px;
+	padding: 6px 12px;
+	margin: 0 12px;
+	text-decoration: none;
+}
+
+.button-icon {
+	width: 32px;
+	height: 32px;
+	margin-right: 8px;
+	vertical-align: middle;
+}

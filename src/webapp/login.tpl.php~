@@ -1,0 +1,15 @@
+<h3>Login</h3>
+
+<?php if (isset($error_msg)) : ?>
+	<div class="error-msg"><?=$error_msg?></div>
+<?php endif; ?>
+
+<form action="?login=1" method="post">
+	<span>E-Mail:</span><br />
+	<input type="email" size="40" maxlength="250" name="email"><br /><br />
+
+	<span>Password:</span><br />
+	<input type="password" size="40" maxlength="250" name="password"<br /><br />
+
+	<input type="submit" value="Login">
+</form>

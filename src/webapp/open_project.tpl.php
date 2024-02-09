@@ -185,7 +185,7 @@
 
 <h3>Contributors / Users</h3>
 
-<div class="user-card">
+<div class="sprint-card">
 	<?php foreach($contributors as $contrib): ?>
 		<div style="padding: 5px;">
 			<?=$contrib['id']?> <strong><?=$contrib["email"]?></strong>
@@ -202,8 +202,9 @@
 
 <h3>Owner</h3>
 
-<div class="user-card">
+<div class="sprint-card">
 	<div style="padding: 5px;">
 		<?=$owner[0]['id']?> <strong><?=$owner[0]['name']?></strong> (<?=$owner[0]['email']?>)
 	</div>
 </div>
+

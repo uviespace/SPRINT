@@ -60,7 +60,7 @@ $owner = $database->select("SELECT u.id, u.name, u.email " .
 						   "WHERE up.idRole = 2 AND up.idProject = ?", ["i", [$_GET['id']]]);
 
 
-# TODO: Post actions
+# Post actions
 
 if (isset($_POST['export']))
 	list($message, $errors) = export_project($_GET['id'], $python_settings);

@@ -13,6 +13,7 @@
  * end_point: endpoint for crud functions of this item
  * create_button_id: id of the create item button
  * empty_item: item template for new creations (allows filling of standard properties
+ * create_item_from_modal_fn: function to create item from entries in modal (optional)
  */
 
 class TableHandler
@@ -50,8 +51,12 @@ class TableHandler
 		{
 				var created_item = { ...this.props.empty_item }; 
 
-				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
-						created_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+				if (this.props.create_item_from_modal_fn) {
+						this.props.create_item_from_modal_fn(created_item);
+				} else {
+						for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+								created_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+						}
 				}
 
 				var response = await fetch(this.props.end_point,
@@ -64,8 +69,12 @@ class TableHandler
 						iziToast.success({ title: 'Success', message: 'Standard successfully created' });
 
 						this.items.push(response_item);
-						const row = this.create_row(this.props.template_id, response_item, this.props.properties,
-																				[this.action_open, this.action_edit, this.action_delete]);
+						const actions = this.props.open_url
+									? [this.action_open, this.action_edit, this.action_delete]
+									: [this.action_edit, this.action_delete];
+						
+						const row = this.create_row(this.props.template_id, response_item,
+																				this.props.properties, actions);
  
 						const table = document.getElementById(this.props.table_id);
 						const tbody = table.querySelector("tbody");
@@ -83,9 +92,14 @@ class TableHandler
 				const tbody = table.querySelector("tbody");
 				const template = document.getElementById(this.props.template_id);
 
+				const actions = this.props.open_url
+							? [this.action_open, this.action_edit, this.action_delete]
+							: [this.action_edit, this.action_delete];
+				
+
 				for (let i = 0; i < this.items.length; i++) {		
-						tbody.appendChild(this.create_row(this.props.template_id, this.items[i], this.props.properties,
-																							[this.action_open, this.action_edit, this.action_delete]));
+						tbody.appendChild(this.create_row(this.props.template_id, this.items[i],
+																							this.props.properties, actions));
 				}
 
 
@@ -167,8 +181,12 @@ class TableHandler
 
 		async update_item()
 		{
-				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
-						this.edit_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+				if (this.props.create_item_from_modal_fn) {
+						this.props.create_item_from_modal_fn(this.edit_item);
+				} else {
+						for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
+								this.edit_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
+						}
 				}
 
 				const end_point = this.base_path + this.props.end_point + "/" + this.edit_item.id;
@@ -181,8 +199,8 @@ class TableHandler
 						const table = document.getElementById(this.props.table_id);
 						const row = table.rows[this.items.indexOf(this.edit_item) + 1];
 
-						for (var i = 0; i < this.props.edit_properties.length; i++) {
-								row.cells[i + 1].textContent = this.edit_item[this.props.edit_properties[i]];
+						for (var i = 0; i < this.props.properties.length; i++) {
+								row.cells[i].textContent = this.edit_item[this.props.properties[i]];
 						}
 						
 						this.close_modal();

@@ -3,6 +3,7 @@
 
 body {
 	font-family: Arial, Helvetica, sans-serif;
+	font-size: 11pt;
 }
 
 label {
@@ -22,6 +23,14 @@ textarea {
 	padding: 8px 12px;
 	border-radius: 6px;
 	width: 500px;
+}
+
+i {
+	font-size: 0.9em;
+}
+
+select {
+	background-color: #fff;
 }
 
 .content-container {
@@ -83,6 +92,11 @@ textarea {
 	text-align: center;
 	white-space: nowrap;
 	cursor: pointer;
+}
+
+.btn-small {
+	margin: 0;
+	padding: 0 8px;
 }
 
 .btn:hover {
@@ -203,8 +217,7 @@ textarea {
 .table {
 	width: 100%;
 	border-radius: 8px 8px 0 0;
-	border: 1px solid #ccc;
-	border-spacing: 0;
+	border-collapse: collapse;
 	//box-shadow: 0 2px 2px rgba(64,64,64,.7);
 	
 }
@@ -216,6 +229,7 @@ textarea {
 	min-width: 80px;
 }
 
+
 .table > thead > tr > th:first-child {
 	border-top-left-radius: 8px;
 }
@@ -226,13 +240,33 @@ textarea {
 
 .table > tbody > tr > td {
 	padding: 6px 12px;
+	border-bottom: 1px solid #ccc;
 }
+
+.table > tbody > tr > td:first-child {
+	border-left: 1px solid #ccc;
+}
+
+.table > tbody > tr > td:last-child {
+	border-right: 1px solid #ccc;
+	text-align: center;
+}
+
+.table > tbody > tr:nth-child(even) {
+	background-color: #EEF3FF;
+}
+
 
 /* Button group  */
 
+.btn-group {
+	display: flex;
+	justify-content: center;
+}
+
 .btn-group button {
 	border: 1px solid #ccc;
-	padding: 4px 8px;
+	padding: 2px 6px;
 	cursor: pointer;
 	float: left;
 }
@@ -328,11 +362,55 @@ textarea {
 	background-color: #fefefe;
 }
 
-.user-card {
-	background-color:#EAEAEA;
+.sprint-card {
+	background-color:#EFEFEF;
 	padding: 5px;
 	width: 500px;
 	border-radius: 5px;
 	box-shadow: 0 2px 1px -1px hsla(0,0%,0%,26%),0 1px 1px 0 hsla(0,0%,0%,26%),0 1px 3px 0 hsla(0,0%,0%,26%);
 	margin-bottom: 32px;
 }
+
+.sprint-card-wide {
+	width: 700px;
+}
+
+.sprint-card > div {
+	padding: 5px;
+}
+
+.sprint-card-badge {
+	background-color: #4E95D3;
+	color: #fff;
+	padding: 2px 6px;
+	text-align: center;
+	border-radius: 6px;
+	float: right;
+}
+
+.h-space-5 {
+	margin-left: 2em;
+}
+
+
+.name-value-table {
+	margin: 24px;
+	margin-bottom: 48px;
+	width: 652px;
+	border-collapse: collapse;
+}
+
+.name-value-table > tbody > tr > td:first-child  {
+	background-color: #efefef;
+	color: #666;
+	text-align: right;
+	width: 20%;
+}
+
+.name-value-table > tbody > tr > td  {
+	padding: 6px;
+	vertical-align: top;
+	border: 1px solid #ddd;
+}
+
+

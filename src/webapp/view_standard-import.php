@@ -151,7 +151,7 @@ $sql =
   "WHERE ".
   "  p.id <> ".$idProject." AND ".
   "  p.id = up.idProject AND ".
-  "  (up.idUser = ".$userid." OR ":
+  "  (up.idUser = ".$userid." OR ".
   "  (up.email = '".$userEmail."' AND ".
   "  up.idRole < 4))";
 

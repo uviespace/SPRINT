@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-
 <?php
 session_start();
 if(!isset($_SESSION['userid'])) {
@@ -69,7 +66,7 @@ if ($result->num_rows > 0) {
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
- 
+
 // get user name from database
 $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
 $result = $mysqli->query($sql);
@@ -79,8 +76,10 @@ $userName = $row["name"];
 $userEmail = $row["email"];
 
 ?>
+<!DOCTYPE html>
+<html>
 
-<head>
+	<head>
 	<title>Datatype <?php echo $type_name;?> </title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">

@@ -1,0 +1,28 @@
+.packet-table {
+
+}
+
+
+.packet-header {
+	display: flex;
+	justify-content: space-between;
+}
+
+.packet-header > div:first-child {
+	border-left: 1px solid #ccc;
+}
+
+.packet-header > div {
+	padding: 4px 8px;
+	border-right: 1px solid #ccc;
+}
+
+.header-name {
+	flex-grow: 2;
+}
+
+.header-short-desc {
+	flex-grow: 3;
+}
+
+

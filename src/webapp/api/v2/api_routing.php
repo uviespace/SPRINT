@@ -37,25 +37,40 @@ $router->get("api/v2/projects/:project_id", function($route_ids) {
 
 // Projects sub path
 
-route_crud($router, "api/v2/projects/:project_id/standards", "standard_id", new StandardsController(), "project_id");
-route_crud($router, "api/v2/projects/:project_id/applications", "application_id", new ApplicationController(), "project_id");
-route_crud($router, "api/v2/projects/:project_id/apids", "apid_id", new ApidController(), "project_id");
+route_crud($router, "api/v2/projects/:project_id/standards", "standard_id", new StandardsController());
+route_crud($router, "api/v2/projects/:project_id/applications", "application_id", new ApplicationController());
+route_crud($router, "api/v2/projects/:project_id/apids", "apid_id", new ApidController());
+route_crud($router, "api/v2/projects/:project_id/contributors", "userproject_id", new ContributorController());
 
 // Standards sub path
 
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/tcheaders", "tcheader_id", new TCHeaderController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/tmheaders", "tmheader_id", new TMHeaderController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/services", "service_id", new ServiceController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/packets", "packet_id", new PacketController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/constants", "constant_id", new ConstantController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datatypes", "datatype_id", new DatatypesController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datapool", "datapool_id", new DatapoolController(), "standard_id");
-route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/parameters", "parameter_id", new ParameterController(), "standard_id");
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/tcheaders", "tcheader_id", new TCHeaderController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/tmheaders", "tmheader_id", new TMHeaderController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/services", "service_id", new ServiceController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/packets", "packet_id", new PacketController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/constants", "constant_id", new ConstantController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datatypes", "datatype_id", new DatatypesController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datapool", "datapool_id", new DatapoolController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/parameters", "parameter_id", new ParameterController());
+
 
 // Packets sub-sub path
 
 route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/parameters",
-		   "parameter_id", new PacketParameterController(), "packet_id");
+		   "parameter_id", new PacketParameterController());
+
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/derived_packets",
+		   "child_id", new DerivedPacketController());
+
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/derived_packets/:child_id/parameters",
+		   "parameter_id", new DerivedPacketParameterController());
+
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datatypes/:datatype_id/enumerations",
+		   "enum_id", new EnumerationController());
+
+
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/parameters/:parameter_id/limits",
+		   "limit_id", new LimitController());
 
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/header_size",
@@ -64,45 +79,51 @@ $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet
 				 $functionController->get_header_size($route_ids["standard_id"], $route_ids["packet_id"]);
 });
 
+$router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/derived_packets/:child_id/parent_size",
+			 function($route_ids) {
+				 $functionController = new FunctionController();
+				 $functionController->get_parent_size($route_ids["standard_id"], $route_ids["packet_id"]);
+			 });
+
 
 $router->resolve($uri);
 
 
-function route_crud($router, $end_point, $id_name, $crudController, $controller_id)
+function route_crud($router, $end_point, $id_name, $crudController)
 {
-	$router->get($end_point, function($route_ids) use ($crudController, $controller_id) {
+	$router->get($end_point, function($route_ids) use ($crudController) {
 		try {
-			$crudController->get_items($route_ids[$controller_id]);
+			$crudController->get_items($route_ids);
 		} catch (Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
 	
-	$router->post($end_point, function($route_ids) use ($crudController, $controller_id) {
+	$router->post($end_point, function($route_ids) use ($crudController) {
 		try {
-			$crudController->create_item($route_ids[$controller_id], json_decode(file_get_contents("php://input")));
+			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));
 		} catch(Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
 	
-	$router->put($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $controller_id) {
+	$router->put($end_point . "/:" . $id_name, function($route_ids) use ($crudController) {
 		try {
 			if (!check_user_can_write_project($route_ids["project_id"]))
 				$crudController->forbidden();
 			
-			$crudController->put_item($route_ids[$controller_id], json_decode(file_get_contents("php://input")));
+			$crudController->put_item($route_ids, json_decode(file_get_contents("php://input")));
 		} catch(Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
 	
-	$router->delete($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $controller_id, $id_name) {
+	$router->delete($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $id_name) {
 		try {
-			if (!check_user_can_delete_project($project_id))
+			if (!check_user_can_delete_project($route_ids["project_id"]))
 				$crudController->forbidden();
 			
-			$crudController->delete_item($route_ids[$controller_id], $route_ids[$id_name]);
+			$crudController->delete_item($route_ids, $route_ids[$id_name]);
 		} catch (Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}

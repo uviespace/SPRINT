@@ -100,11 +100,11 @@
 		<span class="sprint-card-badge"><?=$params_cnt[0]["cnt"]?></span>
 	</div>
 
-	<div>
+	<!--<div>
 		<span class="h-space-5"></span>
 		==> <a href="sel_parameter-derived.php?idProject=<?=$_GET['idProject']?>&idStandard=<?=$_GET['idStandard']?>">Parameters (Derived Packets)</a>
 		<span class="sprint-card-badge"><?=$derived_packets_cnt[0]["cnt"]?></span>
-	</div>
+	</div>-->
 
 	<div>
 		<span class="h-space-5"></span>

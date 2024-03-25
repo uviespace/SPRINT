@@ -22,7 +22,7 @@
 
 
 				<button id="create_param_button_id_<?=$packet["id"]?>" class="btn">
-					<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create TM Header
+					<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Add Parameter
 				</button>
 				<table id="table_param_<?=$packet["id"]?>"  class="table">
 					<thead>

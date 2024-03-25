@@ -414,3 +414,10 @@ select {
 }
 
 
+.success {
+	color: #56b156;
+}
+
+.error {
+	color: #ce4747;
+}

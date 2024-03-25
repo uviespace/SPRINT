@@ -1,6 +1,3 @@
-<!DOCTYPE html>
-<html>
-
 <?php
 session_start();
 if(!isset($_SESSION['userid'])) {
@@ -59,23 +56,23 @@ if ($result->num_rows > 0) {
 }
 
 /*
-$sql = "SELECT * FROM `application` WHERE `id`=".$idApplication;
+   $sql = "SELECT * FROM `application` WHERE `id`=".$idApplication;
 
-$result = $mysqli->query($sql);
+   $result = $mysqli->query($sql);
 
-$num_rows = mysqli_num_rows($result);
+   $num_rows = mysqli_num_rows($result);
 
-if ($result->num_rows > 0) {
-    // output data of each row
-    while($row = $result->fetch_assoc()) {
-        // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
-        $application_name = $row["name"];
-        $application_desc = $row["desc"];
-    }
-} else {
-    //echo "0 results";
-}
-*/
+   if ($result->num_rows > 0) {
+   // output data of each row
+   while($row = $result->fetch_assoc()) {
+   // echo "id: " . $row["id"]. " - Name: " . $row["name"]. "  - Description: " . $row["desc"]. "<br/>";
+   $application_name = $row["name"];
+   $application_desc = $row["desc"];
+   }
+   } else {
+   //echo "0 results";
+   }
+ */
 
 $sql = "SELECT * FROM `standard` WHERE `id`=".$idStandard;
 
@@ -100,57 +97,57 @@ if ($result->num_rows > 0) {
 //echo $calibration_setting."<br/>";
 //$keys = array_keys(json_decode($calibration_setting, true));
 /*
-$data = json_decode($calibration_setting);
+   $data = json_decode($calibration_setting);
 
-if ($calibration_type == "0") {
+   if ($calibration_type == "0") {
 
-    //echo $data->engfmt."<br/>";
-    $values = $data->values;
-    //print_r($values);
-    $keys = array_keys($values);
-    //print_r($keys);
-    
-    //echo "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>";
-    
-    foreach ($values as $val) {
-        $v = get_object_vars($val);
-        
-        $v["label"] = $v["xval"];
-        unset($v["xval"]);
-        $v["y"] = $v["yval"];
-        unset($v["yval"]);
-        
-        //print_r($v);
-        $dataPoints[] = $v;
-        //echo "<br/>(".$v["label"]."/".$v["y"].")<br/>";
-    }
-    
-    //echo "<br/><br/>";
-    
-    //print_r($dataPoints);
+   //echo $data->engfmt."<br/>";
+   $values = $data->values;
+   //print_r($values);
+   $keys = array_keys($values);
+   //print_r($keys);
+   
+   //echo "<br/><br/><br/><br/><br/><br/><br/><br/><br/><br/><br/>";
+   
+   foreach ($values as $val) {
+   $v = get_object_vars($val);
+   
+   $v["label"] = $v["xval"];
+   unset($v["xval"]);
+   $v["y"] = $v["yval"];
+   unset($v["yval"]);
+   
+   //print_r($v);
+   $dataPoints[] = $v;
+   //echo "<br/>(".$v["label"]."/".$v["y"].")<br/>";
+   }
+   
+   //echo "<br/><br/>";
+   
+   //print_r($dataPoints);
 
-} else {
+   } else {
 
-    $dataPoints = array(
-        array("y" => 25, "label" => "Sunday"),
-        array("y" => 15, "label" => "Monday"),
-        array("y" => 25, "label" => "Tuesday"),
-        array("y" => 5, "label" => "Wednesday"),
-        array("y" => 10, "label" => "Thursday"),
-        array("y" => 0, "label" => "Friday"),
-        array("y" => 20, "label" => "Saturday")
-    );
-    
-    //echo "<br/><br/>"; 
-    
-    //print_r($dataPoints);
+   $dataPoints = array(
+   array("y" => 25, "label" => "Sunday"),
+   array("y" => 15, "label" => "Monday"),
+   array("y" => 25, "label" => "Tuesday"),
+   array("y" => 5, "label" => "Wednesday"),
+   array("y" => 10, "label" => "Thursday"),
+   array("y" => 0, "label" => "Friday"),
+   array("y" => 20, "label" => "Saturday")
+   );
+   
+   //echo "<br/><br/>"; 
+   
+   //print_r($dataPoints);
 
-}
-*/
+   }
+ */
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
- 
+
 // get user name from database
 $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
 $result = $mysqli->query($sql);
@@ -161,7 +158,9 @@ $userEmail = $row["email"];
 
 ?>
 
-<head>
+<!DOCTYPE html>
+<html>
+	<head>
 	<title>Calibration <?php echo $calibration_name;?> </title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">

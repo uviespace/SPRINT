@@ -26,12 +26,12 @@ if ($result->num_rows > 0) {
         $project_name = $row["name"];
     }
 } else {
-    //echo "0 results for projects";
+    //echo "0 results";
 }
 
 //Abfrage der Nutzer ID vom Login
 $userid = $_SESSION['userid'];
-
+ 
 // get user name from database
 $sql = "SELECT * FROM `user` WHERE `id` = ".$userid;
 $result = $mysqli->query($sql);
@@ -40,11 +40,13 @@ $row = $result->fetch_assoc();
 $userName = $row["name"];
 $userEmail = $row["email"];
 
+$idUser = $userid;
+
 ?>
 <!DOCTYPE html>
 <html>
-	<head>
-	<title>Project - Document Management - Organisations</title>
+<head>
+	<title>CORDET Editor - Contributors</title>
 	<!-- https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css -->
 	<link rel="stylesheet" type="text/css" href="ext/bootstrap/3.3.7/css/bootstrap.min.css">
 	<!-- https://cdnjs.cloudflare.com/ajax/libs/jquery/3.1.0/jquery.js -->
@@ -64,20 +66,16 @@ $userEmail = $row["email"];
 	<link rel="stylesheet" type="text/css" href="int/layout.css">
     <script type="text/javascript" src="int/config.js"></script>
 	<script type="text/javascript" src="int/livesearch.js"></script>
-	<script type="text/javascript" src="js/item-ajax_view-project-organisation.js"></script>
-	<style type="text/css">
-
-	</style>
+	<script type="text/javascript" src="js/item-ajax_view-project-contributor.js"></script>
 </head>
 <body>
 
 	<div class="container">
-
 		<div class="row">
 		    <div class="col-lg-12 margin-tb">
 		        <div class="pull-left">
 					<h4>Project <?php echo $project_name;?></h4>
-		            <h2>Document Management - Organisations</h2>
+		            <h2>Contributors</h2>
 		        </div>
 		        <div class="pull-right">
 				<button type="button" class="btn btn-success" data-toggle="modal" data-target="#create-item">
@@ -106,11 +104,8 @@ $userEmail = $row["email"];
 			<thead>
 			    <tr>
 				<th>ID</th>
-                <th>ID ORG</th>
-				<th>Name</th>
-				<th>Short Description</th>
-				<th>Country</th>
-				<th>Description</th>
+				<th>Email</th>
+				<th>Role</th>
 				<th width="200px">Action</th>
 			    </tr>
 			</thead>
@@ -118,7 +113,7 @@ $userEmail = $row["email"];
 			</tbody>
 		</table>
 
-		<ul id="pagination" class="pagination-sm"></ul>
+		<!--<input type="text" name="idStandard" value="<?php echo $idStandard; ?>" />-->
 
 		<!-- Create Item Modal -->
 		<div class="modal fade" id="create-item" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -130,49 +125,27 @@ $userEmail = $row["email"];
 				</div>
 
 				<div class="modal-body">
-					<form data-toggle="validator" action-data="api/create_view-project-organisation.php" method="POST">
+					<form data-toggle="validator" action-data="api/create_view-project-contributor.php" method="POST">
+
+                        <input type="hidden" name="idProject" value="<?php echo $idProject ?>" />
+
+                        <input type="hidden" name="idUser" value="<?php echo $idUser ?>" />
 
 						<div class="form-group">
-							<input type="hidden" name="idProject" value="<?php echo $idProject; ?>" />
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Organisation:</label>
-							<select id="sel_organisation_create" name="idOrg_create" class="form-control" onchange="updateDivOrganisationCreate();" data-error="Please enter organisation." required>
+							<label class="control-label" for="title">Email:</label>
+							<!--<input type="text" name="name" class="form-control" data-error="Please enter email." required />-->
+							<select id="sel_owner_create" name="email" class="form-control" data-error="Please enter email." required>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input id="name_create" type="text" name="name" class="form-control" data-error="Please enter name." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input id="shortDesc_create" type="text" name="shortDesc" class="form-control" data-error="Please enter short description." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Country:</label>
-							<input id="idCountry_create" type="text" name="idCountry" class="form-control" data-error="Please enter country." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<!--<div class="form-group">
-							<label class="control-label" for="title">Country:</label>
-							<select id="sel_country_create" name="idCountry" class="form-control" data-error="Please enter country." readonly>
+							<label class="control-label" for="title">Role:</label>
+							<!--<input type="text" name="idRole" class="form-control" data-error="Please enter role." required />-->
+							<select id="sel_role_create" name="idRole" class="form-control" data-error="Please enter role." required>
 								<option value="select"></option>
 							</select>
-							<div class="help-block with-errors"></div>
-						</div>-->
-
-						<div class="form-group">
-							<label class="control-label" for="title">Description:</label>
-							<textarea id="desc_create" name="desc" class="form-control" style="overflow: hidden;" onInput="auto_grow(this)" data-error="Please enter description." readonly></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -198,47 +171,23 @@ $userEmail = $row["email"];
 		      </div>
 
 		      <div class="modal-body">
-					<form data-toggle="validator" action="api/update_view-project-organisation.php" method="put">
+					<form data-toggle="validator" action="api/update_view-project-contributor.php" method="put">
 
 		      			<input type="hidden" name="id" class="edit-id">
 
 						<div class="form-group">
-							<label class="control-label" for="title">Organisation:</label>
-							<select id="sel_organisation" name="idOrg" class="form-control" onchange="updateDivOrganisation();" data-error="Please enter organisation." required>
+							<label class="control-label" for="title">Email:</label>
+							<select id="sel_owner" name="email" class="form-control" data-error="Please enter email." required>
 								<option value="select"></option>
 							</select>
 							<div class="help-block with-errors"></div>
 						</div>
 
 						<div class="form-group">
-							<label class="control-label" for="title">Name:</label>
-							<input id="name" type="text" name="name" class="form-control" data-error="Please enter name." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Short Description:</label>
-							<input id="shortDesc" type="text" name="shortDesc" class="form-control" data-error="Please enter short description." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<div class="form-group">
-							<label class="control-label" for="title">Country:</label>
-							<input id="idCountry" type="text" name="idCountry" class="form-control" data-error="Please enter country." readonly />
-							<div class="help-block with-errors"></div>
-						</div>
-
-						<!--<div class="form-group">
-							<label class="control-label" for="title">Country:</label>
-							<select id="idCountry" id="sel_country" name="idCountry" class="form-control" data-error="Please enter country." readonly>
+							<label class="control-label" for="title">Role:</label>
+							<select id="sel_role" name="idRole" class="form-control" data-error="Please enter role." required>
 								<option value="select"></option>
 							</select>
-							<div class="help-block with-errors"></div>
-						</div>-->
-
-						<div class="form-group">
-							<label class="control-label" for="title">Description:</label>
-							<textarea id="desc" name="desc" class="form-control" style="min-height:75px;" onInput="auto_grow(this)" data-error="Please enter description." readonly></textarea>
 							<div class="help-block with-errors"></div>
 						</div>
 
@@ -251,9 +200,7 @@ $userEmail = $row["email"];
 		      </div>
 		    </div>
 		  </div>
-		  
 		</div>
-
 
 				<div class="topcorner_left">
 <?php include 'logos.php'; ?>

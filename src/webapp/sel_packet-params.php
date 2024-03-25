@@ -50,7 +50,7 @@ $sidebar_actions = [ ["label" => "Back",
 
 $pagetitle = "Packet Parameters";
 $site_js = "js/sel_packet-params.js";
-$site_css = "layout/sel_packet-params.css";
+$site_css = "layout/standard_additions.css";
 $tpl = "sel_packet-params.tpl.php";
 include "template.php";
 

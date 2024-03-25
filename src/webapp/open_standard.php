@@ -36,7 +36,7 @@ $project = $database->select("SELECT name FROM `project` WHERE id = ?", ["i", [$
 $standard = $database->select("SELECT id, name, `desc` FROM standard WHERE id = ?", ["i", [$_GET['idStandard']]]);
 
 # TODO: fix this in the database
-$userrole = $database->select("SELECT idRole FROM userproject WHERE idProject=? AND idUser = ?", ["ii", [$_GET["idProject"], $_SESSION['userid']]]);
+$userrole = $database->select("SELECT idRole FROM userproject WHERE idProject = ? AND idUser = ?", ["ii", [$_GET["idProject"], $_SESSION['userid']]]);
 $id_role = count($userrole) > 0 ? $userrole[0]['idRole'] : 5;
 
 # TC Header, TM Header, APIDs

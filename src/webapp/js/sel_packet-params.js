@@ -56,19 +56,21 @@ async function toggle_param_visibility(packet_id)
 }
 
 
-function create_item(edit_item)
+function create_item(edit_item, table_handler)
 {
-		for (var i = 0; i < edit_dialog_ids.length; i++) {
+		for (var i = 0; i < editc_dialog_ids.length; i++) {
 				edit_item[edit_properties[i]] = document.getElementById(edit_dialog_ids[i]).value;
 		}
 
 		edit_item["parameter"] = document.getElementById(edit_dialog_ids[0]).selectedOptions[0].text;
+		edit_item["order"] = table_handler.items[table_handler.items.length - 1].order + 1;
 
 		return edit_item;
 }
 
 
-function draw_packet_size(packet_id) {
+function draw_packet_size(packet_id)
+{
 		const container = document.getElementById("packet-" + packet_id);
 		const padding_left = window.getComputedStyle(container, null).getPropertyValue("padding-left");
 		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");

@@ -91,9 +91,10 @@ class Router
 
 	function resolve($uri, $start_routing_with = 2)
 	{
+		//echo($uri);
 		$uri = explode('/', $uri);
 		//print_r($uri);
-		//print_r($this->get->children);
+		//print_r($this->delete->children);
 
 		// get root node for request method
 		$method_node = $this->{strtolower($_SERVER['REQUEST_METHOD'])};
@@ -101,6 +102,7 @@ class Router
 
 		for ($i = $start_routing_with; $i < count($uri); $i++) {
 			//echo "Index: " . $i . "\n";
+			//print_r($method_node->children);
 			if (array_key_exists($uri[$i], $method_node->children)) {
 				//echo "Node: " . $method_node->node_name . "\n";
 				$method_node = $method_node->children[$uri[$i]];
@@ -111,6 +113,8 @@ class Router
 				if (!is_numeric($uri[$i]))
 					$this->defaultRequestHandler();
 
+				//echo $value->node_name;
+
 				$route_ids += [ substr($key, 1) => $uri[$i]];
 				$method_node = $value;
 			} else {
@@ -120,22 +124,24 @@ class Router
 			}
 		}
 
-		if ($method_node->method != NULL)
+		if ($method_node->method != NULL) {
+			//echo "What are we even calling";
+			//echo $method_node;
 			call_user_func($method_node->method, $route_ids);
-		else
-			$this->defaultRequestHandler();	
+		} else
+			$this->defaultRequestHandler();
 	}
 	
 
 	private function invalidMethodHandler()
 	{
-		$this->baseController->send_output("", "HTTP/1.1 405 Method not allowed");
+		$this->baseController->send_output("", array("HTTP/1.1 405 Method not allowed"));
 		exit;
 	}
 
 	private function defaultRequestHandler()
 	{
-		$this->send_output("", "HTTP/1.1 404 Not Found");
+		$this->baseController->send_output("", array("HTTP/1.1 404 Not Found"));
 		exit;
 	}
 }

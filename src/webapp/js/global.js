@@ -52,7 +52,7 @@ class TableHandler
 				var created_item = { ...this.props.empty_item }; 
 
 				if (this.props.create_item_from_modal_fn) {
-						this.props.create_item_from_modal_fn(created_item);
+						this.props.create_item_from_modal_fn(created_item, this);
 				} else {
 						for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
 								created_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;

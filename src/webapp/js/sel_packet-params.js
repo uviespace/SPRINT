@@ -44,7 +44,7 @@ async function toggle_param_visibility(packet_id)
 								submit_button_id: "param_submit_button",
 								end_point: packet_end_point + "/parameters",
 								create_button_id: "create_param_button_id_" + packet_id,
-								empty_item: {},
+								empty_item: { order: 0 },
 								create_item_from_modal_fn: create_item
 						}),
 						header_size: await response.json()
@@ -58,12 +58,14 @@ async function toggle_param_visibility(packet_id)
 
 function create_item(edit_item, table_handler)
 {
-		for (var i = 0; i < editc_dialog_ids.length; i++) {
+		for (var i = 0; i < edit_dialog_ids.length; i++) {
 				edit_item[edit_properties[i]] = document.getElementById(edit_dialog_ids[i]).value;
 		}
 
 		edit_item["parameter"] = document.getElementById(edit_dialog_ids[0]).selectedOptions[0].text;
-		edit_item["order"] = table_handler.items[table_handler.items.length - 1].order + 1;
+
+		if (edit_item["order"] === 0)
+				edit_item["order"] = table_handler.items[table_handler.items.length - 1].order + 1;
 
 		return edit_item;
 }

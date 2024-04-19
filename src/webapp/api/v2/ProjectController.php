@@ -1096,4 +1096,61 @@ class ContributorController extends BaseController implements CrudController
 }
 
 
+class CalibrationController extends BaseController implements CrudController
+{
+	private $database;
+
+	public function __construct()
+	{
+		$this->database = new Database();
+	}
+
+	public function get_items($route_ids)
+	{
+		$data = $this->database->select(
+			"SELECT id, `type`, name, shortDesc, setting " .
+			"FROM calibration WHERE idStandard = ?", ["i", [$route_ids["standard_id"]]]);
+
+		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
+	}
+
+	public function get_item($route_ids, $id)
+	{
+		$data = $this->database->select(
+			"SELECT id, `type`, name, shortDesc, setting " .
+			"FROM calibration WHERE id = ?", ["i", [$id]]);
+
+		$this->send_output(json_encode($data[0]), array('HTTP/1.1 200 OK'));
+	}
+
+	public function create_item($route_ids, $item)
+	{
+		$id = $this->database->insert(
+			"INSERT INTO calibration (idStandard, `type`, name, shortDesc, setting) " .
+			"VALUES (?,?,?,?,?)",
+			["iisss", [$route_ids["standard_id"], $item->type, $item->name, $item->shortDesc, $item->setting]]);
+
+		$item->id = $id;
+		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
+	}
+
+	public function delete_item($route_ids, $item_id)
+	{
+		$this->database->execute_non_query("DELETE FROM calibration WHERE id = ?", ["i", [$item_id]]);
+
+		$this->send_output("", array('HTTP/1.1 200 OK'));
+	}
+
+	public function put_item($route_ids, $item)
+	{
+		$this->database->execute_non_query(
+			"UPDATE calibration " .
+			"SET `type` = ?, name = ?, shortDesc = ?, setting = ? " .
+			"WHERE id = ?", ["isssi", [$item->type, $item->name, $item->shortDesc, $item->setting, $item->id]]);
+
+		$this->send_output("", array('HTTP/1.1 200 OK'));
+	}
+}
+
+
 ?>

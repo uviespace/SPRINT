@@ -33,6 +33,16 @@ select {
 	background-color: #fff;
 }
 
+fieldset {
+	border: 1px solid silver;
+	padding: 8px;
+	border-radius: 5px;
+}
+
+legend {
+	padding: 4px;
+}
+
 .content-container {
 	
 }
@@ -97,6 +107,13 @@ select {
 .btn-small {
 	margin: 0;
 	padding: 0 8px;
+}
+
+.btn-toolbar {
+	border: 1px solid #ccc;
+	padding: 2px 6px;
+	cursor: pointer;
+	border-radius: 4px;
 }
 
 .btn:hover {
@@ -182,6 +199,25 @@ select {
 	border-radius: 6px;
 }
 
+.form-input-table {
+	margin: 0;
+	display: block;
+	border: 1px solid #ccc;
+	box-shadow: inset 0 1px 3px #ddd;
+	box-sizing: border-box;
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+
+.form-input-slim {
+	margin: 0;
+	display: block;
+	border: 1px solid #ccc;
+	box-shadow: inset 0 1px 3px #ddd;
+	box-sizing: border-box;
+	padding: 4px 8px;
+	border-radius: 4px;
+}
 
 
 .action-block {
@@ -420,4 +456,39 @@ select {
 
 .error {
 	color: #ce4747;
+}
+
+
+.site-form {
+	width: 600px;
+}
+
+.flex-container {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	gap: 20px;
+}
+
+
+.curve-list-item {
+	padding: 4px 8px;
+	border-radius: 6px;
+	margin: 4px 0;
+	max-width: 700px;
+}
+
+.curve-list-item > span {
+	display: inline-block;
+}
+
+.param-curve-list-item {
+	padding: 8px 12px;
+	border-radius: 6px;
+	margin: 4px 0;
+	max-width: 700px;
+}
+
+.param-curve-list-item > span {
+	display: inline-block
 }

@@ -182,7 +182,7 @@ class TableHandler
 		async update_item()
 		{
 				if (this.props.create_item_from_modal_fn) {
-						this.props.create_item_from_modal_fn(this.edit_item);
+						this.props.create_item_from_modal_fn(this.edit_item, this);
 				} else {
 						for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
 								this.edit_item[this.props.edit_properties[i]] = document.getElementById(this.props.edit_dialog_ids[i]).value;
@@ -213,5 +213,165 @@ class TableHandler
 		close_modal()
 		{
 				document.getElementById(this.props.modal_id).style.display = "none";
+		}
+}
+
+
+
+class DomBinder
+{
+		constructor(view_model, update_callback)
+		{
+				this.view_model = view_model;
+				this.update_callback = update_callback;
+		}
+
+
+		apply_bindings()
+		{
+				const self = this;
+
+				let bind_name_split = "";
+				
+				// fill all data-bind controls
+				const controls = document.querySelectorAll('[data-bind]');
+
+				for (let i = 0; i < controls.length; i++) {
+						const bind_name = controls[i].getAttribute("data-bind");
+
+						if (bind_name.includes(".")) {
+								bind_name_split = bind_name.split(".");
+
+								let value = this.view_model[bind_name_split[0]];
+								for(let j = 1; j < bind_name_split.length; j++) {
+										value = value[bind_name_split[j]];
+								}
+
+								controls[i].value = value;
+						} else {
+								controls[i].value = this.view_model[bind_name];
+						}
+
+						// Register event listener to write changes back to object
+						controls[i].addEventListener("change", function() { self.event_listener(controls[i], bind_name); });
+				}
+
+
+				// fill all data-bind-array controls
+				const array_controls = document.querySelectorAll('[data-bind-array]');
+
+				for (let i = 0; i < array_controls.length; i++) {
+						let bind_value = array_controls[i].getAttribute("data-bind-array");
+						let bind_value_split = bind_value.split(":");
+						let template_id = bind_value_split[0];
+						let bind_name = bind_value_split[1];
+						let tbody = array_controls[i].querySelector("tbody");
+						let template = document.getElementById(template_id);
+
+						let button_template = document.getElementById("add_numerical_value_button");
+						let btn = button_template.content.cloneNode(true);
+						array_controls[i].parentNode.insertBefore(btn, array_controls[i]);
+						array_controls[i].previousElementSibling.addEventListener("click", function() {
+								self.add_row(template, value, { xval: 0, yval: 0 }, tbody);
+						});
+
+						let value = {};
+						if (bind_name.includes(".")) {
+								bind_name_split = bind_name.split(".");
+
+								value = this.view_model[bind_name_split[0]];
+								for(let j = 1; j < bind_name_split.length; j++) {
+										value = value[bind_name_split[j]];
+								}
+						} else {
+								value = this.view_model[bind_name];
+						}
+
+						
+						for(let j = 0; j < value.length; j++) {
+								this.add_row(template, value, value[j], tbody);
+						}
+				}
+		}
+
+		event_listener(control, bind_name)
+		{
+				const control_value = isNaN(parseFloat(control.value)) ? control.value : parseFloat(control.value);
+		
+				if (bind_name.includes(".")) {
+						let bind_name_split = bind_name.split(".");
+
+						let value = this.view_model[bind_name_split[0]];
+						for(let j = 1; j < bind_name_split.length; j++) {
+								if (j == bind_name_split.length - 1)
+										value[bind_name_split[j]] = control_value;
+								else
+										value = value[bind_name_split[j]];
+						}
+				} else {
+						this.view_model[bind_name] = control_value;
+				}
+
+				if (this.update_callback)
+						this.update_callback();
+		}
+
+
+		event_listener_array_element(control, array, index, property)
+		{
+				const control_value = isNaN(parseFloat(control.value)) ? control.value : parseFloat(control.value);
+		
+				array[index][property] = control_value;
+
+				if (this.update_callback)
+						update_chart();
+		}
+
+		event_listener_remove_array_element(array, object, control)
+		{
+				array.splice(array.indexOf(object), 1);
+				control.parentElement.remove();
+
+				if (this.update_callback)
+						update_callback();
+
+		}
+
+
+		add_row(row_template, array, object, parent)
+		{
+				const self = this;
+				let row = row_template.content.cloneNode(true);
+				let td = row.querySelectorAll("td");
+
+				var index = -1;
+				if (!array.includes(object)) {
+						index = array.length;
+						array.push(object);
+				} else {
+						index = array.indexOf(object);
+				}
+
+				let i = 0;
+
+				for (var prop in object) {
+						if (Object.prototype.hasOwnProperty.call(object, prop)) {
+								let input = td[i++].firstChild;
+								input.value = object[prop];
+
+								let current_property = prop;
+								input.addEventListener("change", function() {
+										self.event_listener_array_element(input, array, index, current_property);
+								});
+						}
+				}
+
+				td[i].firstElementChild.addEventListener("click", function() {
+						self.event_listener_remove_array_element(array, object, td[i]);
+				});
+
+				
+
+				parent.appendChild(row);
 		}
 }

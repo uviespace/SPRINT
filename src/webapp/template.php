@@ -11,6 +11,7 @@
 		<?php endif; ?>
 
 		<script type="text/javascript" src="ext/iziToast/iziToast.min.js"></script>
+		<script type="module" src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 		<script type="text/javascript" src="int/config.js"></script>
 		<script type="text/javascript" src="js/global.js"></script>

@@ -72,6 +72,18 @@ class FunctionController extends BaseController {
 
 		$this->send_output(json_encode($result), array('HTTP/1.1 200 OK'));
 	}
+
+	public function set_calibration_curve_to_parameter($param_id, $calibration_curve_id)
+	{
+		if ($calibration_curve_id == 0)
+			$value = "";
+		else
+			$value = '{ "calcurve": ' . $calibration_curve_id . '}';
+
+		$this->database->execute_non_query("UPDATE `parameter` SET setting = ? WHERE id = ?",
+										   ["si", [$value, $param_id]]);
+		$this->send_output("", array("HTTP/1.1 200 OK"));
+	}
 }
 
 /*public function get_packet_size($standard_id, $packet_id)

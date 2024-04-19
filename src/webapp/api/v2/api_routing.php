@@ -52,6 +52,7 @@ route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/constant
 route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datatypes", "datatype_id", new DatatypesController());
 route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/datapool", "datapool_id", new DatapoolController());
 route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/parameters", "parameter_id", new ParameterController());
+route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/calibration", "calibration_id", new CalibrationController());
 
 
 // Packets sub-sub path
@@ -75,15 +76,31 @@ route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/paramete
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/header_size",
 			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"]))
+					 $crudController->forbidden();
+				 
 				 $functionController = new FunctionController();
 				 $functionController->get_header_size($route_ids["standard_id"], $route_ids["packet_id"]);
 });
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/derived_packets/:child_id/parent_size",
 			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"]))
+					 $crudController->forbidden();
+				 
 				 $functionController = new FunctionController();
 				 $functionController->get_parent_size($route_ids["standard_id"], $route_ids["packet_id"]);
-			 });
+});
+
+
+$router->post("api/v2/projects/:project_id/standards/:standard_id/parameters/:parameter_id/calibration_curve/:curve_id",
+			  function($route_ids) {
+				  if (!check_user_can_write_project($route_ids["project_id"]))
+					  $crudController->forbidden();
+				  
+				  $functionController = new FunctionController();
+				  $functionController->set_calibration_curve_to_parameter($route_ids["parameter_id"], $route_ids["curve_id"]);
+});
 
 
 $router->resolve($uri);
@@ -93,6 +110,9 @@ function route_crud($router, $end_point, $id_name, $crudController)
 {
 	$router->get($end_point, function($route_ids) use ($crudController) {
 		try {
+			if (!check_user_can_access_project($route_ids["project_id"]))
+				$crudController->forbidden();
+			
 			$crudController->get_items($route_ids);
 		} catch (Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
@@ -101,10 +121,26 @@ function route_crud($router, $end_point, $id_name, $crudController)
 	
 	$router->post($end_point, function($route_ids) use ($crudController) {
 		try {
+			if (!check_user_can_write_project($route_ids["project_id"]))
+				$crudController->forbidden();
+			
 			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));
 		} catch(Exception $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
+	});
+
+
+	$router->get($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $id_name) {
+		try {
+			if (!check_user_can_access_project($route_ids["project_id"]))
+				$crudController->forbidden();
+			
+			$crudController->get_item($route_ids, $route_ids[$id_name]);
+		} catch(Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+		
 	});
 	
 	$router->put($end_point . "/:" . $id_name, function($route_ids) use ($crudController) {
@@ -129,169 +165,5 @@ function route_crud($router, $end_point, $id_name, $crudController)
 		}
 	});
 }
-
-
-/*
-   if (count($uri) < 6) {
-   $baseController->not_found();
-   }
-
-   $base_path = $uri[PROJECT_INDEX];
-
-   try {
-
-   switch($base_path) {
-   case "projects":
-   $project_id = $uri[PROJECT_ID_INDEX];
-   
-   if (!is_numeric($project_id))
-   $baseController->not_found();
-   else
-   route_projects($baseController, $projectController, $uri, $project_id);
-   break;
-   default:
-   $baseController->not_found();
-   break;
-   }
-   } catch(Exception $e) {
-   $baseController->send_error($e->getMessage());
-   }
-
-
-   function route_projects($baseController, $projectController, $uri, $project_id)
-   {
-   if (!check_user_can_access_project($project_id)) {
-   $baseController->forbidden();
-   return;
-   }
-   
-   if (count($uri) == 6) {
-   $projectController->get_project($project_id);
-   return;
-   }
-   
-   switch($uri[SUB_ITEM_INDEX]) {
-   // api/v2/projects/{project_id}/{sub_item}
-   case "standards":
-   route_project_item($baseController, new StandardsController(), $uri, $project_id);
-   break;
-   case "applications":
-   route_project_item($baseController, new ApplicationController(), $uri, $project_id);
-   break;
-   case "apids":
-   route_project_item($baseController, new ApidController(), $uri, $project_id);
-   break;
-   default:
-   $baseController->not_found();
-   break;
-   }
-   }
-
-   function route_project_item($baseController, $crudController, $uri, $project_id)
-   {
-   if (count($uri) == 7 && $_SERVER['REQUEST_METHOD'] == "GET") {
-   $crudController->get_items($project_id);
-   } else if (count($uri) == 7 && $_SERVER['REQUEST_METHOD'] == "POST") {
-   $crudController->create_item($project_id, json_decode(file_get_contents("php://input")));
-   } else if (count($uri) == 8) {
-   // api/v2/projects/{project_id}/{sub_item}/{sub_item_id}
-   $sub_item_id = $uri[SUB_ITEM_ID];
-   
-   switch($_SERVER['REQUEST_METHOD']) {
-   case "POST":
-   $baseController->not_found();
-   break;
-   case "PUT":
-   if (!check_user_can_write_project($project_id))
-   $baseController->forbidden();
-   
-   $crudController->put_item($project_id, json_decode(file_get_contents("php://input")));
-   break;
-   case "DELETE":
-   if (!check_user_can_delete_project($project_id))
-   $baseController->forbidden();
-   
-   $crudController->delete_item($project_id, $sub_item_id);
-   break;
-   default:
-   $baseController->not_found();
-   break;
-   }
-   } else if ($uri[SUB_ITEM_INDEX] == "standards" && count($uri) > 8) {
-   // api/v2/projects/{project_id}/standards/{standard_id}/{sub_sub_item}
-   switch($uri[SUB_SUB_ITEM_INDEX]) {
-   case "tcheaders":
-   route_sub_project_item($baseController, new TCHeaderController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "tmheaders":
-   route_sub_project_item($baseController, new TMHeaderController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "services":
-   route_sub_project_item($baseController, new ServiceController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "packets":
-   route_sub_project_item($baseController, new PacketController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "constants":
-   route_sub_project_item($baseController, new ConstantController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "datatypes":
-   route_sub_project_item($baseController, new DatatypesController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "datapool":
-   route_sub_project_item($baseController, new DatapoolController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   case "parameters":
-   route_sub_project_item($baseController, new ParameterController(), $uri, $project_id, $uri[SUB_ITEM_ID]);
-   break;
-   default:
-   $baseController->not_found();
-   }
-   } else {
-   // For now
-   $baseController->not_found();
-   }
-   }
-
-
-   function route_sub_project_item($baseController, $crudController, $uri, $project_id, $standard_id)
-   {
-   if (count($uri) == 9 && $_SERVER['REQUEST_METHOD'] == "GET") {
-   $crudController->get_items($standard_id);
-   } else if (count($uri) == 9 && $_SERVER['REQUEST_METHOD'] == "POST") {
-   $crudController->create_item($standard_id, json_decode(file_get_contents("php://input")));
-   } else if (count($uri) == 10) {
-   // api/v2/projects/{project_id}/{sub_item}/{sub_item_id}/{sub_sub_item}/{sub_sub_item_id}
-   $item_id = $uri[SUB_SUB_ITEM_ID_INDEX];
-
-   switch($_SERVER['REQUEST_METHOD']) {
-   case "POST":
-   $baseController->not_found();
-   break;
-   case "PUT":
-   if (!check_user_can_write_project($project_id))
-   $baseController->forbidden();
-
-   $crudController->put_item($standard_id, json_decode(file_get_contents("php://input")));
-   break;
-   case "DELETE":
-   if (!check_user_can_delete_project($project_id))
-   $baseController->forbidden();
-
-   $crudController->delete_item($standard_id, $item_id);
-   break;
-
-   default:
-   $baseController->not_found();
-   }
-   } else if (count($uri) == 11 && $uri[SUB_SUB_ITEM_INDEX] == "packets" &&  $uri[10] == "packet_size") {
-   $item_id = $uri[SUB_SUB_ITEM_ID_INDEX];
-   $functionController = new FunctionController();
-   $functionController->get_packet_size($standard_id, $item_id);
-   } else {
-   $baseController->not_found();
-   }
-
-   }*/
 
 ?>

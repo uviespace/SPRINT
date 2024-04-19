@@ -2,7 +2,7 @@
 
 
 <button id="create_tcheader_button_id" class="btn">
-	<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create TC Header
+	<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create TC Header Element
 </button>
 
 <table id="table_tcheader" class="table">

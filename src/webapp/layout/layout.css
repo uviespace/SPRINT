@@ -70,8 +70,12 @@ legend {
 }
 
 .sprint-logo-header > span {
-	font-style: bold;
-	font-size: 2em;
+	font-weight: bold;
+	font-size: 1.8em;
+}
+
+.sprint-logo-header > img {
+	vertical-align: middle;
 }
 
 .top-header {
@@ -109,6 +113,11 @@ legend {
 	padding: 0 8px;
 }
 
+.btn-semi-small {
+	margin: 0;
+	padding: 4px 12px;
+}
+
 .btn-toolbar {
 	border: 1px solid #ccc;
 	padding: 2px 6px;
@@ -144,6 +153,18 @@ legend {
 	background-image: linear-gradient(#4086C4, #246BA8);
 }
 
+.btn-danger {
+	background-image: linear-gradient(#e04a59, #cc2637);
+	border: 1px solid #af3a45;
+	color: #fff;
+}
+
+.btn-danger:hover {
+	background-image: linear-gradient(#bf4c57, #9b2632);
+	border: 1px solid #6b353a;
+	color: #fff;
+}
+
 
 
 .btn-gradient {
@@ -169,6 +190,11 @@ legend {
 
 .btn-submit:hover {
 	background-image: linear-gradient(#eaebec, #dadbdc);
+}
+
+.btn-disabled {
+	pointer-events: none;
+	background: #efefef;
 }
 
 
@@ -408,7 +434,7 @@ legend {
 }
 
 .sprint-card-wide {
-	width: 700px;
+	width: 800px;
 }
 
 .sprint-card > div {

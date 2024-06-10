@@ -53,9 +53,9 @@
 <?php endif; ?>
 
 <div class="management-block">
-	<a class="menu-button" href="mng_acronym.php"><img src="img/acronym_1_64x64.png" class="button-icon" />Manage Acronyms...</a>
-	<a class="menu-button" href="mng_reference.php"><img src="img/reference_64x64.png" class="button-icon" />Manage References...</a>
-	<a class="menu-button" href="mng_organisation.php"><img src="img/org_1_64x64.png" class="button-icon" />Manage Organisations...</a>
+	<a class="menu-button-disabled" href="mng_acronym.php"><img src="img/acronym_1_64x64.png" class="button-icon" />Manage Acronyms...</a>
+	<a class="menu-button-disabled" href="mng_reference.php"><img src="img/reference_64x64.png" class="button-icon" />Manage References...</a>
+	<a class="menu-button-disabled" href="mng_organisation.php"><img src="img/org_1_64x64.png" class="button-icon" />Manage Organisations...</a>
 </div>
 
 <div class="management-block">

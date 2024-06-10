@@ -25,7 +25,7 @@ function load_data()
 																						end_point: `api/v2/projects/${urlParams.get("idProject")}` +
 																						`/standards/${urlParams.get("idStandard")}/packets`,
 																						create_item: {}
-																					})
+																					});
 
 		packet_handler.load_items();
 }

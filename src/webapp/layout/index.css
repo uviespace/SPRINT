@@ -16,6 +16,18 @@
 	text-decoration: none;
 }
 
+.menu-button-disabled {
+	border: 1px solid #777;
+	border-radius: 4px;
+	background: #ccc;
+	width: 220px;
+	padding: 6px 12px;
+	margin: 0 12px;
+	text-decoration: none;
+	pointer-events: none;
+	color: #111;
+}
+
 .button-icon {
 	width: 32px;
 	height: 32px;

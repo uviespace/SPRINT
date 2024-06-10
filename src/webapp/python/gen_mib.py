@@ -122,6 +122,7 @@ def get_prf_name(limit_id):
     return s
 
 def get_caf_number(setting):
+    #print(settings)
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["caf"]["preamble"])
     jsonlength = settings["caf"]["length"] if "length" in settings["caf"] else 0  # NOTE: jsonlength according to naming convention
     scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for CAF_NUMBR
@@ -459,6 +460,7 @@ def gen_pcf(app, path):
                                 else:
                                     hasNumericalCalibration = False
 
+                                #print(param["id"])
                                 writeln(f, [
                                     get_pcf_name(param),                                   # PCF_NAME
                                     outp(param["name"], 24, True),                         # PCF_DESCR
@@ -502,6 +504,7 @@ def gen_pcf(app, path):
                                     else:
                                         hasNumericalCalibration = False
 
+                                    #print(param["id"])
                                     writeln(f, [
                                         get_pcf_name(param),                                   # PCF_NAME
                                         outp(param["name"], 24, True),                         # PCF_DESCR

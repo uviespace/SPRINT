@@ -80,7 +80,7 @@ function getUrlVars() {
         datasets: [
           {
             label: "Y Value",
-            fill: false,
+#            fill: false,
             lineTension: 0.1,
             backgroundColor: "rgba(59, 89, 152, 0.75)",
             borderColor: "rgba(59, 89, 152, 1)",

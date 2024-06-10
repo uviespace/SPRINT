@@ -82,7 +82,7 @@ class TableHandler
 
 						this.close_modal();
 				} else {
-						iziToast.error({title: 'Error', message: 'Standard could not be created'});
+						iziToast.error({title: 'Error', message: response_item.Error ? response_item.Error : 'Item could not be created'});
 				}
 		}
 
@@ -173,7 +173,8 @@ class TableHandler
 
 								this.close_modal();
 						} else {
-								iziToast.error({ title: "Error", message: "Item could not be deleted"});
+								const result = await response.json()
+								iziToast.error({ title: "Error", message: result.Error ? result.Error : "Item could not be deleted"});
 						}
 				
 				}
@@ -206,7 +207,8 @@ class TableHandler
 						this.close_modal();
 				
 				} else {
-						iziToast.error({ title: "Error", message: "Item could not be updated" });
+						const result = await response.json()
+						iziToast.error({ title: "Error", message: result.Error ? result.Error : "Item could not be updated" });
 				}
 		}
 

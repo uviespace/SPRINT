@@ -39,8 +39,6 @@ if ($os == "WINNT") { // IF WINDOWS
 
 }
 
-// TODO: change python path in project to be the same as in deyployment
-
 $python_settings = array("cmd" => "python3",
 						 "script_path" => "python/",
 						 "import_path" => "./uploads/import/",

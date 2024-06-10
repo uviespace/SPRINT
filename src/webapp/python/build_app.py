@@ -32,6 +32,7 @@ if __name__ == '__main__':
         project_id = sys.argv[1]
         app_id = sys.argv[2]
 
+        
         try:
             il = get_data.get_data(project_id)
             res = consistency_check.check(il)

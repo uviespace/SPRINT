@@ -8,7 +8,7 @@
 }
 
 .button-grid > a {
-	width: 180px;
+	width: 200px;
 }
 
 .sub-grid {
@@ -19,5 +19,5 @@
 }
 
 .sub-grid > .btn {
-	width: 180px;
+	width: 200px;
 }

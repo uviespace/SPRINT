@@ -233,10 +233,16 @@ function update_chart()
 
 function parse_db_item(db_item)
 {
+		const num_options = document.getElementById("numerical_options");
+		const pol_options = document.getElementById("polynomial_options");
+		const log_options = document.getElementById("logarithmic_options");
+		const calib_type_select = document.getElementById("calibration_type");
+		
 		calibration.id = db_item.id;
 		calibration.name = db_item.name;
 		calibration.shortDesc = db_item.shortDesc;
 		calibration.type = db_item.type;
+		
 
 		switch(calibration.type) { 
 		case 0:
@@ -248,16 +254,28 @@ function parse_db_item(db_item)
 				calibration.numerical_settings = JSON.parse(JSON.stringify(standard_numerical_settings));
 				calibration.polynomial_settings = JSON.parse(db_item.setting);
 				calibration.logarithmic_settings = JSON.parse(JSON.stringify(standard_logarithmic_settings));
+
+				calib_type_select.value = "1";
+				num_options.style.display = "none";
+				pol_options.style.display = "block";
+				log_options.style.display = "none";
+				num_options.displ
 				break;
 		case 2:
 				calibration.numerical_settings = JSON.parse(JSON.stringify(standard_numerical_settings));
 				calibration.polynomial_settings = JSON.parse(JSON.stringify(standard_polynomial_settings));
 				calibration.logarithmic_settings = JSON.parse(db_item.setting);
+
+				calib_type_select.value = "2";
+				num_options.style.display = "none";
+				pol_options.style.display = "none";
+				log_options.style.display = "block";
 				break
 		default:
 				iziToast.error({title: 'Error', message: 'Type ' + calibration.type + ' not recognized.'});
 				break;
 		}
+
 }
 
 function build_db_item()

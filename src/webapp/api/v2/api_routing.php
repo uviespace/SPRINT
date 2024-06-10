@@ -3,6 +3,7 @@
 require_once "BaseController.php";
 require_once "ProjectController.php";
 require_once "FunctionController.php";
+require_once "UserController.php";
 require_once "api_session_utils.php";
 require_once "Router.php";
 
@@ -26,13 +27,22 @@ check_session();
 
 $router = new Router();
 
+// Users
+route_crud_admin($router, "api/v2/users", "user_id", new UserController());
+
 
 // Projects
 
-$router->get("api/v2/projects/:project_id", function($route_ids) {
+
+
+
+/*$router->get("api/v2/projects/:project_id", function($route_ids) {
 	$projectController = new ProjectController();
 	$projectController->get_project($route_ids["project_id"]);
 });
+ */
+
+route_crud($router, "api/v2/projects", "project_id", new ProjectController());
 
 
 // Projects sub path
@@ -106,11 +116,72 @@ $router->post("api/v2/projects/:project_id/standards/:standard_id/parameters/:pa
 $router->resolve($uri);
 
 
+function route_crud_admin($router, $end_point, $id_name, $crudController)
+{
+	$router->get($end_point, function($route_ids) use ($crudController) {
+		try {
+			if (!$_SESSION['is_admin'])
+				$crudController->forbidden();
+
+			$crudController->get_items($route_ids);
+		} catch(Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+	});
+
+	$router->post($end_point, function($route_ids) use ($crudController) {
+		try {
+			if (!$_SESSION['is_admin'])
+				$crudController->forbidden();
+			
+			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));
+		} catch(Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+	});
+
+
+	$router->get($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $id_name) {
+		try {
+			if (!$_SESSION['is_admin'])
+				$crudController->forbidden();
+			
+			$crudController->get_item($route_ids, $route_ids[$id_name]);
+		} catch(Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+		
+	});
+	
+	$router->put($end_point . "/:" . $id_name, function($route_ids) use ($crudController) {
+		try {
+			if (!$_SESSION['is_admin'])
+				$crudController->forbidden();
+			
+			$crudController->put_item($route_ids, json_decode(file_get_contents("php://input")));
+		} catch(Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+	});
+	
+	$router->delete($end_point . "/:" . $id_name, function($route_ids) use ($crudController, $id_name) {
+		try {
+			if (!$_SESSION['is_admin'])
+				$crudController->forbidden();
+			
+			$crudController->delete_item($route_ids, $route_ids[$id_name]);
+		} catch (Exception $e) {
+			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
+		}
+	});
+	
+}
+
 function route_crud($router, $end_point, $id_name, $crudController)
 {
 	$router->get($end_point, function($route_ids) use ($crudController) {
 		try {
-			if (!check_user_can_access_project($route_ids["project_id"]))
+			if (array_key_exists("project_id", $route_ids) && !check_user_can_access_project($route_ids["project_id"]))
 				$crudController->forbidden();
 			
 			$crudController->get_items($route_ids);
@@ -121,7 +192,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 	
 	$router->post($end_point, function($route_ids) use ($crudController) {
 		try {
-			if (!check_user_can_write_project($route_ids["project_id"]))
+			if (array_key_exists("project_id", $route_ids) && !check_user_can_write_project($route_ids["project_id"]))
 				$crudController->forbidden();
 			
 			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));

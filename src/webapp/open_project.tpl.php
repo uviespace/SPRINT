@@ -138,44 +138,44 @@
 <h3>Document Management</h3>
 
 <div class="button-grid">
-	<a class="btn" href="sel_project-documentation.php?idProject=<?=$_GET['id']?>">Manage Documents...</a>
+	<a class="btn btn-disabled" href="sel_project-documentation.php?idProject=<?=$_GET['id']?>">Manage Documents...</a>
 </div>
 
 <div class="button-grid">
 	<div class="sub-grid">
-		<a class="btn" href="view_project-acronyms.php?idProject=<?=$_GET['id']?>">Manage Acronyms...</a>
+		<a class="btn btn-disabled" href="view_project-acronyms.php?idProject=<?=$_GET['id']?>">Manage Acronyms...</a>
 		<a href="open_project?idProject=<?=$_GET['id']?>&action=exp_acr">
 			<img src="img/download.png" width="25px" />
 			<span class="badge"><?=$acronym_cnt?></span>
 		</a>
 	</div>
 	<div class="sub-grid">
-		<a class="btn" href="view_project-references.php?idProject=<?=$_GET['id']?>">Manage References...</a>
+		<a class="btn btn-disabled" href="view_project-references.php?idProject=<?=$_GET['id']?>">Manage References...</a>
 		<a href="open_project?idProject=<?=$_GET['id']?>&action=exp_ref" />
 			<img src="img/download.png" width="25px" />
 			<span class="badge"><?=$document_cnt?></span>
 		</a>
 	</div>
-	<a class="btn" href="view_project-organisations.php?idProject=<?=$_GET['id']?>">Manage Organisations</a>
+	<a class="btn btn-disabled" href="view_project-organisations.php?idProject=<?=$_GET['id']?>">Manage Organisations</a>
 </div>
 
 <h3>Requirement Management</h3>
 
 <div class="button-grid">
-	<a class="btn" href="sel_project-requirement.php?idProject=<?=$_GET['id']?>">Tailoring and Traceability</a>
+	<a class="btn btn-disabled" href="sel_project-requirement.php?idProject=<?=$_GET['id']?>">Tailoring and Traceability</a>
 </div>
 
 
 <div class="button-grid">
-	<a class="btn" href="view_project-requirements-external.php?idProject=<?=$_GET['id']?>">Manage Ext. Requ.S...</a>
-	<a class="btn" href="view_project-requirements-external-requ.php?idProject=<?=$_GET['id']?>">Manage Ext. RequR...</a>
+	<a class="btn btn-disabled" href="view_project-requirements-external.php?idProject=<?=$_GET['id']?>">Manage Ext. Requ.S...</a>
+	<a class="btn btn-disabled" href="view_project-requirements-external-requ.php?idProject=<?=$_GET['id']?>">Manage Ext. RequR...</a>
 </div>
 
 
 <div class="button-grid">
-	<a class="btn" href="view_project-requirements-internal.php?idProject=<?=$_GET['id']?>">Manage Int. Requ.S ...</a>
+	<a class="btn btn-disabled" href="view_project-requirements-internal.php?idProject=<?=$_GET['id']?>">Manage Int. Requ.S ...</a>
 	<div class="sub-grid">
-		<a class="btn" href="view_project-requirements-internal-requ.php?idProject=<?=$_GET['id']?>">Manage Int. Requ.R ...</a>
+		<a class="btn btn-disabled" href="view_project-requirements-internal-requ.php?idProject=<?=$_GET['id']?>">Manage Int. Requ.R ...</a>
 		<a href="open_project.php?id=<?=$_GET['id']?>&action=exp_int_req">
 			<img src="img/download.png" width="25px" />
 			<span class="badge"><?=$int_req_cnt?></span>

@@ -35,7 +35,6 @@ if (count($user_project) == 0 && !$_SESSION['is_admin']) {
 $project = $database->select("SELECT name FROM `project` WHERE id = ?", ["i", [$_GET['idProject']]]);
 $standard = $database->select("SELECT id, name, `desc` FROM standard WHERE id = ?", ["i", [$_GET['idStandard']]]);
 
-# TODO: fix this in the database
 $userrole = $database->select("SELECT idRole FROM userproject WHERE idProject = ? AND idUser = ?", ["ii", [$_GET["idProject"], $_SESSION['userid']]]);
 $id_role = count($userrole) > 0 ? $userrole[0]['idRole'] : 5;
 

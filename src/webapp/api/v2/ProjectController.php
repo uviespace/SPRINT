@@ -4,7 +4,7 @@ require_once "BaseController.php";
 require_once "CrudController.php";
 require_once "../../db/Database.php";
 
-class ProjectController extends BaseController {
+class ProjectController extends BaseController implements CrudController {
 
 	private $database;
 
@@ -12,11 +12,68 @@ class ProjectController extends BaseController {
 	{
 		$this->database = new Database();
 	}
+
+	public function get_items($route_ids)
+	{
+		$data = $this->database->select(
+			"SELECT p.id, p.name, p.`desc`, u.id as user_id, u.name as owner, u.email as email, p.isPublic " .
+			"FROM project p " .
+			"	INNER JOIN userproject up ON p.id = up.idProject " .
+			"	INNER JOIN `user` u ON u.id = up.idUser " .
+			"WHERE up.idRole = 2 AND (up.idUser = ? OR ? = 1001 or ? = 1)",
+			["iii", [$_SESSION['userid'], $_SESSION['userid'], $_SESSION['userid']]]);
+		$this->send_output(json_encode($data));
+	}
 	
-	public function get_project($id)
+	public function get_item($route_ids, $id)
 	{
 		$data = $this->database->select("SELECT id, name, `desc` FROM project WHERE id = ?", ["i", [$id]]);
 		$this->send_output(json_encode($data));
+	}
+
+	public function create_item($route_ids, $item)
+	{
+		$id = $this->database->insert("INSERT INTO project(name, `desc`, isPublic) VALUES (?, ?, ?)",
+									  ["ssi", [ $item->name, $item->desc, $item->isPublic ]]);
+
+		$item->id = $id;
+
+		$email = $this->database->select("SELECT email FROM `user` WHERE id = ?", ["i", [$item->user_id]]);
+		
+		$id = $this->database->insert("INSERT INTO userproject(idUser, idProject, idRole, email) " .
+									  "VALUES(?,?,2,?)",
+									  ["iis", [$item->user_id, $item->id, $email[0]["email"]]]);
+
+		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
+	}
+
+	
+	public function delete_item($route_ids, $item_id)
+	{
+		$result = $this->database->select("SELECT count(*) as app_cnt FROM application WHERE idProject = ?",
+										  ["i", [$item_id]]);
+
+		if ($result[0]["app_cnt"] > 0)
+			throw new Exception("Project already contains an appliction");
+
+
+		$result = $this->database->select("SELECT count(*) as stn_cnt FROM standard WHERE idProject = ?",
+										  ["i", [$item_id]]);
+
+		if ($result[0]["stn_cnt"] > 0)
+			throw new Exception("Project already contains a standard");
+
+		$this->database->execute_non_query("DELETE FROM project WHERE id = ?", ["i", [$item_id]]);
+		$this->send_output('', array('HTTP/1.1 200 OK'));
+	}
+
+	
+	public function put_item($route_ids, $item)
+	{
+		$this->database->execute_non_query("UPDATE project SET name = ?, `desc` = ?, isPublic = ? WHERE id = ?",
+										   ["ssii", [$item->name, $item->desc, $item->isPublic, $item->id]]);
+
+		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}
 }
 

@@ -118,6 +118,11 @@ legend {
 	padding: 4px 12px;
 }
 
+.btn-big {
+	padding: 6px 40px;
+	font-size: 1.1em;
+}
+
 .btn-toolbar {
 	border: 1px solid #ccc;
 	padding: 2px 6px;
@@ -151,6 +156,16 @@ legend {
 
 .btn-action:hover {
 	background-image: linear-gradient(#4086C4, #246BA8);
+}
+
+.btn-primary {
+	background: #337ab7;
+	color: white;
+	border: 1px solid #224B6F;
+}
+
+.btn-primary:hover {
+	background: #225d8e;
 }
 
 .btn-danger {
@@ -517,4 +532,56 @@ legend {
 
 .param-curve-list-item > span {
 	display: inline-block
+}
+
+.import-export-container {
+	display: flex;
+	width: 500px;
+	margin: 35px 0;
+	border-radius: 6px;
+	box-shadow: 0 2px 1px -1px hsla(0,0%,0%,26%),0 1px 1px 0 hsla(0,0%,0%,26%),0 1px 3px 0 hsla(0,0%,0%,26%);
+}
+
+.export-area {
+	border-right: 1px solid #cacaca;
+	flex-grow: 1;
+}
+
+.import-area {
+	flex-grow: 3;
+}
+
+.import-export-header {
+	font-size: 1.1em;
+	color: #fff;
+	background: #337AB7;
+	padding: 6px 12px;
+}
+
+.import-export-content {
+	padding: 2px 12px;
+}
+
+.import-export-container > .export-area > .import-export-header {
+	border-top-left-radius: 6px;
+}
+
+.import-export-container > .import-area > .import-export-header {
+	border-top-right-radius: 6px;
+}
+
+.export-area > .import-export-content {
+	text-align: center;
+}
+
+.export-area > .import-export-content > input {
+	width: 150px;
+	height: 40px;
+	margin: 8px 0;
+}
+
+.import-area > .import-export-content > input {
+	width: 300px;
+	height: 40px;
+	margin: 8px 0;
 }

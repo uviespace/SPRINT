@@ -14,6 +14,7 @@
  * create_button_id: id of the create item button
  * empty_item: item template for new creations (allows filling of standard properties
  * create_item_from_modal_fn: function to create item from entries in modal (optional)
+ * modal_filled_fn: function that gets called when modal is filled
  */
 
 class TableHandler
@@ -88,6 +89,8 @@ class TableHandler
 
 		fill_table()
 		{
+				const self = this;
+				
 				const table = document.getElementById(this.props.table_id);
 				const tbody = table.querySelector("tbody");
 				const template = document.getElementById(this.props.template_id);
@@ -111,6 +114,50 @@ class TableHandler
 				const modal = document.getElementById(this.props.modal_id);
 				const close_button = modal.querySelector(".modal-close");
 				close_button.onclick = function() { instance.close_modal.call(instance);  }
+
+				// Create filter if neccesary and wire up events
+				const controls = document.querySelectorAll('[data-filter]');
+
+				for(let i = 0; i < controls.length; i++) {
+						if (controls[i].nodeName != "SELECT")
+								continue;
+						
+						const input = document.createElement("input");
+						input.setAttribute("type", "text");
+						input.setAttribute("class", "form-input modal-input");
+						input.setAttribute("placeholder", "Filter...");
+						let current_control = controls[i];
+						const options_list = self.create_options_list(current_control.options);
+						
+						input.addEventListener("input", function() { self.filter_event_listener(current_control, input, options_list ) });
+
+						controls[i].insertAdjacentElement("beforebegin", input);
+				}
+		}
+
+		create_options_list(options)
+		{
+				let result = [];
+
+				for(let i = 0; i < options.length; i++)
+						result.push({ value: options[i].value, text: options[i].text });
+
+				return result;
+		}
+
+		filter_event_listener(select, input, full_list)
+		{
+				// remove all options
+				select.innerHTML = "";
+
+				for(let i = 0; i < full_list.length; i++) {
+						if (full_list[i].text.toUpperCase().includes(input.value.toUpperCase())) {
+								const opt = document.createElement("option");
+								opt.value = full_list[i].value;
+								opt.text = full_list[i].text;
+								select.appendChild(opt);
+						}
+				}
 		}
 
 		create_row(template_id, data_row, properties, actions)
@@ -155,6 +202,9 @@ class TableHandler
 				document.getElementById(this.props.submit_button_id).onclick = function() { instance.update_item.call(instance) };
 
 				modal.style.display = "block";
+
+				if (this.props.modal_filled_fn)
+						this.props.modal_filled_fn(item);
 		}
 
 		async action_delete(item)

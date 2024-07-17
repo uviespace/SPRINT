@@ -576,13 +576,13 @@ class DatatypesController extends BaseController implements CrudController
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT id, domain, name, nativeType, `desc`, " .
-										"  size, value, " .
+										"  size, value, setting, " .
 										"  concat('PTC/PFC: ', json_value(`setting`, '$.PUS.ptc'), '/', " .
-										"json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
-										"json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
-
+										"    json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
+										"  json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
 										"FROM `type` " .
-										"WHERE idStandard = ?", ["i", [$route_ids["standard_id"]]]);
+										"WHERE idStandard = ? " .
+									    "ORDER BY domain, name", ["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
@@ -596,11 +596,11 @@ class DatatypesController extends BaseController implements CrudController
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO `type`(domain, name, nativeType, size, " .
-									  "  value, `desc`, idStandard)" .
-									  "VALUES(?,?,?,?,?,?,?)",
-									  ["sssissi", [$item->domain, $item->name,
+									  "  value, `desc`, idStandard, setting)" .
+									  "VALUES(?,?,?,?,?,?,?,?)",
+									  ["sssissis", [$item->domain, $item->name,
 												   $item->nativeType, $item->size, $item->value,
-												   $item->desc, $route_ids["standard_id"]]]);
+												   $item->desc, $route_ids["standard_id"], $item->setting]]);
 		
 		$item->id = $id;
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
@@ -619,13 +619,13 @@ class DatatypesController extends BaseController implements CrudController
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE `type` " .
-										   "SET domain = ?, name = ?, nativeType = ? " .
-										   "  size = ?, value = ?, desc = ? " .
+										   "SET domain = ?, name = ?, nativeType = ?, " .
+										   "  size = ?, value = ?, `desc`= ? , setting = ? " .
 										   "WHERE id = ?",
-										   ["sssissi", [ $item->domain, $item->name,
+										   ["sssiissi", [ $item->domain, $item->name,
 														 $item->nativeType, $item->size,
-														 $item->size, $item->value,
-														 $item->desc, $item->id ]]);
+														 $item->value, $item->desc,
+														 $item->setting, $item->id ]]);
 
 		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}

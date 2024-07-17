@@ -75,7 +75,7 @@
 			<input class="form-input modal-input" id="edit_parameter_short_desc" type="text" name="short_desc" />
 
 			<label for="datatype">Datatype:</label>
-			<select name="datatype" id="edit_parameter_datatype" class="form-input modal-input">
+			<select name="datatype" id="edit_parameter_datatype" class="form-input modal-input" data-filter="on">
 				<?php foreach($datatypes as $type): ?>
 					<option value="<?=$type["id"]?>"><?=$type["domain"]?> / <?=$type["name"]?> (<?=$type["id"]?>)</option>
 				<?php endforeach; ?>

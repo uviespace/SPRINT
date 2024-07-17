@@ -37,9 +37,9 @@ route_crud_admin($router, "api/v2/users", "user_id", new UserController());
 
 
 /*$router->get("api/v2/projects/:project_id", function($route_ids) {
-	$projectController = new ProjectController();
-	$projectController->get_project($route_ids["project_id"]);
-});
+   $projectController = new ProjectController();
+   $projectController->get_project($route_ids["project_id"]);
+   });
  */
 
 route_crud($router, "api/v2/projects", "project_id", new ProjectController());
@@ -124,7 +124,7 @@ function route_crud_admin($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 
 			$crudController->get_items($route_ids);
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -135,7 +135,7 @@ function route_crud_admin($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -147,7 +147,7 @@ function route_crud_admin($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->get_item($route_ids, $route_ids[$id_name]);
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 		
@@ -159,7 +159,7 @@ function route_crud_admin($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->put_item($route_ids, json_decode(file_get_contents("php://input")));
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -170,7 +170,7 @@ function route_crud_admin($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->delete_item($route_ids, $route_ids[$id_name]);
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -185,7 +185,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->get_items($route_ids);
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -196,7 +196,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->create_item($route_ids, json_decode(file_get_contents("php://input")));
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -208,7 +208,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->get_item($route_ids, $route_ids[$id_name]);
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 		
@@ -220,7 +220,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->put_item($route_ids, json_decode(file_get_contents("php://input")));
-		} catch(Exception $e) {
+		} catch(\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});
@@ -231,7 +231,7 @@ function route_crud($router, $end_point, $id_name, $crudController)
 				$crudController->forbidden();
 			
 			$crudController->delete_item($route_ids, $route_ids[$id_name]);
-		} catch (Exception $e) {
+		} catch (\Throwable $e) {
 			$crudController->send_output(json_encode(array("Error" => $e->getMessage())) , array("Http/1.1 500 Internal Server Error"));
 		}
 	});

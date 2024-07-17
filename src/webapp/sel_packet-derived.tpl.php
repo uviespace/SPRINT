@@ -77,7 +77,7 @@
 
 		<div class="modal-body">
 			<label for="discriminant">Discriminant</label>
-			<select name="dscriminant" id="edit_packet_discriminant" class="form-input modal-input">
+			<select name="dscriminant" id="edit_packet_discriminant" class="form-input modal-input" data-filter="on">
 				<?php foreach($discriminants as $disc): ?>
 					<option value="<?=$disc["name"]?>"><?=$disc["idType"]?> / <?=$disc["name"]?></option>
 				<?php endforeach; ?>

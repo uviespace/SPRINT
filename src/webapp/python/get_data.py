@@ -117,6 +117,8 @@ def get_data(idProject):
                             if param_i != None:
                                 t = param_i["param"]["type"]
                                 if t["setting"] != None:
+                                    print(enum)
+                                    print(derived)
                                     for enum in t["setting"]["Enumerations"]:
                                         if enum["Name"] == derived["disc"]:
                                             derived["_disc"] = int(enum["_dec"])

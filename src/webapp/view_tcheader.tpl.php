@@ -51,7 +51,7 @@
 
 		<div class="modal-body">
 			<label for="parameter">Parameter:</label>
-			<select name="parameter" id="edit_tcheader_parameter" class="form-input modal-input">
+			<select name="parameter" id="edit_tcheader_parameter" class="form-input modal-input" data-filter="on">
 				<?php foreach($parameter_values as $param): ?>
 					<option value="<?=$param["id"]?>"><?=$param["parameter"]?></option>
 				<?php endforeach; ?>

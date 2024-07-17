@@ -64,7 +64,7 @@ function create_item(edit_item, table_handler)
 
 		edit_item["parameter"] = document.getElementById(edit_dialog_ids[0]).selectedOptions[0].text;
 
-		if (edit_item["order"] === 0)
+		if (edit_item["order"] === 0 && table_handler.items.length > 0)
 				edit_item["order"] = table_handler.items[table_handler.items.length - 1].order + 1;
 
 		return edit_item;

@@ -1,11 +1,11 @@
 <?php
 
-function lib_dwnFile($clean, $file) {
+function lib_dwnFile($clean, $file, $content_type = "application/zip") {
 	//$_SESSION['scriptcase']['form_Application_mob']['contr_erro'] = 'on';
 	if (file_exists($file)) {
 		$size = filesize($file);
 		header('Content-Description: File Transfer');
-		header('Content-Type: application/zip');
+		header('Content-Type: ' . $content_type);
 		header('Content-Disposition: attachment; filename='.basename($file));
 		header('Content-Length: ' . $size);
 		header('Content-Transfer-Encoding: binary');

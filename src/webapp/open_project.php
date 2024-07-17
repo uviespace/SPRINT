@@ -61,7 +61,7 @@ $owner = $database->select("SELECT u.id, u.name, u.email " .
 
 
 # Post actions
-
+$errors = [];
 if (isset($_POST['export']))
 	list($message, $errors) = export_project($_GET['id'], $python_settings);
 

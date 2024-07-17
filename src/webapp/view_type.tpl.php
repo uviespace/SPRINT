@@ -61,9 +61,11 @@
 			<input class="form-input modal-input" id="edit_datatype_native_type" type="text" name="native_type" />
 
 			<label for="size">Size:</label>
-			<input class="form-input modal-input" id="edit_datatype_size" type="number" name="size" />
+			<input class="form-input modal-input" id="edit_datatype_size" type="number" name="size" onchange="update_pus_datatypes()" />
 
-			<!--  <label for="format">Param. Type/Format</label>-->
+			<label for="format">Param. Type/Format</label>
+			<select class="form-input modal-input" id="edit_datatype_pustype">
+			</select>
 
 
 			<label for="value">Value:</label>

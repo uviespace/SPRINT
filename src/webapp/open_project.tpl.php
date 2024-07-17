@@ -1,24 +1,28 @@
 <h2>Project <?= $project_name ?></h2>
 
-
 <?php if ($id_role < 4): ?>
-<form method="post" enctype="multipart/form-data">
-	<div class="user-card">
-		<input class="btn" type="submit" name="export" value="Export Project" />
-		<input id="file-upload" class="btn" type="file" name="importfile[]" multiple="multiple" style="display:none">
-		<label for="file-upload" class="btn">Choose File</label>
-		<input type="submit" name="import" value="Import Standard" class="btn" />
-
-		<?php if (!empty($errors)): ?>
+	<form method="post" enctype="multipart/form-data">
+		<div class="import-export-container">
+			<div class="export-area">
+				<div class="import-export-header">Export</div>
+				<div class="import-export-content">
+					<input type="submit" class="btn btn-primary" name="export" value="Export Project" />
+				</div>
+			</div>
+			<div class="import-area">
+				<div class="import-export-header">Import</div>
+				<div class="import-export-content">
+					<input class="form-input" type="file" name="importfile[]" multiple="multiple" />
+					<input type="submit" class="btn btn-primary" name="import" value="Import Standard" />
+				</div>
+			</div>
+		</div>
+		<div>
 			<?php foreach($errors as $e): ?>
-				<div style="color: red;"><?= $e ?></div>
+				<div style="color: red;"><?=$e?></div>
 			<?php endforeach; ?>
-		<?php endif; ?>
-		<?php if (!empty($message)): ?>
-			<div style="color: green;"><?= $message ?></div>
-		<?php endif; ?>
-	</div>
-</form>
+		</div>
+	</form>
 <?php endif; ?>
 
 

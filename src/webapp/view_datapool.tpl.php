@@ -1,9 +1,30 @@
 <h2>Datapool</h2>
 
+
+<form method="post" enctype="multipart/form-data">
+	<div class="import-export-container">
+		<div class="export-area">
+			<div class="import-export-header">Export</div>
+			<div class="import-export-content">
+				<input type="submit" class="btn btn-primary" name="export" value="Export" />
+			</div>
+		</div>
+		<div class="import-area">
+			<div class="import-export-header">Import</div>
+			<div class="import-export-content">
+				<input class="form-input" type="file" name="import_file" />
+				<input type="submit" class="btn btn-primary" name="import" value="Import" />
+				<div><?=$result_msg?></div>
+			</div>
+		</div>
+	</div>
+</form>
+
+
+
 <button id="create_datapool_button_id" class="btn">
 	<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create Datapool
 </button>
-
 
 <table id="table_datapool" class="table">
 	<thead>
@@ -71,7 +92,7 @@
 			</select>
 
 			<label for="datatype">Datatype:</label>
-			<select name="datatype" id="edit_datapool_datatype" class="form-input modal-input">
+			<select name="datatype" id="edit_datapool_datatype" class="form-input modal-input" data-filter="on">
 				<?php foreach($datatypes as $type): ?>
 					<option value="<?=$type["id"]?>"><?=$type["domain"]?> / <?=$type["name"]?> (<?=$type["id"]?>)</option>
 				<?php endforeach; ?>

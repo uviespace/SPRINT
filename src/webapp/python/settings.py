@@ -18,16 +18,10 @@ def get_settings():
         settings["db_name"] = ""
     else:
         # We are on the developer machine
-        # settings["tmp_path"] = "/tmp/local"
-        # settings["db_host"] = "127.0.0.1"
-        # settings["db_user"] = "user"
-        # settings["db_passwd"] = "pass"
-        # settings["db_name"] = "testdb"
-
         settings["tmp_path"] = "/tmp/local"
         settings["db_host"] = "127.0.0.1"
         settings["db_user"] = "user"
         settings["db_passwd"] = "pass"
-        settings["db_name"] = "usermysql1"
+        settings["db_name"] = "testdb"
         
     return settings

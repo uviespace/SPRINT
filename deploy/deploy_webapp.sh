@@ -3,7 +3,7 @@
 WEBAPP_PATH=../src/webapp
 TEMP_PATH=/tmp
 SSH_USER=u\\johanng84
-REMOTE_PATH=user/html/SPRINT_NEXT
+REMOTE_PATH=user/html/SPRINT
 
 echo "Creating deployment archive"
 tar --exclude=db_config.php \
@@ -25,5 +25,5 @@ tar -xf $TEMP_PATH/web_app_deploy.tar -C $TEMP_PATH/local_deployment
 
 
 echo "Deploying to webspace"
-scp -r $TEMP_PATH/local_deployment/* $SSH_USER@webspace-access:$REMOTE_PATH
+scp -r $TEMP_PATH/local_deployment/* $SSH_USER@webspace-access.univie.ac.at:$REMOTE_PATH
 

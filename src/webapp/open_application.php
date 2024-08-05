@@ -1,4 +1,4 @@
-<?php
+#<?php
 
 require_once "utils/session_utils.php";
 require_once 'db/db_config.php';
@@ -66,7 +66,7 @@ if (isset($_POST["cal_curve_submit"]) && $id_role < 4)
 	$calibration_import_msg = import_calibration_curve($database);
 
 if (isset($_POST["build"]) && $id_role < 4) {
-	$cmd = $python_settings["script_path"] . "build_app.py " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
+	$cmd = $python_settings["script_path"] . "build_app.sh " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
 
 	$file = shell_exec($cmd);
 	$file = substr($file, 0, strlen($file) - 1);
@@ -84,7 +84,7 @@ if (isset($_POST["build"]) && $id_role < 4) {
 if (isset($_POST["build_dp_list"]) && $id_role < 4) {
 	$message_dp_list = "The build Datapool CSV function is called.\n\n";
 
-	$cmd = $python_settings["cmd"] . " " . $python_settings["script_path"] . "build_dp_csv.py " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
+	$cmd = $python_settings["script_path"] . "build_dp_csv.py " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
 
 	$file = shell_exec($cmd);
 	$file = substr($file, 0, strlen($file) - 1);

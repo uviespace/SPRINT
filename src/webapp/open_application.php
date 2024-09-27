@@ -68,11 +68,12 @@ if (isset($_POST["cal_curve_submit"]) && $id_role < 4)
 if (isset($_POST["build"]) && $id_role < 4) {
 	$cmd = $python_settings["script_path"] . "build_app.sh " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
 
-	$file = shell_exec($cmd);
-	$file = substr($file, 0, strlen($file) - 1);
+	$stdout = shell_exec($cmd);
+	$lines = array_filter(explode(PHP_EOL, $stdout));
+	$file = $lines[count($lines) - 1];
 
 	if (file_exists($file)) {
-		$message_build_app .= $file . "\n\n";
+		$message_build_app .= $stdout . "\n\n";
 		lib_dwnFile(true, $file);
 	} else {
 		$message_build_app .= "Error: file could not be created!\n";

@@ -299,9 +299,9 @@ def get_ptc_pfc_GEN(param):
         (10, 16, 0, multi) if domain == "SCOS-2000" and name == "Relative time CUC (4/1)" else \
         (10, 17, 0, multi) if domain == "SCOS-2000" and name == "Relative time CUC (4/2)" else \
         (10, 18, 0, multi) if domain == "SCOS-2000" and name == "Relative time CUC (4/3)" else \
-        (11, 0, 0, multi) if domain == "" and name == "Deduced" and size == None else \
-        (11, size, 0, multi) if domain == "" and name == "Deduced" and size != None else \
-        (11, 0, 0, multi) if domain == "General" and name == "generic" else \
+        (11, 0, 0, multi) if domain == "" and name == "deduced" and size == None else \
+        (11, size, 0, multi) if domain == "" and name == "deduced" and size != None else \
+        (11, 0, 0, multi) if domain == "General" and name == "deduced" else \
         (11, size, 0, multi) if domain == "General" and name == "deduced" and size != None else \
         (0, 0, 0, 0)
 

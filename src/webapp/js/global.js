@@ -116,7 +116,7 @@ class TableHandler
 				close_button.onclick = function() { instance.close_modal.call(instance);  }
 
 				// Create filter if neccesary and wire up events
-				const controls = document.querySelectorAll('[data-filter]');
+				const controls = document.querySelectorAll('[data-filter="on"]');
 
 				for(let i = 0; i < controls.length; i++) {
 						if (controls[i].nodeName != "SELECT")
@@ -132,6 +132,8 @@ class TableHandler
 						input.addEventListener("input", function() { self.filter_event_listener(current_control, input, options_list ) });
 
 						controls[i].insertAdjacentElement("beforebegin", input);
+
+						controls[i].dataset.filter = "done"
 				}
 		}
 

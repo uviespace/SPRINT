@@ -71,6 +71,13 @@
 				<option value="6">DpVar Imported (6)</option>
 			</select>
 
+			<label for="role">Role:</label>
+			<select name="role" id="edit_parameter_role" class="form-input modal-input">
+				<?php foreach($role_values as $role): ?>
+					<option value="<?=$role["id"]?>"><?=$role["name"]?> (<?=$role["id"]?>)</option>
+				<?php endforeach; ?>
+			</select>
+
 			<label for="short_desc">Short Description:</label>
 			<input class="form-input modal-input" id="edit_parameter_short_desc" type="text" name="short_desc" />
 

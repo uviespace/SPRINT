@@ -1,4 +1,4 @@
-#<?php
+<?php
 
 require_once "utils/session_utils.php";
 require_once 'db/db_config.php';

@@ -4,13 +4,14 @@ const edit_dialog_ids = [ "edit_parameter_domain",
 													"edit_parameter_name",
 													"edit_parameter_short_desc",
 													"edit_parameter_kind",
+													"edit_parameter_role",
 													"edit_parameter_datatype",
 													"edit_parameter_multiplicity",
 													"edit_parameter_value",
 													"edit_parameter_unit" ];
 
 const edit_properties = [ "domain", "name", "shortDesc",
-													"kind", "idType", "multiplicity",
+													"kind", "role", "idType", "multiplicity",
 													"value", "unit"];
 
 function load_data()

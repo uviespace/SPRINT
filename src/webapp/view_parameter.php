@@ -1,6 +1,7 @@
 <?php
 
 require_once "utils/session_utils.php";
+require_once "utils/drop_down_utils.php";
 require_once 'db/db_config.php';
 require_once 'db/Database.php';
 require_once 'int/config.php';
@@ -25,6 +26,8 @@ $datatypes = $database->select("SELECT id, domain, name " .
 							   "WHERE idStandard = ? OR idStandard IS NULL " .
 							   "ORDER BY domain, name",
 							   ["i", [$_GET["idStandard"]]]);
+
+$role_values = get_roles($database, 3);
 
 # Template settings
 $sidebar_actions = [ ["label" => "Back",

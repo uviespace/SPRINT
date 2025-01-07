@@ -3,7 +3,7 @@
 WEBAPP_PATH=../src/webapp
 TEMP_PATH=/tmp
 SSH_USER=u\\johanng84
-REMOTE_PATH=user/html/SPRINT
+REMOTE_PATH=spaceprojq75/html/SPRINT
 
 echo "Creating deployment archive"
 tar --exclude=db_config.php \

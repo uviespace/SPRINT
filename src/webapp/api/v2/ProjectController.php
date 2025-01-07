@@ -335,7 +335,7 @@ class ApidController extends BaseController implements CrudController
 		$this->not_found();
 	}
 
-	public function create_item($project_id, $item)
+	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO `process` (idProject, address, name, `desc`) " .
 									  "VALUES (?,?,?,?)",

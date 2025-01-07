@@ -224,6 +224,8 @@ class TableHandler
 								this.items.splice(index, 1);
 
 								this.close_modal();
+						} else if (response.status == 403) {
+								iziToast.error({ title: "Forbidden", message: "Not enough rights to delete item" });
 						} else {
 								const result = await response.json()
 								iziToast.error({ title: "Error", message: result.Error ? result.Error : "Item could not be deleted"});

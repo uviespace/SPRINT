@@ -607,3 +607,50 @@ legend {
 	background-color: #f8d7da;
 	border-color: #f5c6cb;
 }
+
+
+.standard-import-container {
+	display: grid;
+	width: 500px;
+	margin-top: 24px;
+	grid-template-columns: 150px 350px;
+	grid-template-rows: 42px 42px auto;
+	grid-template-areas: "sidebar main";
+	column-gap: 8px;
+	border-radius: 6px;
+	box-shadow: 0 2px 1px -1px hsla(0,0%,0%,26%),0 1px 1px 0 hsla(0,0%,0%,26%),0 1px 3px 0 hsla(0,0%,0%,26%);
+}
+
+
+.standard-import-sidebar {
+	display: inline-block;
+	height: 100%;
+	background: #ccdfff;
+	text-align: right;	
+}
+
+.standard-import-sidebar:first-child{
+	border-top-left-radius: 6px;
+}
+
+.standard-import-sidebar:last-child {
+	border-bottom-left-radius: 6px;
+}
+
+.standard-import-sidebar > div {
+	padding: 8px;
+}
+
+.standard-import-content {
+	display: inline-block;
+	justify-self: stretch;
+	padding: 4px;
+}
+
+.standard-import-content > select {
+	width: 95%;
+}
+
+.standard-import-sub-service {
+	padding-left: 26px;
+}

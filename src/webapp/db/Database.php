@@ -56,6 +56,24 @@ class Database
 
 		return $id;
 	}
+
+	public function begin_transaction()
+	{
+		$this->connection->begin_transaction();
+	}
+
+	public function rollback()
+	{
+		$this->connection->rollback();
+	}
+
+	public function commit()
+	{
+		$this->connection->commit();
+	}
+	
+	
+	
 }
 
 ?>

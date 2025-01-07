@@ -50,8 +50,8 @@ $headers = $database->select("SELECT ps.`type`, count(*) as cnt " .
 							 "ORDER BY `type` ", ["i", [$_GET['idStandard']]]);
 
 # Card 1
-$tc_header_cnt = $headers[0]["cnt"];
-$tm_header_cnt = $headers[1]["cnt"];
+$tc_header_cnt = get_type_count($headers, 0);
+$tm_header_cnt = get_type_count($headers, 1);
 $apid_cnt = $database->select("SELECT count(*) as cnt FROM `process` WHERE idProject = ?", ["i", [$_GET['idProject']]]);
 
 # Card 2
@@ -151,4 +151,17 @@ function export_standard($idStandard, $python_settings)
 }
 
 
+function get_type_count($header, $type)
+{
+	foreach($header as $t) {
+		if ($t['type'] == $type)
+			return $t['cnt'];
+	}
+
+	return 0;
+}
+
 ?>
+
+
+

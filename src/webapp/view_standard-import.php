@@ -74,7 +74,8 @@ if (isset($_POST['standard']) && $_POST['standard'] > -1) {
 if (isset($_POST['sel_all_services'])) {
 	$_POST['sel_services'] = [];
 	foreach($services as $s)
-		array_push($_POST['sel_services'], $s['id']);
+		if ($s['service_exists'] == null)
+			array_push($_POST['sel_services'], $s['id']);
 }
 
 if (isset($_POST['sel_services'])) {

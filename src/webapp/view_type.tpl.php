@@ -9,16 +9,17 @@
 		<tr>
 			<th>ID</th>
 			<th>Domain</th>
-			<th>Name</th>
+			<th style="text-align:left;padding-left:2vw;">Name</th>
 			<th>Native Type</th>
 			<th>Size</th>
 			<th>Type/Format</th>
 			<th>Default Value</th>
-			<th>Description</th>
+			<th>Users</th>
+			<th style="text-align:left;padding-left:2vw;" >Description</th>
 			<th>Action</th>
 		</tr>
 	</thead>
-	<tbody>	
+	<tbody>
 	</tbody>
 </table>
 
@@ -27,12 +28,13 @@
 	<tr>
 		<td></td>
 		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>
-		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td>
 			<div class="btn-group">
 				<button><i class="nf nf-cod-edit"></i></button>

@@ -1,4 +1,0 @@
-Options +FollowSymlinks
-RewriteEngine on
-
-RewriteRule ^api/v2/$ api_routing.php

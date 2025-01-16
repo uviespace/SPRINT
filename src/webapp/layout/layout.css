@@ -44,7 +44,7 @@ legend {
 }
 
 .content-container {
-	
+
 }
 
 .sidebar {
@@ -185,7 +185,7 @@ legend {
 .btn-gradient {
 	background: transparent;
 	background-image: linear-gradient(#fafbfc, #eaebec);
-	
+
 }
 
 .btn-submit {
@@ -222,11 +222,11 @@ legend {
 
 .upload-area-filename  {
 	background: white;
-	
+
 }
 
 .btn-upload-submit {
-	
+
 }
 
 
@@ -296,14 +296,13 @@ legend {
 	border-radius: 8px 8px 0 0;
 	border-collapse: collapse;
 	//box-shadow: 0 2px 2px rgba(64,64,64,.7);
-	
+
 }
 
 .table > thead > tr > th {
 	background-color: #337AB7;
 	color: #D1E0FF;
 	padding: 6px 12px;
-	min-width: 80px;
 }
 
 
@@ -316,8 +315,11 @@ legend {
 }
 
 .table > tbody > tr > td {
-	padding: 6px 12px;
+	padding: 6px px;
 	border-bottom: 1px solid #ccc;
+	border-right: solid 1px #337AB7;
+	border-left:  solid 1px #337AB7;
+	text-align: center;
 }
 
 .table > tbody > tr > td:first-child {
@@ -400,7 +402,7 @@ legend {
 
 /* Add Animation */
 @-webkit-keyframes animatetop {
-	from {top:-300px; opacity:0} 
+	from {top:-300px; opacity:0}
 	to {top:0; opacity:1}
 }
 
@@ -626,7 +628,7 @@ legend {
 	display: inline-block;
 	height: 100%;
 	background: #ccdfff;
-	text-align: right;	
+	text-align: right;
 }
 
 .standard-import-sidebar:first-child{

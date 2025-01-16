@@ -26,9 +26,9 @@
 						<tr>
 							<th>ID</th>
 							<th>Discriminant</th>
-							<th>Name</th>
-							<th>Short Desc.</th>
-							<th>Description</th>
+							<th style="text-align:left;padding-left:2vw;">Name</th>
+							<th style="text-align:left;padding-left:2vw;">Short Desc.</th>
+							<th style="text-align:left;padding-left:2vw;">Description</th>
 							<th>Parameter Desc.</th>
 							<th>Destination Desc.</th>
 							<th>Code</th>
@@ -39,7 +39,7 @@
 					<tbody></tbody>
 				</table>
 
-				
+
 			</div>
 		</div>
 	<?php endforeach; ?>
@@ -50,9 +50,9 @@
 	<tr>
 		<td></td>
 		<td></td>
-		<td></td>
-		<td></td>
-		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -88,10 +88,10 @@
 
 			<label for="short_desc">Short Desc.:</label>
 			<input class="form-input modal-input" id="edit_packet_short_desc" type="text" name="short_desc" />
-	
+
 			<label for="description">Description</label>
 			<textarea id="edit_packet_description" rows="4" class="modal-input"></textarea>
-	
+
 			<label for="param_desc">Parameter Desc.:</label>
 			<input class="form-input modal-input" id="edit_packet_param_desc" type="text" name="param_desc" />
 

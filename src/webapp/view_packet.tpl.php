@@ -12,11 +12,11 @@
 		<th>Subtype</th>
 		<th>Dscriminant</th>
 		<th>Domain</th>
-		<th>Name</th>
-		<th>Short Desc.</th>
+		<th style="text-align:left;padding-left:2vw;">Name</th>
+		<th style="text-align:left;padding-left:2vw;">Short Desc.</th>
 		<th>Action</th>
 	</thead>
-	<tbody>	
+	<tbody>
 	</tbody>
 </table>
 
@@ -28,8 +28,8 @@
 		<td></td>
 		<td></td>
 		<td></td>
-		<td></td>
-		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td>
 			<div class="btn-group">
 				<button><i class="nf nf-cod-edit"></i></button>
@@ -98,4 +98,4 @@
 			<button id="packet_submit_button" class="btn-submit"></button>
 		</div>
 	</div>
-</div> 
+</div>

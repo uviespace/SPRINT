@@ -24,7 +24,7 @@ class ProjectController extends BaseController implements CrudController {
 			["iii", [$_SESSION['userid'], $_SESSION['userid'], $_SESSION['userid']]]);
 		$this->send_output(json_encode($data));
 	}
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$data = $this->database->select("SELECT id, name, `desc` FROM project WHERE id = ?", ["i", [$id]]);
@@ -39,7 +39,7 @@ class ProjectController extends BaseController implements CrudController {
 		$item->id = $id;
 
 		$email = $this->database->select("SELECT email FROM `user` WHERE id = ?", ["i", [$item->user_id]]);
-		
+
 		$id = $this->database->insert("INSERT INTO userproject(idUser, idProject, idRole, email) " .
 									  "VALUES(?,?,2,?)",
 									  ["iis", [$item->user_id, $item->id, $email[0]["email"]]]);
@@ -47,14 +47,14 @@ class ProjectController extends BaseController implements CrudController {
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$result = $this->database->select("SELECT count(*) as app_cnt FROM application WHERE idProject = ?",
 										  ["i", [$item_id]]);
 
 		if ($result[0]["app_cnt"] > 0)
-			throw new Exception("Project already contains an appliction");
+			throw new Exception("Project already contains an application");
 
 
 		$result = $this->database->select("SELECT count(*) as stn_cnt FROM standard WHERE idProject = ?",
@@ -67,7 +67,7 @@ class ProjectController extends BaseController implements CrudController {
 		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE project SET name = ?, `desc` = ?, isPublic = ? WHERE id = ?",
@@ -326,7 +326,7 @@ class ApidController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT id, address, name, `desc` " .
 										"FROM `process` " .
 										"WHERE idProject = ?", ["i", [$route_ids["project_id"]]]);
-		
+
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
@@ -346,7 +346,7 @@ class ApidController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM `process` WHERE id = ?",
@@ -354,7 +354,7 @@ class ApidController extends BaseController implements CrudController
 		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE `process` " .
@@ -386,13 +386,13 @@ class ServiceController extends BaseController implements CrudController
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO service (idStandard, `type`, `name`, `desc`) " .
@@ -403,7 +403,7 @@ class ServiceController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM service WHERE id = ?",
@@ -411,7 +411,7 @@ class ServiceController extends BaseController implements CrudController
 		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE service " .
@@ -434,23 +434,23 @@ class PacketController extends BaseController implements CrudController
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT id, kind, type, subtype, discriminant, " .
-										"  domain, name, shortDesc, `desc`, idProcess, " .
-										"  descParam, descDest, code " .
-										"FROM packet " .
-										"WHERE type IS NOT NULL AND idStandard = ? " .
-										"ORDER BY type, subtype",
-										["i", [$route_ids["standard_id"]]]);
-		
+						"domain, name, shortDesc, `desc`, idProcess, " .
+						"descParam, descDest, code " .
+						"FROM packet " .
+						"WHERE type IS NOT NULL AND idStandard = ? " .
+						"ORDER BY type, subtype",
+						["i", [$route_ids["standard_id"]]]);
+
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO packet (idStandard, idProcess, kind, type, subtype, " .
@@ -472,7 +472,7 @@ class PacketController extends BaseController implements CrudController
 		$item->id = $id;
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM packet WHERE id = ?",
@@ -480,7 +480,7 @@ class PacketController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE packet " .
@@ -513,24 +513,24 @@ class ConstantController extends BaseController implements CrudController
 	{
 		$this->database = new Database();
 	}
-	
+
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT id, domain, name, value, `desc` " .
 										"FROM constants " .
 										"WHERE idStandard = ?",
 										["i", [$route_ids["standard_id"]]]);
-		
+
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO constants (idStandard, domain, name, value, `desc`) " .
@@ -542,7 +542,7 @@ class ConstantController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM constants WHERE id = ?",
@@ -550,7 +550,7 @@ class ConstantController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE constants " .
@@ -575,14 +575,18 @@ class DatatypesController extends BaseController implements CrudController
 
 	public function get_items($route_ids)
 	{
-		$data = $this->database->select("SELECT id, domain, name, nativeType, `desc`, " .
-										"  size, value, setting, " .
-										"  concat('PTC/PFC: ', json_value(`setting`, '$.PUS.ptc'), '/', " .
-										"    json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
-										"  json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
-										"FROM `type` " .
-										"WHERE idStandard = ? " .
-									    "ORDER BY domain, name", ["i", [$route_ids["standard_id"]]]);
+		$data = $this->database->select("SELECT t.id, t.domain, t.name, t.nativeType, t.`desc`, " .
+						"t.size, t.value, t.setting, " .
+						"COUNT(r.id) as ref_count, " .
+						"CONCAT('PTC/PFC: ', json_value(t.`setting`, '$.PUS.ptc'), '/', " .
+						"JSON_VALUE(t.`setting`, '$.PUS.pfc')) AS pusparamtype, " .
+						"JSON_VALUE(t.`setting`, '$.PUS.type') AS `pusdatatype` " .
+						"FROM `type` t "  .
+						"LEFT JOIN parameter r ON r.idType = t.id " .
+						"WHERE t.idStandard = ? " .
+						"GROUP BY t.id, t.`domain`, t.name " .
+						"ORDER BY t.domain, t.name", ["i", [$route_ids["standard_id"]]]);
+
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
@@ -592,7 +596,7 @@ class DatatypesController extends BaseController implements CrudController
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO `type`(domain, name, nativeType, size, " .
@@ -601,21 +605,21 @@ class DatatypesController extends BaseController implements CrudController
 									  ["sssissis", [$item->domain, $item->name,
 												   $item->nativeType, $item->size, $item->value,
 												   $item->desc, $route_ids["standard_id"], $item->setting]]);
-		
+
 		$item->id = $id;
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM `type` WHERE id = ?",
 										   ["i", [$item_id]]);
 		$this->send_output("", array('HTTP/1.1 200 OK'));
-		
+
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE `type` " .
@@ -640,7 +644,7 @@ class DatapoolController extends BaseController implements CrudController
 	{
 		$this->database = new Database();
 	}
-	
+
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT  p.id, p.domain, p.name, p.kind, " .
@@ -654,17 +658,17 @@ class DatapoolController extends BaseController implements CrudController
 										"  AND p.kind IN (3, 4, 5, 6)" .
 										"ORDER BY domain, kind, name",
 										["i", [$route_ids["standard_id"]]]);
-		
+
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO parameter(idStandard, domain, name, " .
@@ -681,7 +685,7 @@ class DatapoolController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM parameter WHERE id = ?",
@@ -690,7 +694,7 @@ class DatapoolController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE parameter " .
@@ -716,25 +720,28 @@ class ParameterController extends BaseController implements CrudController
 	{
 		$this->database = new Database();
 	}
-	
+
 	public function get_items($route_ids)
 	{
-		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, p.shortDesc, " .
-										"  p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
-										"  p.role, p.multiplicity, p.value, p.unit " .
-										"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
-										"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
-										"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
+		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, " .
+						"p.shortDesc, p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
+						"p.role, p.multiplicity, p.value, p.unit, " .
+						"COUNT(r.id) as ref_count ".
+						"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
+						"LEFT JOIN parametersequence r ON r.idParameter = p.id " .
+						"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
+						"GROUP BY p.id, p.domain, p.name " .
+						"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO parameter(idStandard, domain, name, " .
@@ -751,7 +758,7 @@ class ParameterController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM parameter WHERE id = ?",
@@ -760,7 +767,7 @@ class ParameterController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE parameter " .
@@ -788,8 +795,8 @@ class PacketParameterController extends BaseController implements CrudController
 	{
 		$this->database = new Database();
 	}
-	
-	
+
+
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT ps.id, concat(p.domain, ' / ', p.name) AS parameter, " .
@@ -807,13 +814,13 @@ class PacketParameterController extends BaseController implements CrudController
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO parametersequence(idStandard, idParameter, idPacket, `role`, `order`, `group`, " .
@@ -826,7 +833,7 @@ class PacketParameterController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM parametersequence WHERE id = ?",
@@ -835,7 +842,7 @@ class PacketParameterController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE parametersequence " .
@@ -871,13 +878,13 @@ class DerivedPacketController extends BaseController implements CrudController
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert("INSERT INTO packet(idStandard, idParent, kind, type, subtype, name, " .
@@ -890,7 +897,7 @@ class DerivedPacketController extends BaseController implements CrudController
 		$this->send_output(json_encode($item), array('Http/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM packet WHERE id = ?",
@@ -899,7 +906,7 @@ class DerivedPacketController extends BaseController implements CrudController
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query("UPDATE packet " .
@@ -924,7 +931,7 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 	{
 		$this->database = new Database();
 	}
-	
+
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select(
@@ -937,17 +944,17 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 			"WHERE ps.idPacket = ? AND ps.idStandard = ? " .
 			"ORDER BY ps.`order`",
 			["ii", [$route_ids["child_id"], $route_ids["standard_id"]]]);
-		
+
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function get_item($route_ids, $id)
 	{
 		$this->not_found();
 	}
 
-	
+
 	public function create_item($route_ids, $item)
 	{
 		$id = $this->database->insert(
@@ -961,7 +968,7 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function delete_item($route_ids, $item_id)
 	{
 		$this->database->execute_non_query("DELETE FROM parametersequence WHERE id = ?",
@@ -970,7 +977,7 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
 
-	
+
 	public function put_item($route_ids, $item)
 	{
 		$this->database->execute_non_query(
@@ -1060,7 +1067,7 @@ class LimitController extends BaseController implements CrudController
 			"ORDER BY id", ["i", [$route_ids["parameter_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
-		
+
 	}
 
 	public function get_item($route_ids, $id)

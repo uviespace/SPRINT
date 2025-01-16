@@ -9,18 +9,19 @@
 		<tr>
 			<th>ID</th>
 			<th>Domain</th>
-			<th>Name</th>
-			<th>Short Description</th>
+			<th style="text-align:left;padding-left:2vw;">Name</th>
+			<th style="text-align:left;padding-left:2vw;">Short Description</th>
 			<th>Kind</th>
 			<th>Data-type</th>
 			<th>Role</th>
 			<th>Multiplicity</th>
 			<th>Value</th>
 			<th>Unit</th>
+			<th>Users</th>
 			<th>Action</th>
 		</tr>
 	</thead>
-	<tbody>		
+	<tbody>
 	</tbody>
 </table>
 
@@ -28,7 +29,8 @@
 	<tr>
 		<td></td>
 		<td></td>
-		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td></td>
 		<td></td>
 		<td></td>
@@ -96,7 +98,7 @@
 
 			<label for="unit">Unit:</label>
 			<input class="form-input modal-input" id="edit_parameter_unit" type="text" name="unit" />
-			
+
 		</div>
 
 		<div class="modal-footer">

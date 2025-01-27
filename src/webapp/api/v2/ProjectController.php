@@ -2,7 +2,7 @@
 
 require_once "BaseController.php";
 require_once "CrudController.php";
-require_once "../../db/Database.php";
+require_once "db/Database.php";
 
 class ProjectController extends BaseController implements CrudController {
 
@@ -575,6 +575,17 @@ class DatatypesController extends BaseController implements CrudController
 
 	public function get_items($route_ids)
 	{
+		/*
+		$data = $this->database->select("SELECT id, domain, name, nativeType, `desc`, " .
+						"size, value, setting, " .
+						"concat('PTC/PFC: ', json_value(`setting`, '$.PUS.ptc'), '/', " .
+						"json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
+						"json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
+						"FROM `type` " .
+						"WHERE idStandard = ? " .
+						"ORDER BY domain, name", ["i", [$route_ids["standard_id"]]]);
+		*/
+
 		$data = $this->database->select("SELECT t.id, t.domain, t.name, t.nativeType, t.`desc`, " .
 						"t.size, t.value, t.setting, " .
 						"COUNT(r.id) as ref_count, " .
@@ -723,6 +734,14 @@ class ParameterController extends BaseController implements CrudController
 
 	public function get_items($route_ids)
 	{
+		/*
+		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, p.shortDesc, " .
+						"p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
+						"p.role, p.multiplicity, p.value, p.unit " .
+						"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
+						"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
+						"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
+		 */
 		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, " .
 						"p.shortDesc, p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
 						"p.role, p.multiplicity, p.value, p.unit, " .

@@ -25,6 +25,7 @@ import json
 from collections import OrderedDict
 import re
 import traceback
+import numpy as np
 
 enumid = 1
 
@@ -117,8 +118,6 @@ def get_data(idProject):
                             if param_i != None:
                                 t = param_i["param"]["type"]
                                 if t["setting"] != None:
-                                    print(enum)
-                                    print(derived)
                                     for enum in t["setting"]["Enumerations"]:
                                         if enum["Name"] == derived["disc"]:
                                             derived["_disc"] = int(enum["_dec"])
@@ -266,6 +265,7 @@ def get_standards(db, project):
     as_hash = {}
     as_list = []
     for row in cur.fetchall():
+        print(row)
         enumid = 1
         standard = {}
         standard["datapool"] = {}
@@ -290,8 +290,9 @@ def get_standards(db, project):
         project["_nr_std"] = project["_nr_std"] + 1
         as_list.append(standard)
         as_hash[standard["id"]] = standard
+        
 
-        '''
+        
         if standard["setting"]:
             dpid_p = standard["setting"]["datapool"]["parameter"]["offset"]
         else:
@@ -299,7 +300,7 @@ def get_standards(db, project):
 
         for param in standard["datapool"]["params"]:
             param["_dpid"] = dpid_p
-            # print("PAR - DP ID: ", dpid_p, " Param: ", param["name"])
+            #print("PAR - DP ID: ", dpid_p, " Param: ", param["name"])
             dpid_p += 1  # for dp2
             # if param["_multi"] == None:  # for dp
             #    dpid_p += 1
@@ -316,19 +317,19 @@ def get_standards(db, project):
             # else:
             #    dpid_v += param["_multi"]
             # print("VAR - DP ID: ", dpid_v, " Param: ", param["name"])
-        '''
+        
 
     # get maximal number of datapool identifier from db
     db_execute(cur, """
         SELECT MAX(nrParameter) FROM datapoolidentifier WHERE idProject={0}""".format(project["id"]))
     param_max_nr_fetch = cur.fetchall()
     param_max_nr = param_max_nr_fetch[0][0]
+    #print("param_max_nr_fetch: ", param_max_nr_fetch)
     if param_max_nr is None:
         param_max_nr = 0
     else:
         param_max_nr = int(param_max_nr)
-    #print("Project ID = ", project["id"], ", Parameter Max Nr = ", param_max_nr)
-
+    print("Project ID = ", project["id"], ", Datapool Max Nr = ", param_max_nr)
     # get all tupel (idParameter, nrParameter) from db
     db_execute(cur, """
         SELECT idParameter, nrParameter FROM datapoolidentifier WHERE idProject={0}""".format(project["id"]))
@@ -447,15 +448,16 @@ def get_params(db, standard):
 
     # get all the information from all parameters from db
     db_execute(cur, """
-        SELECT p.* FROM parameter p 
+        SELECT p.*, r.idReferenceParameter
+        FROM parameter p
+            LEFT JOIN parameter_deduced_relation r ON r.idParameter = p.id
         WHERE p.idStandard={0} OR p.idStandard IS NULL or p.idStandard in 
             (SELECT ss.idStandardParent FROM standardstandard ss WHERE ss.idStandardChild={0} and ss.relation=1)
-            ORDER BY p.domain,p.name""".format(standard["id"]))
+        ORDER BY p.domain,p.name""".format(standard["id"]))
 
     as_list = []
     as_hash = {}
     for row in cur.fetchall():
-        #print("param: ", row[5], " (", int(row[0]), ")")
         param = {}
         param["id"] = int(row[0])
         param["standard"] = standard
@@ -474,13 +476,15 @@ def get_params(db, standard):
         param["size"] = int(row[9]) if row[9] is not None else None
         param["unit"] = row[10]
         param["multi"] = row[11]  # int(row[11]) if (row[11] is not None and row[11] != '') else None
-        param["setting"] = json.loads(row[12], object_pairs_hook=OrderedDict) if row[12] else None
+        param["setting"] = json.loads(row[12])if row[12] else None
         param["role"] = int(row[13]) if row[13] is not None else None
+        param["related_param_id"] = int(row[14]) if row[14] is not None else None
         # None := size unknown / undefined
         # -1 := variable size
         param["_size"] = (
             param["type"]["size"] if param["type"] != None and param["type"]["size"] != None else
             param["size"])
+        #print("param: ", param["name"], " (", param["id"], ")", " size: ", param["_size"])
         param["_value"] = (
             param["value"] if len(param["value"]) > 0 else
             param["type"]["value"] if param["type"] is not None else  # TODO: uncomment if needed
@@ -512,7 +516,10 @@ def get_params(db, standard):
         # None := length is unknown / undefined
         if param["_size"] != None and param["_multi"] != None:
             if param["_size"] != -1:
-                param["_length"] = param["_size"] * param["_multi"]
+                if param["_multi"] > 0:
+                    param["_length"] = param["_size"] * param["_multi"]
+                else:
+                    param["_length"] = param["_size"]
             else:
                 param["_length"] = -1
         else:
@@ -1290,6 +1297,7 @@ def get_param_sequence(db, standard, _type, packet):
         #print("elem name: ", param["name"], " | elem[\"param\"][\"_length\"]: ", elem["param"]["_length"], " | offset: ", offset)
 
         # TODO: group / repetition not yet supported.
+        
         if offset != None and elem["param"]["_length"] != None:
             offset = offset + int(elem["param"]["_length"])
         else:
@@ -1345,6 +1353,7 @@ def get_app_components(db, app):
         component = {}
         component["app"] = app
         component["setting"] = json.loads(row[2]) if row[2] else None
+        print(component["setting"])
         component["id"] = row[3]
         component["shortName"] = row[4]
         component["name"] = row[5]

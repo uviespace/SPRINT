@@ -6,6 +6,8 @@ import get_data
 import math
 import traceback
 import simplejson
+import datetime
+import os
 
 settings = {}
 
@@ -59,6 +61,10 @@ def get_paf_name(type_):
 
 def get_pid_name(packet):
     return outp(settings["pid"]["offset"] + int(packet["_nr"]), 10)
+
+def get_dp_offset():
+    return settings["dp2"]["offset"]
+    
 
 def get_pcf_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcf"]["preamble"])
@@ -122,7 +128,6 @@ def get_prf_name(limit_id):
     return s
 
 def get_caf_number(setting):
-    #print(settings)
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["caf"]["preamble"])
     jsonlength = settings["caf"]["length"] if "length" in settings["caf"] else 0  # NOTE: jsonlength according to naming convention
     scoslength = 10  # NOTE: 10 according to maximal length in SCOS2000 specification for CAF_NUMBR
@@ -140,11 +145,10 @@ def get_tcp_name(standard):
     return outp(standard["name"], 8, True)
 
 def outp(s, max_len, stripSpaces = False):
-    if s == None:
+    if s is None:
         return ''
 
-    #s = unicode(s).replace('\t', '').replace('\n', '')
-    s = str(s).replace('\t', '').replace('\n', '')
+    s = str(s).replace('\t', '').replace('\n', '').strip()
     if stripSpaces and " " in s:
         s = s.title().replace(' ', '')
 
@@ -206,7 +210,6 @@ def get_ptc_pfc(param):
         #else:
             #print("get_ptc_pfc_NEW: No PUS found in datatype")
     else:
-        #print("get_ptc_pfc_NEW: datatype = None")
         ptc, pfc, size, multi = get_ptc_pfc_GEN(param)
         #if (name == "generic"):
         #    ptc, pfc, size, multi = 11, 0, 0, multi
@@ -243,10 +246,12 @@ def get_ptc_pfc_GEN(param):
     # format: (ptc, pfc, width, repetition)
     return \
         (1, 0, 1, multi) if domain == "General" and name == "bit" else \
-        (3, 4, 8, multi) if domain == "C99" and name == "uint8_t" and multi < 0 else \
+        (3, 4, 8, multi) if domain == "C99" and name == "uint8_t" and multi < 2 else \
         (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "uint8_t" else \
-        (3, 12, 16, multi) if domain == "C99" and name == "uint16_t" else \
-        (3, 14, 32, multi) if domain == "C99" and name == "uint32_t" else \
+        (3, 12, 16, multi) if domain == "C99" and name == "uint16_t" and multi < 2 else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "uint16_t" else \
+        (3, 14, 32, multi) if domain == "C99" and name == "uint32_t" and multi < 2 else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "uint32_t" else \
         (3, 16, 64, multi) if domain == "C99" and name == "uint64_t" else \
         (4, 4, 8, multi) if domain == "C99" and name == "int8_t" and multi < 0 else \
         (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "int8_t" else \
@@ -300,8 +305,9 @@ def get_ptc_pfc_GEN(param):
         (10, 17, 0, multi) if domain == "SCOS-2000" and name == "Relative time CUC (4/2)" else \
         (10, 18, 0, multi) if domain == "SCOS-2000" and name == "Relative time CUC (4/3)" else \
         (11, 0, 0, multi) if domain == "" and name == "deduced" and size == None else \
+        (11, 0, 0, multi) if domain == "General" and name == "deduced" and size == None else \
         (11, size, 0, multi) if domain == "" and name == "deduced" and size != None else \
-        (11, 0, 0, multi) if domain == "General" and name == "deduced" else \
+        (11, 0, 0, multi) if domain == "General" and name == "generic" else \
         (11, size, 0, multi) if domain == "General" and name == "deduced" and size != None else \
         (0, 0, 0, 0)
 
@@ -414,20 +420,18 @@ def pcf_decim(width):
     return decim
 
 def gen_pcf(app, path):
+    paramsAll = True
     f = new_file(path, "pcf")
     for relation in app["standards"]:
         if relation["relation"] == 1:
             standard = relation["standard"]
 
-            comp_dp2 = app["components"]["hash"]["dp2"]
-            settings_dp2 = comp_dp2["setting"]
-            dpid_offset = settings_dp2["dpid_offset"] - 0   # -1 because dpid starts with 0+1
-
-            #for tm in standard["packets"]["TM"]["list"]:
+            dpid_offset = get_dp_offset()            #for tm in standard["packets"]["TM"]["list"]:
             #    for param_i in tm["body"]:
             #        print("gen_pcf: ", param_i["param"]["id"], param_i["param"]["name"])
 
             # TODO: include also all other datapool items which are not used in TM and TC packets
+                        
             for param in standard["params"]["list"]:
 
                 # check if parameter is in header
@@ -439,64 +443,72 @@ def gen_pcf(app, path):
                         found = 1
                         break
 
-                if found == 0:
-                    # check if parameter is in packet
-                    #print(param["id"])
-                    for tm in standard["packets"]["TM"]["list"]:
-                        written = 0
-                        #print(tm["type"], tm["subtype"], tm["name"])
+                if paramsAll:
 
-                        # check if parameter is in base packet
-                        for param_i in tm["body"]:
-                            #print("gen_pcf: ", param_i["param"]["name"])
-                            if param_i["param"]["id"] == param["id"]:
-                                #print(param["id"], param["name"])
-                                ptc, pfc, width, repetition = get_ptc_pfc(param)
-                                #ptc2,pfc2,width2,repetition2 = get_ptc_pfc_NEW(param)
-                                hasTextualCalibration = (len(param["type"]["enums"]) > 0)
-                                if param["setting"] is not None and "calcurve" in param["setting"]:
-                                    hasNumericalCalibration = True
-                                    #print("CAF: ", get_caf_number(param["setting"]))
-                                else:
-                                    hasNumericalCalibration = False
+                    # print(param["id"], param["name"])
+                    ptc, pfc, width, repetition = get_ptc_pfc(param)
+                    if ptc == 11 and param['related_param_id'] is not None:
+                        pcf_related = get_pcf_name(standard["params"]["hash"][param['related_param_id']])
+                    #if ptc == 11 and param["setting"] is not None:
+                    #    for par in standard["params"]["list"]:
+                    #        if param["setting"]["deduced"] == par["id"]:
+                    #            #print(par["id"])
+                    #            pcf_related = get_pcf_name(par)    
+                    #            break
+                    else:
+                        pcf_related = ''
+                    # ptc2,pfc2,width2,repetition2 = get_ptc_pfc_NEW(param)
+                    hasTextualCalibration = (len(param["type"]["enums"]) > 0)
+                    if param["setting"] is not None and "calcurve" in param["setting"]:
+                        hasNumericalCalibration = True
+                        # print("CAF: ", get_caf_number(param["setting"]))
+                    else:
+                        hasNumericalCalibration = False
 
-                                #print(param["id"])
-                                writeln(f, [
-                                    get_pcf_name(param),                                   # PCF_NAME
-                                    outp(param["name"], 24, True),                         # PCF_DESCR
-                                    outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10),  # PCF_PID
-                                    outp(param["unit"], 4),                                # PCF_UNIT
-                                    outp(ptc, 2),                                          # PCF_PTC
-                                    outp(pfc, 5),                                          # PCF_PFC
-                                    outp(width, 6),                                        # PCF_WIDTH
-                                    '',                                                    # PCF_VALID
-                                    '',                                                    # PCF_RELATED
-                                    'S' if hasTextualCalibration else 'N',                 # PCF_CATEG
-                                    'R',                                                   # PCF_NATUR
-                                    get_txf_name(param["type"]) if hasTextualCalibration else
-                                    get_caf_number(param["setting"]) if hasNumericalCalibration else
-                                    '',                                                    # PCF_CURTX
-                                    'F',                                                   # PCF_INTER
-                                    'N',                                                   # PCF_USCON
-                                    pcf_decim(param["_size"]),                             # PCF_DECIM
-                                    '',                                                    # PCF_PARVAL
-                                    '',                                                    # PCF_SUBSYS
-                                    '',                                                    # PCF_VALPAR
-                                    '',                                                    # PCF_SPTYPE
-                                    'Y',                                                   # PCF_CORR
-                                    '',                                                    # PCF_OBTID
-                                    '',                                                    # PCF_DARC
-                                    'B'                                                    # PCF_ENDIAN
-                                ])
-                                written = 1
-                                break
+                    if param["name"] != "Dummy":  # exclude PTC: 11 (Deduced Dummy and Spares)
+                        writeln(f, [
+                            get_pcf_name(param),  # PCF_NAME
+                            outp(param["name"], 24, True),  # PCF_DESCR
+                            outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10),  # PCF_PID
+                            outp(param["unit"], 4),  # PCF_UNIT
+                            outp(ptc, 2),  # PCF_PTC
+                            outp(pfc, 5),  # PCF_PFC
+                            outp(width, 6),  # PCF_WIDTH
+                            '',  # PCF_VALID
+                            pcf_related,  # PCF_RELATED
+                            'S' if hasTextualCalibration else 'N',  # PCF_CATEG
+                            'R',  # PCF_NATUR
+                            get_txf_name(param["type"]) if hasTextualCalibration else
+                            get_caf_number(param["setting"]) if hasNumericalCalibration else
+                            '',  # PCF_CURTX
+                            'F',  # PCF_INTER
+                            'N',  # PCF_USCON
+                            pcf_decim(param["_size"]),  # PCF_DECIM
+                            '',  # PCF_PARVAL
+                            '',  # PCF_SUBSYS
+                            '',  # PCF_VALPAR
+                            '',  # PCF_SPTYPE
+                            'Y',  # PCF_CORR
+                            '',  # PCF_OBTID
+                            '',  # PCF_DARC
+                            'B'  # PCF_ENDIAN
+                        ])
 
-                        # check if parameter is in derived packet
-                        for derived in tm["derivations"]["list"]:
-                            for param_i in derived["body"]:
+                else:
+                    if found == 0:
+                        # check if parameter is in packet
+                        #print(param["id"])
+                        for tm in standard["packets"]["TM"]["list"]:
+                            written = 0
+                            #print(tm["type"], tm["subtype"], tm["name"])
+
+                            # check if parameter is in base packet
+                            for param_i in tm["body"]:
+                                #print("gen_pcf: ", param_i["param"]["name"])
                                 if param_i["param"]["id"] == param["id"]:
                                     #print(param["id"], param["name"])
                                     ptc, pfc, width, repetition = get_ptc_pfc(param)
+                                    #ptc2,pfc2,width2,repetition2 = get_ptc_pfc_NEW(param)
                                     hasTextualCalibration = (len(param["type"]["enums"]) > 0)
                                     if param["setting"] is not None and "calcurve" in param["setting"]:
                                         hasNumericalCalibration = True
@@ -504,7 +516,6 @@ def gen_pcf(app, path):
                                     else:
                                         hasNumericalCalibration = False
 
-                                    #print(param["id"])
                                     writeln(f, [
                                         get_pcf_name(param),                                   # PCF_NAME
                                         outp(param["name"], 24, True),                         # PCF_DESCR
@@ -534,11 +545,54 @@ def gen_pcf(app, path):
                                     ])
                                     written = 1
                                     break
+
+                            # check if parameter is in derived packet
+                            for derived in tm["derivations"]["list"]:
+                                for param_i in derived["body"]:
+                                    if param_i["param"]["id"] == param["id"]:
+                                        #print(param["id"], param["name"])
+                                        ptc, pfc, width, repetition = get_ptc_pfc(param)
+                                        hasTextualCalibration = (len(param["type"]["enums"]) > 0)
+                                        if param["setting"] is not None and "calcurve" in param["setting"]:
+                                            hasNumericalCalibration = True
+                                            #print("CAF: ", get_caf_number(param["setting"]))
+                                        else:
+                                            hasNumericalCalibration = False
+
+                                        writeln(f, [
+                                            get_pcf_name(param),                                   # PCF_NAME
+                                            outp(param["name"], 24, True),                         # PCF_DESCR
+                                            outp((dpid_offset + int(param["_dpid"])) if "_dpid" in param else '', 10),  # PCF_PID
+                                            outp(param["unit"], 4),                                # PCF_UNIT
+                                            outp(ptc, 2),                                          # PCF_PTC
+                                            outp(pfc, 5),                                          # PCF_PFC
+                                            outp(width, 6),                                        # PCF_WIDTH
+                                            '',                                                    # PCF_VALID
+                                            '',                                                    # PCF_RELATED
+                                            'S' if hasTextualCalibration else 'N',                 # PCF_CATEG
+                                            'R',                                                   # PCF_NATUR
+                                            get_txf_name(param["type"]) if hasTextualCalibration else
+                                            get_caf_number(param["setting"]) if hasNumericalCalibration else
+                                            '',                                                    # PCF_CURTX
+                                            'F',                                                   # PCF_INTER
+                                            'N',                                                   # PCF_USCON
+                                            pcf_decim(param["_size"]),                             # PCF_DECIM
+                                            '',                                                    # PCF_PARVAL
+                                            '',                                                    # PCF_SUBSYS
+                                            '',                                                    # PCF_VALPAR
+                                            '',                                                    # PCF_SPTYPE
+                                            'Y',                                                   # PCF_CORR
+                                            '',                                                    # PCF_OBTID
+                                            '',                                                    # PCF_DARC
+                                            'B'                                                    # PCF_ENDIAN
+                                        ])
+                                        written = 1
+                                        break
+                                if written == 1:
+                                    break
+
                             if written == 1:
                                 break
-
-                        if written == 1:
-                            break
     close_file(f)
 
 def gen_ccf(app, path):
@@ -899,6 +953,8 @@ def gen_cpc(app, path):
 
 def gen_cvp(app, path):
     f = new_file(path, "cvp")
+    offset = settings["cvp"]["offset"]
+    length = settings["cvp"]["length"]
     for relation in app["standards"]:
         if relation["relation"] == 1:
             standard = relation["standard"]
@@ -927,19 +983,21 @@ def gen_cvp(app, path):
                             writeln(f, [
                                 get_ccf_name(derived),  # CVP_TASK
                                 'C',                    # CVP_TYPE
-                                outp(cvsid, 1)          # CVP_CVSID
+                                outp(offset+cvsid, length)          # CVP_CVSID
                             ])
                 else:
                     for cvsid in [0, 1, 2]:
                         writeln(f, [
                             get_ccf_name(packet),  # CVP_TASK
                             'C',                   # CVP_TYPE
-                            outp(cvsid, 1)         # CVP_CVSID
+                            outp(offset+cvsid, length)         # CVP_CVSID
                         ])
     close_file(f)
 
 def gen_cvs(app, path):
     f = new_file(path, "cvs")
+    offset = settings["cvp"]["offset"]
+    length = settings["cvp"]["length"]
     for cvsid in [0, 1, 2]:
         cvstype = \
             'A' if cvsid == 0 else \
@@ -952,7 +1010,7 @@ def gen_cvs(app, path):
             '20' if cvsid == 2 else \
             '20'
         writeln(f, [
-            outp(cvsid, 1),        # CVS_ID
+            outp(offset + cvsid, length),        # CVS_ID
             outp(cvstype, 1),      # CVS_TYPE
             'R',                   # CVS_SOURCE
             '0',                   # CVS_START
@@ -1166,7 +1224,8 @@ def gen_txf(app, path):
             standard = relation["standard"]
             for type_ in standard["types"].values():
                 hasTextualCalibration = (len(type_["enums"]) > 0)
-                if hasTextualCalibration and type_["__mib_used_tm"]:
+                #if hasTextualCalibration and type_["__mib_used_tm"]:
+                if hasTextualCalibration:  # do not only use enumerations only used in telemetry packets
                     writeln(f, [
                         get_txf_name(type_),
                         outp(type_["name"], 32),
@@ -1182,7 +1241,8 @@ def gen_txp(app, path):
             standard = relation["standard"]
             for type_ in standard["types"].values():
                 hasTextualCalibration = (len(type_["enums"]) > 0)
-                if hasTextualCalibration and type_["__mib_used_tm"]:
+                #if hasTextualCalibration and type_["__mib_used_tm"]:
+                if hasTextualCalibration:  # do not only use enumerations only used in telemetry packets
                     txf_numbr = get_txf_name(type_)
                     for enum in type_["enums"]:
                         value = outp(enum["_dec"], 14)
@@ -1213,11 +1273,13 @@ def gen_pcpc(app, path):
             offset = 0
             for param_i in standard["headers"]["TC"]:
                 if int(param_i["role"]) in [1, 2, 4, 5] or param_i["_value"] == None:
+                    """
                     if offset >= 48:
                         prefix = "DF"
                     else:  # primary header
                         prefix = "P"
-                    pcpc_name = prefix + get_pcpc_name(standard, param_i)
+                    """
+                    pcpc_name = get_pcpc_name(standard, param_i)
                     writeln(f, [
                         pcpc_name,
                         outp(param_i["param"]["name"], 24),
@@ -1234,11 +1296,7 @@ def gen_pcdf(app, path):
             standard = relation["standard"]
             offset = 0
             for param_i in standard["headers"]["TC"]:
-                if offset >= 48:
-                    prefix = "DF"
-                else:
-                    prefix = "P"
-                pcpc_name = prefix + get_pcpc_name(standard, param_i)
+                pcpc_name = get_pcpc_name(standard, param_i)
                 pcdf_type, pcdf_pname, pcdf_value = \
                     ('T', pcpc_name, '0') if int(param_i["role"]) == 1 else \
                     ('S', pcpc_name, '0') if int(param_i["role"]) == 2 else \
@@ -1674,20 +1732,32 @@ def gen_mib(path, comp):
     gen_prv(app, path)  # parameter range value file which defines the parameter allowed value ranges.
     # TODO: generate VERSION file
 
+
 if __name__ == '__main__':
 
-    if (len(sys.argv) == 3):
-
+    if 1:  # (len(sys.argv) == 3):
+        # for SMILE
         project_id = sys.argv[1]
         app_id = sys.argv[2]
+
+        version = '1.8.2'
+        outdir = './mib/'
+
+        if not os.path.isdir(outdir):
+            os.makedirs(outdir)
+
         try:
             il = get_data.get_data(project_id)            
             app = il["apps"]["hash"][int(app_id)]
-            gen_mib("./mib", app["components"]["hash"]["mib"])
+            gen_mib(outdir, app["components"]["hash"]["mib"])
             print("Done")
         except Exception as e:
             print("Something went wrong...")
             print(traceback.format_exc())
+
+        # create VERSION file
+        with open(os.path.join(outdir, 'VERSION'), 'w') as fd:
+            fd.write('IASW MIB v{}, generated on {}\n'.format(version, datetime.datetime.utcnow().strftime('%Y%m%d')))
 
     else:
         print("Usage: python gen_mib.py {project_id} {application_id}")    

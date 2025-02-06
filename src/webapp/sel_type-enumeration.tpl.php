@@ -14,6 +14,7 @@
 			<div class="col-id"><?=$enum["id"]?></div>
 			<div class="col-type"><?=$enum["domain"]?> / <?=$enum["name"]?></div>
 			<div class="col-param"><?=$enum["enum_count"]?> enum items</div>
+			<div class="col-param"><?=$enum["ref_count"]?> users</div>
 
 			<div id="enum-<?=$enum["id"]?>" class="packet-container" style="display: none;">
 				<button id="create_enum_button_id_<?=$enum["id"]?>" class="btn">
@@ -24,9 +25,9 @@
 					<thead>
 						<tr>
 							<th>ID</th>
-							<th>Name</th>
+							<th style="text-align:left;padding-left:2vw;">Name</th>
 							<th>Value</th>
-							<th>Description</th>
+							<th style="text-align:left;padding-left:2vw;">Description</th>
 							<th>Action</th>
 						</tr>
 					</thead>
@@ -42,9 +43,9 @@
 <template id="table_enum_row">
 	<tr>
 		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td></td>
-		<td></td>
-		<td></td>
+		<td style="text-align:left;padding-left:2vw;"></td>
 		<td>
 			<div class="btn-group">
 				<button><i class="nf nf-cod-edit"></i></button>
@@ -76,4 +77,4 @@
 			<button id="enum_submit_button" class="btn-submit"></button>
 		</div>
 	</div>
-</div> 
+</div>

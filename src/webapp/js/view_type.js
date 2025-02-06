@@ -121,8 +121,8 @@ function load_data()
 		table_id: "table_datatype",
 		template_id: "table_datatype_row",
 		properties: [ "id", "domain", "name",
-					  "nativeType", "size", "pusparamtype", 
-					  "value", "desc" ],
+					  "nativeType", "size", "pusparamtype",
+					  "value", "ref_count", "desc"],
 		modal_id: "datatype_modal",
 		edit_dialog_ids: edit_dialog_ids,
 		edit_properties: edit_properties,
@@ -163,12 +163,12 @@ function update_pus_datatypes(item)
 	const size = size_input.value;
 
 	for (let i = 0; i < pus_data.length; i++) {
-		// size of pus datatype is the same as size of c datatype or pus data type is variable 
+		// size of pus datatype is the same as size of c datatype or pus data type is variable
 		if (size == pus_data[i].size || pus_data[i].size == -1) {
 			// TODO: check boundaries of variable pus datatype
 			const pfc = pus_data[i].PFC == -1 ? size : pus_data[i].PFC;
 			const type = pus_data[i].type + "_" + pus_data[i].PTC + "_" + pfc;
-			
+
 			const opt = document.createElement("option");
 			opt.text = pus_data[i].name + " (" + pus_data[i].desc + ")";
 			opt.value = `{"PUS": {"type": "${type}", "ptc": ${pus_data[i].PTC}, "pfc": ${pfc}}}`
@@ -179,4 +179,3 @@ function update_pus_datatypes(item)
 
 	pus_select.value = item.setting;
 }
-

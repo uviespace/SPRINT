@@ -35,7 +35,7 @@ function load_data()
 																					 template_id: "table_parameter_row",
 																					 properties: [ "id", "domain", "name", "shortDesc",
 																												 "kind", "datatype", "role", "multiplicity",
-																												 "value", "unit" ],
+																												 "value", "unit", "ref_count"],
 																					 modal_id: "parameter_modal",
 																					 edit_dialog_ids: edit_dialog_ids,
 																					 edit_properties: edit_properties,

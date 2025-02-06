@@ -38,7 +38,7 @@ if (isset($_GET['login'])) {
 			// Change md5 password to argon
 			if ($user[0]['hash_type'] == 0) {
 				$hash = password_hash($password, PASSWORD_ARGON2ID);
-				$database->execute_non_query("UPDATE `user` SET hash_type=1, hash=? WHERE id = ?", ["si", [$hash, $user[0]['id']]]);
+				$database->execute_non_query("UPDATE `user` SET hash_type=1, password=NULL, hash=? WHERE id = ?", ["si", [$hash, $user[0]['id']]]);
 			}
 
 			header("refresh:0;url=index.php");

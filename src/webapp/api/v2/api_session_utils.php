@@ -1,7 +1,7 @@
 <?php
 
 require_once "BaseController.php";
-require_once "../../db/Database.php";
+require_once "db/Database.php";
 
 function check_session() {
 	$baseController = new BaseController();
@@ -32,7 +32,7 @@ function check_user_can_delete_project($project_id) {
 							  ["iiii", [$_SESSION['userid'], $project_id, $_SESSION['userid'], $project_id]]);
 
 	return count($user) > 0 || $_SESSION['is_admin'];
-	
+
 }
 
 function check_user_can_write_project($project_id) {

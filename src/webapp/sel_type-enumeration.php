@@ -26,8 +26,9 @@ $standard_name = $database->select("SELECT name FROM standard WHERE id = ?", ["i
 
 
 $enums = $database->select(
-	"SELECT t.id, t.`domain`, t.name, count(e.id) as enum_count, e.id > 0 as enum_exists " .
+	"SELECT t.id, t.`domain`, t.name, count(e.id) as enum_count, e.id > 0 as enum_exists, count(r.id) as ref_count " .
 	"FROM `type` t LEFT JOIN enumeration e ON e.idType = t.id " .
+	"LEFT JOIN parameter r ON r.idType = t.id " .
 	"WHERE t.idStandard = ? " .
 	"GROUP BY t.id, t.`domain`, t.name " .
 	"ORDER BY enum_exists DESC, t.`domain`, t.name",

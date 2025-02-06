@@ -88,6 +88,15 @@
 				<?php endforeach; ?>
 			</select>
 
+			<div id="ref_param_area">
+				<label for="reference_param">Reference Parameter</label>
+				<select name="reference_param" id="edit_parameter_reference_param" class="form-input modal-input" data-filter="on">
+					<?php foreach($parameters as $param): ?>
+						<option value="<?=$param["id"]?>"><?=$param["domain"]?> / <?=$param["name"]?> (<?=$param["id"]?>)></option>
+					<?php endforeach; ?>
+				</select>
+			</div>
+
 			<label for="multiplicity">Multiplicity</label>
 			<input class="form-input modal-input" id="edit_parameter_multiplicity" type="number" name="multiplicity" />
 

@@ -599,8 +599,8 @@ class DatatypesController extends BaseController implements CrudController
 									  "  value, `desc`, idStandard, setting)" .
 									  "VALUES(?,?,?,?,?,?,?,?)",
 									  ["sssissis", [$item->domain, $item->name,
-												   $item->nativeType, $item->size, $item->value,
-												   $item->desc, $route_ids["standard_id"], $item->setting]]);
+													$item->nativeType, $item->size, $item->value,
+													$item->desc, $route_ids["standard_id"], $item->setting]]);
 		
 		$item->id = $id;
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
@@ -623,9 +623,9 @@ class DatatypesController extends BaseController implements CrudController
 										   "  size = ?, value = ?, `desc`= ? , setting = ? " .
 										   "WHERE id = ?",
 										   ["sssiissi", [ $item->domain, $item->name,
-														 $item->nativeType, $item->size,
-														 $item->value, $item->desc,
-														 $item->setting, $item->id ]]);
+														  $item->nativeType, $item->size,
+														  $item->value, $item->desc,
+														  $item->setting, $item->id ]]);
 
 		$this->send_output('', array('HTTP/1.1 200 OK'));
 	}
@@ -721,8 +721,9 @@ class ParameterController extends BaseController implements CrudController
 	{
 		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, p.shortDesc, " .
 										"  p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
-										"  p.role, p.multiplicity, p.value, p.unit " .
+										"  p.role, p.multiplicity, p.value, p.unit, r.idReferenceParameter as ref_param_id " .
 										"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
+										"  LEFT JOIN parameter_deduced_relation r ON r.idParameter = p.id " .
 										"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
 										"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
 
@@ -748,6 +749,12 @@ class ParameterController extends BaseController implements CrudController
 													 $item->unit]]);
 
 		$item->id = $id;
+
+		if ($item->ref_param_id != NULL) {
+			$this->database->insert("INSERT INTO parameter_deduced_relation (idParameter, idReferenceParameter) " .
+									"VALUES (?, ?)", ["i", [$item->id, $item->ref_param_id]]);
+		}
+		
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
 
@@ -773,6 +780,16 @@ class ParameterController extends BaseController implements CrudController
 														  $item->idType, $item->multiplicity,
 														  $item->value, $item->unit,
 														  $item->id]]);
+
+		if ($item->ref_param_id != NULL) {
+			$this->database->execute_non_query("DELETE FROM parameter_deduced_relation WHERE idParameter = ? ",
+											   ["i", [$item->id]]);
+			$this->database->insert("INSERT INTO parameter_deduced_relation (idParameter, idReferenceParameter) " .
+									"VALUES (?, ?)", ["ii", [$item->id, $item->ref_param_id]]);
+		} else {
+			$this->database->execute_non_query("DELETE FROM parameter_deduced_relation WHERE idParameter = ? ",
+											   ["i", [$item->id]]);
+		}
 
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}

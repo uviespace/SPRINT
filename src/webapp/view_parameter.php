@@ -27,6 +27,14 @@ $datatypes = $database->select("SELECT id, domain, name " .
 							   "ORDER BY domain, name",
 							   ["i", [$_GET["idStandard"]]]);
 
+$parameters = $database->select(
+	"SELECT id, domain, name " .
+	"FROM `parameter` " .
+	"WHERE idStandard = ? " .
+	"ORDER BY domain, name",
+	["i", [$_GET["idStandard"]]]
+);
+
 $role_values = get_roles($database, 3);
 
 # Template settings

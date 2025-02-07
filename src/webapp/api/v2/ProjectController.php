@@ -2,7 +2,7 @@
 
 require_once "BaseController.php";
 require_once "CrudController.php";
-require_once "db/Database.php";
+require_once "../../db/Database.php";
 
 class ProjectController extends BaseController implements CrudController {
 
@@ -434,12 +434,12 @@ class PacketController extends BaseController implements CrudController
 	public function get_items($route_ids)
 	{
 		$data = $this->database->select("SELECT id, kind, type, subtype, discriminant, " .
-						"domain, name, shortDesc, `desc`, idProcess, " .
-						"descParam, descDest, code " .
-						"FROM packet " .
-						"WHERE type IS NOT NULL AND idStandard = ? " .
-						"ORDER BY type, subtype",
-						["i", [$route_ids["standard_id"]]]);
+										"domain, name, shortDesc, `desc`, idProcess, " .
+										"descParam, descDest, code " .
+										"FROM packet " .
+										"WHERE type IS NOT NULL AND idStandard = ? " .
+										"ORDER BY type, subtype",
+										["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
@@ -576,27 +576,27 @@ class DatatypesController extends BaseController implements CrudController
 	public function get_items($route_ids)
 	{
 		/*
-		$data = $this->database->select("SELECT id, domain, name, nativeType, `desc`, " .
-						"size, value, setting, " .
-						"concat('PTC/PFC: ', json_value(`setting`, '$.PUS.ptc'), '/', " .
-						"json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
-						"json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
-						"FROM `type` " .
-						"WHERE idStandard = ? " .
-						"ORDER BY domain, name", ["i", [$route_ids["standard_id"]]]);
-		*/
+		   $data = $this->database->select("SELECT id, domain, name, nativeType, `desc`, " .
+		   "size, value, setting, " .
+		   "concat('PTC/PFC: ', json_value(`setting`, '$.PUS.ptc'), '/', " .
+		   "json_value(`setting`, '$.PUS.pfc')) AS pusparamtype, " .
+		   "json_value(`setting`, '$.PUS.type') as `pusdatatype` " .
+		   "FROM `type` " .
+		   "WHERE idStandard = ? " .
+		   "ORDER BY domain, name", ["i", [$route_ids["standard_id"]]]);
+		 */
 
 		$data = $this->database->select("SELECT t.id, t.domain, t.name, t.nativeType, t.`desc`, " .
-						"t.size, t.value, t.setting, " .
-						"COUNT(r.id) as ref_count, " .
-						"CONCAT('PTC/PFC: ', json_value(t.`setting`, '$.PUS.ptc'), '/', " .
-						"JSON_VALUE(t.`setting`, '$.PUS.pfc')) AS pusparamtype, " .
-						"JSON_VALUE(t.`setting`, '$.PUS.type') AS `pusdatatype` " .
-						"FROM `type` t "  .
-						"LEFT JOIN parameter r ON r.idType = t.id " .
-						"WHERE t.idStandard = ? " .
-						"GROUP BY t.id, t.`domain`, t.name " .
-						"ORDER BY t.domain, t.name", ["i", [$route_ids["standard_id"]]]);
+										"t.size, t.value, t.setting, " .
+										"COUNT(r.id) as ref_count, " .
+										"CONCAT('PTC/PFC: ', json_value(t.`setting`, '$.PUS.ptc'), '/', " .
+										"JSON_VALUE(t.`setting`, '$.PUS.pfc')) AS pusparamtype, " .
+										"JSON_VALUE(t.`setting`, '$.PUS.type') AS `pusdatatype` " .
+										"FROM `type` t "  .
+										"LEFT JOIN parameter r ON r.idType = t.id " .
+										"WHERE t.idStandard = ? " .
+										"GROUP BY t.id, t.`domain`, t.name " .
+										"ORDER BY t.domain, t.name", ["i", [$route_ids["standard_id"]]]);
 
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
@@ -733,33 +733,20 @@ class ParameterController extends BaseController implements CrudController
 
 	public function get_items($route_ids)
 	{
-		/*
-		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, p.shortDesc, " .
-<<<<<<< HEAD
-										"  p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
-										"  p.role, p.multiplicity, p.value, p.unit, r.idReferenceParameter as ref_param_id " .
-										"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
-										"  LEFT JOIN parameter_deduced_relation r ON r.idParameter = p.id " .
-										"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
-										"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
-=======
-						"p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
-						"p.role, p.multiplicity, p.value, p.unit " .
-						"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
-						"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
-						"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
-		 */
-		$data = $this->database->select("SELECT p.id, p.domain, p.name, p.kind, " .
-						"p.shortDesc, p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
-						"p.role, p.multiplicity, p.value, p.unit, " .
-						"COUNT(r.id) as ref_count ".
-						"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
-						"LEFT JOIN parametersequence r ON r.idParameter = p.id " .
-						"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
-						"GROUP BY p.id, p.domain, p.name " .
-						"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
->>>>>>> origin/webapp-redesign-mod
 
+		$data = $this->database->select(
+			"SELECT p.id, p.domain, p.name, p.kind, " .
+			"p.shortDesc, p.idType, concat(t.domain, ' / ', t.name) AS datatype, " .
+			"p.role, p.multiplicity, p.value, p.unit, " .
+			"COUNT(ps.id) as ref_count, r.idReferenceParameter as ref_param_id ".
+			"FROM parameter p INNER JOIN type t ON t.id = p.idType " .
+			"  LEFT JOIN parameter_deduced_relation r ON r.idParameter = p.id " .
+			"  LEFT JOIN parametersequence ps ON ps.idParameter = p.id " .
+			"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
+			"GROUP BY p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, datatype, " .
+	        "  p.role, p.multiplicity, p.value, p.unit, ref_param_id ".
+			"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
+		
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
 

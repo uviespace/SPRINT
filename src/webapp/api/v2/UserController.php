@@ -2,7 +2,7 @@
 
 require_once "BaseController.php";
 require_once "CrudController.php";
-require_once "db/Database.php";
+require_once "../../db/Database.php";
 
 
 class UserController extends BaseController implements CrudController

@@ -1,7 +1,7 @@
 <?php
 
 require_once "BaseController.php";
-require_once "db/Database.php";
+require_once "../../db/Database.php";
 
 function check_session() {
 	$baseController = new BaseController();

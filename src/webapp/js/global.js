@@ -121,7 +121,7 @@ class TableHandler
 				for(let i = 0; i < controls.length; i++) {
 						if (controls[i].nodeName != "SELECT")
 								continue;
-						
+
 						const input = document.createElement("input");
 						input.setAttribute("type", "text");
 						input.setAttribute("class", "form-input modal-input");
@@ -132,8 +132,12 @@ class TableHandler
 						input.addEventListener("input", function() { self.filter_event_listener(current_control, input, options_list ) });
 
 						controls[i].insertAdjacentElement("beforebegin", input);
-
 						controls[i].dataset.filter = "done"
+
+						if  (controls[i].hasAttribute("data-focusout")) {
+								input.addEventListener("focusout", function() { window[controls[i].dataset.focusout](); });
+						}
+						
 				}
 		}
 

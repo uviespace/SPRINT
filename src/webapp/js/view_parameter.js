@@ -46,7 +46,8 @@ function load_data()
 																					 empty_item: {},
 																					 create_item_from_modal_fn: create_item,
 																					 modal_filled_fn: set_ref_param_visibility,
-																					 create_item_from_modal_fn: create_item_from_modal																				 });
+																					 create_item_from_modal_fn: create_item_from_modal
+																				 });
 
 		parameter_hdl.load_items();
 }

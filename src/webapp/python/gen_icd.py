@@ -318,7 +318,7 @@ def outp_datapool(std_name, name, list, g):
             hex(item["_dpid"]),
             #"{0}/{1}".format(item["domain"], item["name"]) if len(item["domain"]) > 0 else item["name"],
             item["name"],
-            item["desc"] if len(item["desc"]) > 0 else item["shortDesc"],
+            item["desc"] if item['desc'] != None and len(item["desc"]) > 0 else item["shortDesc"],
             item["_value"],
             (item["type"]["name"] if item["type"] != None else "") + ("" if not isArray else ("[" + save_str(item["multi"]) + "]")),
             item["_size"] * multi if (item["_size"] != None and multi != None) else ""

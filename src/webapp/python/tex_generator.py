@@ -72,6 +72,7 @@ class TexGenerator(Generator):
         if self.popCol != None:
             data.pop(self.popCol)
         data = self.conv(data)
+        #print(data)
         if len(data) == self.col_num:
             self.writeln(" & ".join([self.enc(d) for d in data]) + " \\\\\\hline")
         else:

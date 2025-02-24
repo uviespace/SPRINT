@@ -21,15 +21,6 @@ if (!check_user_can_access_project($_GET["idProject"])) {
 
 $database = new Database();
 
-# Check if user can acces project
-# TODO: maybe put somewhere else to call
-$user_project = $database->select("SELECT id fROM userproject u WHERE idUser = ? AND idProject = ?",["ii", [$_SESSION['userid'], $_GET['idProject']]]);
-
-if (count($user_project) == 0 && !$_SESSION['is_admin']) {
-	http_response_code(403);
-	die('Forbidden');
-}
-
 # Load neccesary data
 
 $project = $database->select("SELECT name FROM `project` WHERE id = ?", ["i", [$_GET['idProject']]]);

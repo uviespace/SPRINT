@@ -18,16 +18,12 @@ $database = new Database();
 
 # Check if user can acces project
 
-$user_project = $database->select("SELECT id fROM userproject u WHERE idUser = ? AND idProject = ?",["ii", [$_SESSION['userid'], $_GET['id']]]);
-
-if (count($user_project) == 0 && !$_SESSION['is_admin']) {
+if (!check_user_can_access_project($_GET['id'])) {
 	http_response_code(403);
 	die('Forbidden');
 }
 
-# Load neccesary data
-
-$project = $database->select("SELECT name FROM `project` WHERE id = ?", ["i", [$_GET['id']]]);
+$project = $database->select("SELECT name FROM project WHERE id = ?", ["i", [$_GET['id']]]);
 
 $project_name = $project[0]["name"];
 $pagetitle = "Project " . $project_name;

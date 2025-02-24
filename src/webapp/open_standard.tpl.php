@@ -123,9 +123,11 @@
 
 <div class="sprint-card sprint-card-wide">
 	<div>
-		<a href="open_standard_editor.php?idProject=<?=$_GET['idProject']?>&idStandard=<?=$_GET['idStandard']?>">Settings...</a>
+		<!-- <a href="open_standard_editor.php?idProject=<?=$_GET['idProject']?>&idStandard=<?=$_GET['idStandard']?>">Settings...</a> -->
+		Settings... (disabled for now)
 	</div>
 	<div>
-		<a href="open_standard_check.php?idProject=<?=$_GET['idProject']?>&idStandard=<?=$_GET['idStandard']?>">Check Standard...</a>
+		<!-- <a href="open_standard_check.php?idProject=<?=$_GET['idProject']?>&idStandard=<?=$_GET['idStandard']?>">Check Standard...</a> -->
+		Check Standard... (disabled for now)
 	</div>
 </div>

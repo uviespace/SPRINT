@@ -1618,46 +1618,51 @@ def gen_pic(app, path):
 def prepare(app):
     # Generate SPID for all TM packets
     for relation in app["standards"]:
+
         if int(relation["relation"]) == 1:
             standard = relation["standard"]
-            for tm in standard["packets"]["TM"]["list"]:
-                if len(tm["derivations"]["list"]) > 0:
-                    for derived in tm["derivations"]["list"]:
-                        derived["__mib_spid"] = get_pid_name(derived)
-                else:
-                    tm["__mib_spid"] = get_pid_name(tm)
+        else:
+            continue
 
-    # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
-    for packet in standard["packets"]["TC"]["list"]:
-        #ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TC"]["params"][param["id"]] = param
-            #print("param: "+str(param["id"]))
+        for tm in standard["packets"]["TM"]["list"]:
+            if len(tm["derivations"]["list"]) > 0:
+                for derived in tm["derivations"]["list"]:
+                    derived["__mib_spid"] = get_pid_name(derived)
+            else:
+                  tm["__mib_spid"] = get_pid_name(tm)
 
-    # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
-    for packet in standard["packets"]["TM"]["list"]:
-        # ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TM"]["params"][param["id"]] = param
-            # print("param: "+str(param["id"]))
+        # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
+        for packet in standard["packets"]["TC"]["list"]:
+            #ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TC"]["params"][param["id"]] = param
+                #print("param: "+str(param["id"]))
 
-    # Mark all types for whether they are used for commands and/or reports
-    for relation in app["standards"]:
-        if relation["relation"] == 1:
-            standard = relation["standard"]
-            for type_ in standard["types"].values():
-                type_["__mib_used_tc"] = False
-                type_["__mib_used_tm"] = False
-            for param in standard["packets"]["TC"]["params"].values():
-                type_ = param["type"]
-                if type_ != None:
-                    type_["__mib_used_tc"] = True
-            for param in standard["packets"]["TM"]["params"].values():
-                type_ = param["type"]
-                if type_ != None:
-                    type_["__mib_used_tm"] = True
+        # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
+        for packet in standard["packets"]["TM"]["list"]:
+            # ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TM"]["params"][param["id"]] = param
+                # print("param: "+str(param["id"]))
+
+        # Mark all types for whether they are used for commands and/or reports
+        for relation in app["standards"]:
+            if relation["relation"] == 1:
+                standard = relation["standard"]
+                for type_ in standard["types"].values():
+                    type_["__mib_used_tc"] = False
+                    type_["__mib_used_tm"] = False
+                for param in standard["packets"]["TC"]["params"].values():
+                    type_ = param["type"]
+                    if type_ != None:
+                        type_["__mib_used_tc"] = True
+                for param in standard["packets"]["TM"]["params"].values():
+                    type_ = param["type"]
+                    if type_ != None:
+                        type_["__mib_used_tm"] = True
+
 
 
 def gen_mib(path, comp):

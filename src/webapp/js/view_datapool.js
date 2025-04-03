@@ -33,6 +33,13 @@ function load_data()
 																					create_item_from_modal_fn: create_item
 																				});
 
+		datapool_hdl.add_validations({
+				validations: [
+						{ id: "edit_datapool_domain", type: "max_length", param: 256, msg: "Domain names cannot be longer than 256"},
+						{ id: "edit_datapool_name", type: "max_length", param: 256, msg: "Datapool names cannot be longer than 256"},
+				],
+				required_properties: [ "edit_datapool_name", "edit_datapool_kind", "edit_datapool_datatype" ]
+		});
 		datapool_hdl.load_items();
 }
 

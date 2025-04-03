@@ -28,14 +28,16 @@ SET time_zone = "+00:00";
 
 INSERT INTO `parameterrole` (`id`, `filter`, `name`, `desc`, `setting`) VALUES
 (0, 0, 'None', NULL, NULL),
-(1, 1, 'Type', NULL, NULL),
-(2, 1, 'Subtype', NULL, NULL),
+(1, 1, 'Type (T)', NULL, NULL),
+(2, 1, 'Subtype (S)', NULL, NULL),
 (3, 2, 'Discriminant', NULL, NULL),
-(4, 1, 'APID', NULL, NULL),
-(5, 1, 'Acknowledge Flags', NULL, NULL),
+(4, 1, 'APID (A)', NULL, NULL),
+(5, 1, 'Acknowledgement Flags (K)', NULL, NULL),
 (6, 3, 'Parameter ID', NULL, NULL),
 (7, 3, 'Command ID', NULL, NULL),
 (8, 2, 'Spare', NULL, NULL);
+(9, 1, 'Auto (P)', NULL, NULL);
+(10, 1, 'Fixed (F)', NULL, NULL);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

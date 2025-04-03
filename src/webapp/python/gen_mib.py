@@ -26,7 +26,7 @@ def writeln(f, data):
     f.write("{0}\n".format(u"\t".join(data)).encode('utf8'))
 
 def close_file(f):
-    f.close()    
+    f.close()
 
 def empty_file(path, name):
     f = new_file(path, name)
@@ -64,7 +64,7 @@ def get_pid_name(packet):
 
 def get_dp_offset():
     return settings["dp2"]["offset"]
-    
+
 
 def get_pcf_name(param):
     preamble = "{0}{1}".format(settings["general"]["preamble"], settings["pcf"]["preamble"])
@@ -176,7 +176,7 @@ def gen_vdf(app, path):
         outp(app["name"], 8, True),
         outp(app["desc"], 32),
         '1',                                      # domain ID
-        outp(settings["general"]["release"], 5), 
+        outp(settings["general"]["release"], 5),
         outp(settings["general"]["issue"], 5)
     ])
     close_file(f)
@@ -431,7 +431,7 @@ def gen_pcf(app, path):
             #        print("gen_pcf: ", param_i["param"]["id"], param_i["param"]["name"])
 
             # TODO: include also all other datapool items which are not used in TM and TC packets
-                        
+
             for param in standard["params"]["list"]:
 
                 # check if parameter is in header
@@ -453,7 +453,7 @@ def gen_pcf(app, path):
                     #    for par in standard["params"]["list"]:
                     #        if param["setting"]["deduced"] == par["id"]:
                     #            #print(par["id"])
-                    #            pcf_related = get_pcf_name(par)    
+                    #            pcf_related = get_pcf_name(par)
                     #            break
                     else:
                         pcf_related = ''
@@ -628,7 +628,7 @@ def gen_ccf(app, path):
                         for param_derived in derived["body"]:
                             npars = npars + 1
                         # !!! naming convention !!!
-                        ccf_descr = "SASW "+outp(derived["name"], 19, True)
+                        ccf_descr = outp(derived["name"], 19, True)
                         writeln(f, [
                             get_ccf_name(derived),                  # CCF_NAME
                             ccf_descr,                              # CCF_DESCR; was: outp(packet["name"], 24, True),
@@ -657,7 +657,7 @@ def gen_ccf(app, path):
                     for param_i in packet["body"]:
                         npars = npars + 1
                     # !!! naming convention !!!
-                    ccf_descr = "SASW "+outp(packet["name"], 19, True)
+                    ccf_descr = outp(packet["name"], 19, True)
 
                     '''
                     if packet["derivations"]["list"]:
@@ -1252,7 +1252,7 @@ def gen_txp(app, path):
                             value,
                             outp(enum["Name"], 14)  # TODO: limit 14 characters
                         ])
-    close_file(f)    
+    close_file(f)
 
 def gen_tcp(app, path):
     f = new_file(path, "tcp")
@@ -1287,7 +1287,7 @@ def gen_pcpc(app, path):
                     ])
                 pcdf_len = int(param_i["param"]["_size"])
                 offset = offset + pcdf_len
-    close_file(f)    
+    close_file(f)
 
 def gen_pcdf(app, path):
     f = new_file(path, "pcdf")
@@ -1298,11 +1298,12 @@ def gen_pcdf(app, path):
             for param_i in standard["headers"]["TC"]:
                 pcpc_name = get_pcpc_name(standard, param_i)
                 pcdf_type, pcdf_pname, pcdf_value = \
-                    ('T', pcpc_name, '0') if int(param_i["role"]) == 1 else \
-                    ('S', pcpc_name, '0') if int(param_i["role"]) == 2 else \
-                    ('A', pcpc_name, '0') if int(param_i["role"]) == 4 else \
-                    ('K', pcpc_name, '0') if int(param_i["role"]) == 5 else \
-                    ('P', pcpc_name, '0') if param_i["_value"] is None else \
+                    ('T', pcpc_name, '0') if int(param_i["role"]) == 1  else \
+                    ('S', pcpc_name, '0') if int(param_i["role"]) == 2  else \
+                    ('A', pcpc_name, '0') if int(param_i["role"]) == 4  else \
+                    ('K', pcpc_name, '0') if int(param_i["role"]) == 5  else \
+                    ('P', pcpc_name, '0') if int(param_i["role"]) == 9  else \
+                    ('F', pcpc_name, '0') if int(param_i["role"]) == 10 else \
                     ('F', '', param_i["_value"])
                 pcdf_len = param_i["param"]["_size"]
                 pcdf_bit = offset
@@ -1317,8 +1318,8 @@ def gen_pcdf(app, path):
                     'D'
                 ])
                 offset = offset + pcdf_len
-    
-    close_file(f)    
+
+    close_file(f)
 
 def gen_ocf(app, path):
     f = new_file(path, "ocf")
@@ -1413,7 +1414,7 @@ def gen_pid_line(f, tm, derived=None):
     pid_tpsd = pid_spid if length2 is None else '-1'
 
     # !!! namin convention !!!
-    pid_descr = "SASW "+pid_descr
+    pid_descr = pid_descr
 
     writeln(f, [
         outp(tm["type"], 3),                # PID_TYPE
@@ -1432,7 +1433,7 @@ def gen_pid_line(f, tm, derived=None):
         '1',     # PID_CHECK
         'N',     # PID_EVENT
         ''       # PID_EVID
-    ])         
+    ])
 
 def gen_pid(app, path):
     f = new_file(path, "pid")
@@ -1507,7 +1508,7 @@ def gen_plf_param(f, param_i, spid, offset):
         '0',
         '1'
     ])
-    return offset + param["_size"]    
+    return offset + param["_size"]
 
 def gen_plf_params(f, base, derived, spid, offset):
     for param_i in base:
@@ -1530,7 +1531,7 @@ def gen_plf(app, path):
                     if tm["_length"] != None:
                         gen_plf_params(f, tm["body"], [], tm["__mib_spid"], offset)
 
-    close_file(f)    
+    close_file(f)
 
 def getSpidPrefix(tm_type):
     switcher = {
@@ -1587,7 +1588,7 @@ def gen_tpcf(app, path):
                         gen_tpcf_line(f, tm, derived)
                 else:
                     gen_tpcf_line(f, tm)
-    close_file(f)    
+    close_file(f)
 
 def gen_pic(app, path):
     f = new_file(path, "pic")
@@ -1611,14 +1612,16 @@ def gen_pic(app, path):
                     '0',                     # PIC_PI2_WID
                     outp(tm["process"]["address"], 5)  # PIC_APID
                 ])
-    
+
     close_file(f)
 
 def prepare(app):
     # Generate SPID for all TM packets
     for relation in app["standards"]:
+
         if int(relation["relation"]) == 1:
             standard = relation["standard"]
+<<<<<<< HEAD
             for tm in standard["packets"]["TM"]["list"]:
                 if len(tm["derivations"]["list"]) > 0:
                     for derived in tm["derivations"]["list"]:
@@ -1633,30 +1636,50 @@ def prepare(app):
             param = param_i["param"]
             standard["packets"]["TC"]["params"][param["id"]] = param
             #print("param: "+str(param["id"]))
+=======
+        else:
+            continue
 
-    # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
-    for packet in standard["packets"]["TM"]["list"]:
-        # ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TM"]["params"][param["id"]] = param
-            # print("param: "+str(param["id"]))
+        for tm in standard["packets"]["TM"]["list"]:
+            if len(tm["derivations"]["list"]) > 0:
+                for derived in tm["derivations"]["list"]:
+                    derived["__mib_spid"] = get_pid_name(derived)
+            else:
+                  tm["__mib_spid"] = get_pid_name(tm)
+>>>>>>> origin/webapp-redesign-mod
 
-    # Mark all types for whether they are used for commands and/or reports
-    for relation in app["standards"]:
-        if relation["relation"] == 1:
-            standard = relation["standard"]
-            for type_ in standard["types"].values():
-                type_["__mib_used_tc"] = False
-                type_["__mib_used_tm"] = False
-            for param in standard["packets"]["TC"]["params"].values():
-                type_ = param["type"]
-                if type_ != None:
-                    type_["__mib_used_tc"] = True
-            for param in standard["packets"]["TM"]["params"].values():
-                type_ = param["type"]
-                if type_ != None:
-                    type_["__mib_used_tm"] = True
+        # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
+        for packet in standard["packets"]["TC"]["list"]:
+            #ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TC"]["params"][param["id"]] = param
+                #print("param: "+str(param["id"]))
+
+        # NEW: Copy param information into standard["packets"]["TM"]["params"] structure
+        for packet in standard["packets"]["TM"]["list"]:
+            # ccf_name = get_ccf_name(packet)
+            for param_i in packet["body"]:
+                param = param_i["param"]
+                standard["packets"]["TM"]["params"][param["id"]] = param
+                # print("param: "+str(param["id"]))
+
+        # Mark all types for whether they are used for commands and/or reports
+        for relation in app["standards"]:
+            if relation["relation"] == 1:
+                standard = relation["standard"]
+                for type_ in standard["types"].values():
+                    type_["__mib_used_tc"] = False
+                    type_["__mib_used_tm"] = False
+                for param in standard["packets"]["TC"]["params"].values():
+                    type_ = param["type"]
+                    if type_ != None:
+                        type_["__mib_used_tc"] = True
+                for param in standard["packets"]["TM"]["params"].values():
+                    type_ = param["type"]
+                    if type_ != None:
+                        type_["__mib_used_tm"] = True
+
 
 
 def gen_mib(path, comp):
@@ -1698,7 +1721,7 @@ def gen_mib(path, comp):
     empty_file(path, "dpf") # alphanumeric display proforma file, containing the list of TM alphanumeric displays (AND)
     empty_file(path, "dpc") # alphanumeric display proforma definition file, containing the list of parameters to be displayed in each AND.
     empty_file(path, "gpf") # graphic display proforma file, containing the list of TM graphic displays
-    empty_file(path, "gpc") # graphic display proforma definition file, containing the list of parameters to be displayed in each GRD.        
+    empty_file(path, "gpc") # graphic display proforma definition file, containing the list of parameters to be displayed in each GRD.
     empty_file(path, "spf") # To be delivered empty: scrolling display proforma file, containing the list of TM scrolling displays (SCD).
     empty_file(path, "spc") # To be delivered empty: scrolling display proforma definition file, containing the list of parameters to be displayed in each SCD.
     empty_file(path, "ppf") # To be delivered empty: This table will contain the list and the format specification of telemetry printout proforma.
@@ -1747,7 +1770,7 @@ if __name__ == '__main__':
             os.makedirs(outdir)
 
         try:
-            il = get_data.get_data(project_id)            
+            il = get_data.get_data(project_id)
             app = il["apps"]["hash"][int(app_id)]
             gen_mib(outdir, app["components"]["hash"]["mib"])
             print("Done")
@@ -1760,4 +1783,4 @@ if __name__ == '__main__':
             fd.write('IASW MIB v{}, generated on {}\n'.format(version, datetime.datetime.utcnow().strftime('%Y%m%d')))
 
     else:
-        print("Usage: python gen_mib.py {project_id} {application_id}")    
+        print("Usage: python gen_mib.py {project_id} {application_id}")

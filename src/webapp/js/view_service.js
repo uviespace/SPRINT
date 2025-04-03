@@ -19,6 +19,14 @@ function load_data()
 																						 create_item: {}
 																					 });
 
+		service_handler.add_validations({
+				validations:[
+						{ id: "edit_service_type", type: "max_value", param: 255, msg: "Service type must be between 1 and 255" },
+						{ id: "edit_service_name", type: "max_length", param: 256, msg: "Service name cannot be longer 256" }
+				],
+				required_properties: [ "edit_service_type", "edit_service_name" ]
+		});
+
 		service_handler.load_items();
 }
 

@@ -54,14 +54,14 @@ const pus_data = [
 		"desc":"Simple precision real (MIL std); 32 bits; Referred to as PTC=5, PFC=2 in ESA missions Parameter Types definitions"
 	},
 
-	{ "type":"39", "PTC": 6, "PFC": 0, "name":"PTC 6 / PFC 0", "size":"0", "desc":"Bit string; variable; variable-length bit-string (not supported by SCOS2000)" },
-    { "type":"40", "PTC": 6, "PFC": -1, "name":"PTC 6 / 0 < PFC < 33", "size":"1:32", "desc":"Unsigned integer; PFC bits; PUS bit-string parameter" },
+	{ "type":"39", "PTC": 6, "PFC": 0, "name":"PTC 6 / PFC 0", "size":"-1", "desc":"Bit string; variable; variable-length bit-string (not supported by SCOS2000)" },
+    { "type":"40", "PTC": 6, "PFC": -1, "name":"PTC 6 / 0 < PFC < 33", "size": "-1", "desc":"Unsigned integer; PFC bits; PUS bit-string parameter" },
 
-	{ "type":"41", "PTC": 7, "PFC": 0, "name":"PTC 7 / PFC 0", "size":"0", "desc":"Octet string; variable; variable-length octet string" },
-    { "type":"42", "PTC": 7, "PFC": -1, "name":"PTC 7 / PFC > 0", "size":"0", "desc":"Octet string; PFC octets; fixed-length octet string" },
+		{ "type":"41", "PTC": 7, "PFC": 0,  "name":"PTC 7 / PFC 0", "size":"-1", "desc":"Octet string; variable; variable-length octet string" },
+    { "type":"42", "PTC": 7, "PFC": -1, "name":"PTC 7 / PFC > 0", "size":"-1", "desc":"Octet string; PFC octets; fixed-length octet string" },
 
-	{ "type":"43", "PTC": 8, "PFC": 0, "name":"PTC 8 / PFC 0", "size":"0", "desc":"ASCII string; variable; variable-length character string" },
-    { "type":"44", "PTC": 8, "PFC": -1, "name":"PTC 8 / PFC > 0", "size":"0", "desc":"ASCII string; PFC octets; fixed-length character string" },
+	{ "type":"43", "PTC": 8, "PFC": 0, "name":"PTC 8 / PFC 0", "size":"-1", "desc":"ASCII string; variable; variable-length character string" },
+    { "type":"44", "PTC": 8, "PFC": -1, "name":"PTC 8 / PFC > 0", "size":"-1", "desc":"ASCII string; PFC octets; fixed-length character string" },
 
 	{ "type":"45", "PTC": 9, "PFC": 0, "name":"PTC 9 / PFC 0", "size":"0", "desc":"Absolute time; variable; absolute time based on its p-field (not supported by SCOS2000)" },
     { "type":"46", "PTC": 9, "PFC": 1, "name":"PTC 9 / PFC 1", "size":"48", "desc":"Absolute time; 6 octets; absolute time CDS format without microseconds" },

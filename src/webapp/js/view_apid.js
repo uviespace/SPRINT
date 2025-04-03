@@ -19,6 +19,15 @@ function load_data()
 																					create_item: {}
 																				});
 
+		apid_handler.add_validations({
+				validations: [
+						{id: "edit_apid_address", type: "max_value", param: 2047, msg: "Address must be between 1 and 2047" },
+						{id: "edit_apid_name", type: "max_length", param: 256, msg: "Name cannot be longer than 256 characters" }
+				],
+				required_properties: [ "edit_apid_address", "edit_apid_name" ]
+		});
+		
+
 		apid_handler.load_items();
 }
 

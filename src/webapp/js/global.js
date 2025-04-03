@@ -1,6 +1,150 @@
 /*
+ * init contains both validations and required_properties
+ *
+ * validations: list of validation
+ * validation: {
+ *     id: <id of input field>,
+ *     type: <min_length|max_length|is_number|min_value|max_value>,
+ *     param: <parameter of the validator type>,
+ *     msg: <message to be displayed in case of error>
+ * }
+ * 
+ * required_properties: list of IDs of input that are required
+ */
+
+class Validator
+{		
+		constructor(init)
+		{
+				this.validations = init.validations;
+				this.required_properties = init.required_properties;
+		}
+
+		validate_form()
+		{
+				const missing_field_error_msg = "This field is required!";
+				const validator_types = [ "min_length", "max_length", "is_number", "min_value", "max_value" ];
+
+				let validate_success = true;
+
+				for (let i = 0; i < this.validations.length; i++) {
+						const input = document.getElementById(this.validations[i].id);
+						for (let j = 0; j < validator_types.length; j++) {
+								let previous_error_msg = document.getElementById(this.validations[i].id + "_" + validator_types[j] + "_error_msg");
+								if (previous_error_msg)
+										previous_error_msg.remove();
+						}
+
+						switch(this.validations[i].type) {
+						case 'min_length':
+								if (input.value && input.value.length < this.validations[i].param) {
+										this._create_error_msg(input, this.validations[i].id + "_min_length_error_msg", this.validations[i].msg);
+										validate_success = false;
+								}
+								break;
+
+						case 'max_length':
+								if (input.value && input.value.length > this.validations[i].param) {
+										this._create_error_msg(input, this.validations[i].id + "_max_length_error_msg", this.validations[i].msg);
+										validate_success = false;
+								}
+								break;
+
+						case 'is_number':
+								if (!this._is_number(input.value)) {
+										this._create_error_msg(input, this.validations[i].id + "_is_number_error_msg", this.validations[i].msg);
+										validate_success = false;
+								}
+								break;
+
+						case 'min_value':
+								if (!this._is_number(input.value)) {
+										this._create_error_msg(input, this.validations[i].id + "_min_value_error_msg", this.validations[i].msg);
+										validate_success = false;
+								} else {
+										const int_value = parseInt(input.value);
+										if (int_value < this.validations[i].param) {
+												this._create_error_msg(input, this.validations[i].id + "_min_value_error_msg", this.validations[i].msg);
+												validate_success = false;
+										}
+								}
+								break;
+
+						case 'max_value':
+								if (!this._is_number(input.value)) {
+										this._create_error_msg(input, this.validations[i].id + "_max_value_error_msg", this.validations[i].msg);
+										validate_success = false;
+								} else {
+										const int_value = parseInt(input.value);
+										if (int_value > this.validations[i].param) {
+												this._create_error_msg(input, this.validations[i].id + "_max_value_error_msg", this.validations[i].msg);
+												validate_success = false;
+										}
+								}
+								break;
+								break;
+						}
+				}
+
+				for (let i = 0; i < this.required_properties.length; i++) {
+						const input = document.getElementById(this.required_properties[i]);
+						const previous_error_msg = document.getElementById(this.required_properties[i] + "_error_msg");
+						if (previous_error_msg)
+								previous_error_msg.remove()
+
+						if (!input.value)  {
+								this._create_error_msg(input, this.required_properties[i] + "_error_msg", missing_field_error_msg);
+								validate_success = false;
+						}
+				}
+
+				return validate_success;
+		}
+
+		hide_all_validations_msgs()
+		{
+				const validator_types = [ "min_length", "max_length", "is_number", "min_value", "max_value" ];
+				
+				for (let i = 0; i < this.validations.length; i++) {
+						for (let j = 0; j < validator_types.length; j++) {
+								let previous_error_msg = document.getElementById(this.validations[i].id + "_" + validator_types[j] + "_error_msg");
+								if (previous_error_msg)
+										previous_error_msg.remove();
+						}
+				}
+
+				for (let i = 0; i < this.required_properties.length; i++) {
+						const previous_error_msg = document.getElementById(this.required_properties[i] + "_error_msg");
+						if (previous_error_msg)
+								previous_error_msg.remove()
+				}
+				
+		}
+
+		_create_error_msg(input, id, msg)
+		{
+				const error_msg = document.createElement("div");
+				error_msg.setAttribute("id", id);
+				error_msg.setAttribute("class", "alert alert-error");
+				error_msg.setAttribute("style", "max-width: inherit;");
+				error_msg.innerText = msg;
+				input.insertAdjacentElement("beforebegin", error_msg);
+		}
+
+		_is_number(value)
+		{
+				if (typeof value != "string")
+						return false;
+
+				return !isNaN(value) && !isNaN(parseInt(value))
+		}
+}
+
+
+/*
  * prop: Properties
  *
+ * name: easy way to set all required IDs just by name
  * table_id: id of the table the data should be displayed
  * template_id: id of the template of a new table row
  * properties: array of properties in an object
@@ -21,8 +165,17 @@ class TableHandler
 {
 		constructor(props)
 		{
+				if (props.name != null && props.name != "") {
+						props.table_id = props.name + "_table";
+						props.template_id = props.name + "_table_row";
+						props.modal_id = props.name + "_modal";
+						props.submit_button_id = props.name + "_submit_button";
+						props.create_button_id = props.name + "_create_button";
+				}
+
 				this.props = props;
 				this.base_path = "";
+				this.validator = new Validator({ validations: [], required_properties: [] });
 		}
 
 		async load_items()
@@ -33,6 +186,12 @@ class TableHandler
 				this.fill_table();
 		}
 
+		add_validations(validations)
+		{
+				this.validator.validations = validations.validations;
+				this.validator.required_properties = validations.required_properties;
+		}
+		
 		create_item()
 		{
 				const modal = document.getElementById(this.props.modal_id);
@@ -50,6 +209,9 @@ class TableHandler
 
 		async create_item_async()
 		{
+				if (!this.validator.validate_form())
+						return;
+				
 				var created_item = { ...this.props.empty_item }; 
 
 				if (this.props.create_item_from_modal_fn) {
@@ -113,7 +275,10 @@ class TableHandler
 
 				const modal = document.getElementById(this.props.modal_id);
 				const close_button = modal.querySelector(".modal-close");
-				close_button.onclick = function() { instance.close_modal.call(instance);  }
+				close_button.onclick = function() {
+						self.validator.hide_all_validations_msgs();
+						instance.close_modal.call(instance);
+				}
 
 				// Create filter if neccesary and wire up events
 				const controls = document.querySelectorAll('[data-filter="on"]');
@@ -195,6 +360,7 @@ class TableHandler
 
 		action_edit(item)
 		{
+				const self = this;
 				const modal = document.getElementById(this.props.modal_id);
 
 				this.edit_item = item;
@@ -205,7 +371,10 @@ class TableHandler
 
 				document.getElementById(this.props.submit_button_id).textContent = "Update";
 				let instance = this;
-				document.getElementById(this.props.submit_button_id).onclick = function() { instance.update_item.call(instance) };
+				document.getElementById(this.props.submit_button_id).onclick = function() {
+						if (self.validator.validate_form())
+								instance.update_item.call(instance)
+				};
 
 				modal.style.display = "block";
 
@@ -275,7 +444,6 @@ class TableHandler
 				document.getElementById(this.props.modal_id).style.display = "none";
 		}
 }
-
 
 
 class DomBinder

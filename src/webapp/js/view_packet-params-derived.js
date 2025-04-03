@@ -31,7 +31,12 @@ const packet_handler = new TableHandler({
 
 
 async function load_data()
-{		
+{
+		packet_handler.add_validations({
+				validations: [],
+				required_properties: [ "edit_param_parameter", "edit_param_order", "edit_param_role" ]
+		});
+		
 		await packet_handler.load_items();
 		draw_packet_size();
 }

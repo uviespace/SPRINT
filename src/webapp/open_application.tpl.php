@@ -27,7 +27,7 @@
 				</div>
 
 				<div class="item-box-control">
-					<select name="relation_type" class="form-input-slim" style="display: inline-block">
+					<select name="relation_type[]" class="form-input-slim" style="display: inline-block">
 						<?php
 						if (array_key_exists($std["id"], $rel_map)) {
 							$relation = $rel_map[$std["id"]]["relation"];

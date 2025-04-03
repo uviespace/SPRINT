@@ -1,0 +1,5 @@
+TcPcktVN003Telecommand packet version number
+TcPcktId0313Telecommand packet ID
+TcPcktSeqCtrl2016The packet sequence control
+TcFailureCode400*16The failure identification code
+Total bits: 48\newline Total bytes: 6.0\newline Total words: 3.0

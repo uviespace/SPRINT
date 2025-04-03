@@ -50,6 +50,10 @@ async function toggle_param_visibility(packet_id)
 						header_size: await response.json()
 				};
 
+				packets[packet_id].table_handler.add_validations({
+						validations: [],
+						required_properties: [ "edit_parameter_parameter", "edit_parameter_role" ]
+				});
 				await packets[packet_id].table_handler.load_items();
 				draw_packet_size(packet_id);
 		}

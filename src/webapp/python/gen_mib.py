@@ -1272,7 +1272,7 @@ def gen_pcpc(app, path):
             standard = relation["standard"]
             offset = 0
             for param_i in standard["headers"]["TC"]:
-                if int(param_i["role"]) in [1, 2, 4, 5] or param_i["_value"] == None:
+                if int(param_i["role"]) in [1, 2, 4, 5, 9] or param_i["_value"] == None:
                     """
                     if offset >= 48:
                         prefix = "DF"

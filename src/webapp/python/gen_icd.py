@@ -88,36 +88,63 @@ def outp_service_overview(standard, g):
 
 #-------------------------------------------------------------------------------------
 def outp_service_desc(service, g):
-    if check_service_type(int(service["type"])): # sort out unused services by service type
-        g.begin(service["name"], "Description"+service["name"], service["name"]+" Commands and Reports", ["Kind", "Type", "Subtype", "Name", "Short Description", "Description", "Parameters", "Destination"])
+    # sort out unused services by service type
+    if check_service_type(int(service["type"])):
+        g.begin(service["name"],
+                "Description"+service["name"],
+                service["name"]+" Commands and Reports",
+                ["Kind", "Type", "Subtype", "Name", "Short Description", "Description", "Parameters", "Destination"])
         for packet in service["packets"]:
-            if check_service_subtype(int(packet["type"]), int(packet["subtype"])): # sort out unused services by service type and subtype
-                g.write([packet["kind"], packet["type"], packet["subtype"], packet["name"], packet["shortDesc"], packet["desc"], packet["descParam"], packet["descDest"]])
+            # sort out unused services by service type and subtype
+            if check_service_subtype(int(packet["type"]), int(packet["subtype"])): 
+                g.write([packet["kind"],
+                         packet["type"],
+                         packet["subtype"],
+                         packet["name"],
+                         packet["shortDesc"],
+                         packet["desc"],
+                         packet["descParam"],
+                         packet["descDest"]])
         g.end()
 
 #-------------------------------------------------------------------------------------
 def outp_type_def(type_, g):
-    if type_["size"] != None and (type_["nativeType"].strip() !=""):
+    if type_["size"] is not None and (type_["nativeType"].strip() != ""):
         tname = type_["name"]
         ntname = type_["nativeType"]
         tdesc = type_["desc"]
         g.write(["\\textbf{"+tname+"}", tdesc, ntname])
-        if len(type_["enums"]) > 0:        
-             for enum in type_["enums"]:
-                 g.write(["\\hspace{0.5cm}"+enum["Name"], enum["desc"], enum["_dec"]])
+        if len(type_["enums"]) > 0:
+            for enum in type_["enums"]:
+                g.write(["\\hspace{0.5cm}"+enum["Name"], enum["desc"], enum["_dec"]])
 
+
+def outp_type_enums(app, type_, g):
+    if len(type_["enums"]) > 0:
+        g.begin(app["name"], f"Enum_{type_["name"]}", f"Enum_{type_["name"]}", ["Id", "Name", "Description"])
+        for enum in type_["enums"]:
+            g.write([enum["Value"], enum["Name"], enum["desc"]])
+        g.end()
 #-------------------------------------------------------------------------------------
 # Generate the file defining the data types defined in all the standards
 # attached to the argument application.
 # NB: General-purpose data types not attached to any standard are not covered. 
 def outp_type_list(app, g):
     g.begin(app["name"], "Types", "Types", ["Name", "Description", "Value"])
-    for standard_relation in app["standards"]:        
+    for standard_relation in app["standards"]:
         standard = standard_relation["standard"]
         for type_ in standard["types"].values():
             if type_["ownerStandardId"] == standard["id"]:
-                outp_type_def(type_, g)       
+                outp_type_def(type_, g)
     g.end()
+
+    # Generate enums one per file
+    for standard_relation in app["standards"]:
+        standard = standard_relation["standard"]
+        for type_ in standard["types"].values():
+            if type_["ownerStandardId"] == standard["id"]:
+                outp_type_enums(app, type_, g)
+
 
 #-------------------------------------------------------------------------------------
 def outp_elem(element, info, g, rep_desc, size_desc, depth):
@@ -130,11 +157,11 @@ def outp_elem(element, info, g, rep_desc, size_desc, depth):
         offset_byte = "-"
         offset_bit = "-"
 
-    if param["_length"] != None:
+    if param["_length"] is not None:
         if param["_length"] >= 0:
-            if info["length"] != None:
+            if info["length"] is not None:
                 info["length"] = info["length"] + param["_length"]
-            if param["_multi"] != None and param["_multi"] != 1:
+            if param["_multi"] is not None and param["_multi"] != 1:
                 size = "{1}*{0}".format(save_str(param["_size"]), save_str(param["_multi"]))
             else:
                 size = save_str(param["_size"])
@@ -144,7 +171,7 @@ def outp_elem(element, info, g, rep_desc, size_desc, depth):
             size = "variable"
     else:
         info["length"] = None
-        size = "undefined"        
+        size = "undefined"
 
     if param["domain"].lower() != "predefined" or param["name"].lower() != "dummy":
         g.write([
@@ -159,7 +186,7 @@ def outp_elem(element, info, g, rep_desc, size_desc, depth):
 
 #-------------------------------------------------------------------------------------
 def outp_cont_line(depth, g):
-    g.write([("- " * depth) + (" " if depth > 0 else "") + "...", "", "", "", "", ""])    
+    g.write([("- " * depth) + (" " if depth > 0 else "") + "...", "", "", "", "", ""])
 
 #-------------------------------------------------------------------------------------
 def process_elem(elements, i, info, g, rep_desc, size_desc, depth):
@@ -167,14 +194,14 @@ def process_elem(elements, i, info, g, rep_desc, size_desc, depth):
     group = int(element["group"]) if element["group"] is not None else None
     repetition = int(element["repetition"]) if element["repetition"] is not None else None
 
-    if group != None and group > 0:
+    if group is not None and group > 0:
         depth = outp_elem(element, info, g, rep_desc, size_desc, depth)
-        if repetition != None and repetition > 0:
+        if repetition is not None and repetition > 0:
             # Fixed repetition
             for m in range(0, repetition):
                 ii = 0
                 while ii < group:
-                    ii = process_elem(elements, i+ii+1, info, g, rep_desc + "[{0}]".format(m), size_desc, depth)-i
+                    ii = process_elem(elements, i+ii+1, info, g, rep_desc + f"[{m}]", size_desc, depth)-i
         else:
             # Dynamic repetition. Length only known for first iteration.
             ii = 0
@@ -184,15 +211,15 @@ def process_elem(elements, i, info, g, rep_desc, size_desc, depth):
             outp_cont_line(depth, g)
             ii = 0
             while ii < group:
-                ii = process_elem(elements, i+ii+1, info, g, rep_desc + "[{0}]".format(element["param"]["name"]), size_desc, depth)-i
+                ii = process_elem(elements, i+ii+1, info, g, rep_desc + f"[{element["param"]["name"]}]", size_desc, depth)-i
         i = i + group
     else:
-        if repetition != None and repetition > 0:
+        if repetition is not None and repetition > 0:
             for m in range(0, repetition):
                 outp_elem(element, info, g, rep_desc, size_desc, depth)
         else:
             outp_elem(element, info, g, rep_desc, size_desc, depth)
-        
+
     return i
 
 #-------------------------------------------------------------------------------------
@@ -210,7 +237,7 @@ def outp_sequence_table(name, caption, caption_tbl, elements, g):
     while i < len(elements):
         i = process_elem(elements, i, info, g, "", "", 0)+1
 
-    if info["length"] != None:
+    if info["length"] is not None:
         s = "Total bits: {0}\nTotal bytes: {1}\nTotal words: {2}".format(
             save_str(int(info["length"])),
             save_str(int(info["length"])/8.0),
@@ -228,7 +255,7 @@ def outp_type(name, t, g):
     for key in t["enums"][0].keys():
         if key[0] != "_":
             keys.append(key)
-        
+
     g.begin(name, t["name"], t["name"], keys)
     for enum in t["enums"]:
         values = []
@@ -240,7 +267,7 @@ def outp_type(name, t, g):
 
 #-------------------------------------------------------------------------------------
 def gen_packet_name(packet):
-    return "{0} {1} {2}".format(packet["type"], packet["subtype"], packet["name"])
+    return f"{packet["type"]} {packet["subtype"]} {packet["name"]}"
 
 #-------------------------------------------------------------------------------------
 def get_discriminant_param(params):
@@ -254,7 +281,8 @@ def outp_service(service, g):
     g.setPopCol(4)
     name = service["standard"]["name"]
     for packet in service["packets"]:
-        if check_service_type(int(packet["type"])) and check_service_subtype(int(packet["type"]), int(packet["subtype"])):  # sort out unused services by service type and subtype
+        # sort out unused services by service type and subtype
+        if check_service_type(int(packet["type"])) and check_service_subtype(int(packet["type"]), int(packet["subtype"])):  
             body_params = packet["body"]
             if len(packet["derivations"]["list"]) > 0:
                 n = 1
@@ -269,38 +297,42 @@ def outp_service(service, g):
                     outp_sequence(base_name, caption, caption_tbl, params, g)
                     n = n + 1
             else:
-                base_name = u"{0}{1}s{2}".format(name, packet["type"], packet["subtype"])
+                base_name = "{0}{1}s{2}".format(name, packet["type"], packet["subtype"])
                 outp_sequence(base_name, packet["name"], packet["name"], body_params, g)
     g.setPopCol(None)
 
 #-------------------------------------------------------------------------------------
 def outp_packet_details_print_stmt(tex, caption, nelements):
     if nelements > 0:
-        tex.writeln(u"\\print{0}{{|l|l|l|l|p{{14cm}}}}".format(tex.texName(caption)))                
+        tex.writeln("\\print{0}{{|l|l|l|l|p{{14cm}}}}".format(tex.texName(caption)))
     else:
         tex.writeln("")
         tex.writeln("This packet does not have any parameters.")
 
 #-------------------------------------------------------------------------------------
 def outp_packet_details(app, tex):
-    tex.open(u"{0} {1}.tex".format(app["name"], "PacketDetails"))
+    tex.open("{0} {1}.tex".format(app["name"], "PacketDetails"))
     for standard_relation in app["standards"]:
         standard = standard_relation["standard"]
         for packet in standard["packets"]["list"]:
             if len(packet["derivations"]["list"]) > 0:
                 n = 1
                 for derived in packet["derivations"]["list"]:
-                    tex.writeln(u"\\pagebreak")
+                    tex.writeln("\\pagebreak")
                     caption = "{0}{1}".format(packet["name"], n)
-                    tex.writeln("\\subsection{{{2}({3},{4}) {0} ({1})}}".format(tex.enc(packet["name"]), tex.enc(derived["disc"]), packet["kind"], packet["type"], packet["subtype"]))
+                    tex.writeln("\\subsection{{{2}({3},{4}) {0} ({1})}}"
+                                .format(tex.enc(packet["name"]),
+                                        tex.enc(derived["disc"]),
+                                        packet["kind"], packet["type"],
+                                        packet["subtype"]))
                     #tex.writeln(tex.enc(packet["_desc"]))
                     #tex.writeln("")
                     tex.writeln(tex.enc(derived["desc"]))
                     outp_packet_details_print_stmt(tex, caption, len(packet["body"])+len(derived["body"]))
-                    tex.writeln("")       
-                    n = n + 1             
+                    tex.writeln("")
+                    n = n + 1       
             else:
-                tex.writeln(u"\\pagebreak")
+                tex.writeln("\\pagebreak")
                 tex.writeln("\\subsection{{{1}({2},{3}) {0}}}".format(tex.enc(packet["name"]), packet["kind"], packet["type"], packet["subtype"]))
                 tex.writeln(tex.enc(packet["desc"]))
                 outp_packet_details_print_stmt(tex, packet["name"], len(packet["body"]))
@@ -318,10 +350,10 @@ def outp_datapool(std_name, name, list, g):
             hex(item["_dpid"]),
             #"{0}/{1}".format(item["domain"], item["name"]) if len(item["domain"]) > 0 else item["name"],
             item["name"],
-            item["desc"] if item['desc'] != None and len(item["desc"]) > 0 else item["shortDesc"],
+            item["desc"] if item['desc'] is not None and len(item["desc"]) > 0 else item["shortDesc"],
             item["_value"],
-            (item["type"]["name"] if item["type"] != None else "") + ("" if not isArray else ("[" + save_str(item["multi"]) + "]")),
-            item["_size"] * multi if (item["_size"] != None and multi != None) else ""
+            (item["type"]["name"] if item["type"] is not None else "") + ("" if not isArray else ("[" + save_str(item["multi"]) + "]")),
+            item["_size"] * multi if (item["_size"] is not None and multi is not None) else ""
         ])
     g.end()
 
@@ -347,42 +379,42 @@ def outp_app(app, g):
 
 #-------------------------------------------------------------------------------------
 def outp_gen_files(app, tex):
-    fileNames = tex.fileNames[:]
-    tex.open(u"{0}.tex".format(app["name"]))          
-    tex.writeln("\\def \\SetPacketDetailsTableSpec#1 {\\def\\@tblSpecPacketDetails{#1}}")          
+    file_names = tex.fileNames[:]
+    tex.open(f"{app["name"]}.tex")
+    tex.writeln("\\def \\SetPacketDetailsTableSpec#1 {\\def\\@tblSpecPacketDetails{#1}}")
     tex.writeln("% Use following line to overwrite the table spec for the packet details.")
     tex.writeln("\\SetPacketDetailsTableSpec{|l|l|l|l|l|}")
-    for fileName in fileNames:
-        tex.writeln(u"\\input{{./GeneratedTables/{0}}}".format(fileName))
+    for file_name in file_names:
+        tex.writeln(f"\\input{{./GeneratedTables/{file_name}}}")
     tex.close()
 
 #-------------------------------------------------------------------------------------
 # Generate the file defining the data types defined in all the standards
 # attached to the argument application.
-# NB: General-purpose data types not attached to any standard are not covered. 
-def outp_app_types(path, app):
-    def print_type(f, type_):
-        if type_["size"] != None and (type_["nativeType"].strip() !=""):
-            tname = type_["name"]
-            ntname = type_["nativeType"]
-            writeln(f, "/** Definition of type \"{0}\" */".format(tname))
-            writeln(f, "typedef {0} {1};".format(ntname, tname))
-            if len(type_["enums"]) > 0:        
-                writeln(f, "enum {")
-                for i, enum in enumerate(type_["enums"]):
-                    isLast = (i == len(type_["enums"])-1)
-                    writeln(f, "{0} = {1}{2}".format(cname(enum["Name"]), enum["_dec"], '' if isLast else ','), 1)
-                writeln(f, "};")
-            writeln(f, "")
+# NB: General-purpose data types not attached to any standard are not covered.
+# def outp_app_types(path, app):
+#     def print_type(f, type_):
+#         if type_["size"] != None and (type_["nativeType"].strip() !=""):
+#             tname = type_["name"]
+#             ntname = type_["nativeType"]
+#             writeln(f, "/** Definition of type \"{0}\" */".format(tname))
+#             writeln(f, "typedef {0} {1};".format(ntname, tname))
+#             if len(type_["enums"]) > 0:
+#                 writeln(f, "enum {")
+#                 for i, enum in enumerate(type_["enums"]):
+#                     isLast = (i == len(type_["enums"])-1)
+#                     writeln(f, "{0} = {1}{2}".format(cname(enum["Name"]), enum["_dec"], '' if isLast else ','), 1)
+#                 writeln(f, "};")
+#             writeln(f, "")
 
-    f = list()
-    gen_includes(f)
-    for standard_relation in app["standards"]:
-        standard = standard_relation["standard"]
-        for type_ in standard["types"].values():
-            if type_["ownerStandardId"] == standard["id"]:
-                print_type(f, type_)       
-    gen_file(f, path, gen_file_name_h("Types"), True, False, "Type definitions.")
+#     f = list()
+#     gen_includes(f)
+#     for standard_relation in app["standards"]:
+#         standard = standard_relation["standard"]
+#         for type_ in standard["types"].values():
+#             if type_["ownerStandardId"] == standard["id"]:
+#                 print_type(f, type_)
+#     gen_file(f, path, gen_file_name_h("Types"), True, False, "Type definitions.")
 
 
 #-------------------------------------------------------------------------------------
@@ -397,22 +429,21 @@ def gen_icd(path, comp):
         csv = CsvGenerator(path, settings["CSV"])
         outp_app(app, csv)
         outp_type_list(app, csv)
-    
+
     if settings["LaTeX"]["Enabled"]:
         tex = TexGenerator(path, settings["LaTeX"])
         outp_app(app, tex)
         outp_gen_files(app, tex)
-        outp_packet_details(app, tex)    
+        outp_packet_details(app, tex)
         outp_type_list(app, tex)
 
 if __name__ == '__main__':
 
-    if (len(sys.argv) == 3):
-
+    if len(sys.argv) == 3:
         project_id = sys.argv[1]
         app_id = sys.argv[2]
         try:
-            il = get_data.get_data(project_id)            
+            il = get_data.get_data(project_id)
             app = il["apps"]["hash"][int(app_id)]
             gen_icd("./icd", app["components"]["hash"]["icd"])
             print("Done")

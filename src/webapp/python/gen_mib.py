@@ -1297,14 +1297,16 @@ def gen_pcdf(app, path):
             offset = 0
             for param_i in standard["headers"]["TC"]:
                 pcpc_name = get_pcpc_name(standard, param_i)
+                
                 pcdf_type, pcdf_pname, pcdf_value = \
                     ('T', pcpc_name, '0') if int(param_i["role"]) == 1  else \
                     ('S', pcpc_name, '0') if int(param_i["role"]) == 2  else \
                     ('A', pcpc_name, '0') if int(param_i["role"]) == 4  else \
                     ('K', pcpc_name, '0') if int(param_i["role"]) == 5  else \
                     ('P', pcpc_name, '0') if int(param_i["role"]) == 9  else \
-                    ('F', pcpc_name, '0') if int(param_i["role"]) == 10 else \
+                    ('F', '', param_i["_value"]) if int(param_i["role"]) == 10 else \
                     ('F', '', param_i["_value"])
+                print(pcdf_type, pcdf_pname, pcdf_value)
                 pcdf_len = param_i["param"]["_size"]
                 pcdf_bit = offset
                 writeln(f, [
@@ -1618,25 +1620,8 @@ def gen_pic(app, path):
 def prepare(app):
     # Generate SPID for all TM packets
     for relation in app["standards"]:
-
         if int(relation["relation"]) == 1:
             standard = relation["standard"]
-<<<<<<< HEAD
-            for tm in standard["packets"]["TM"]["list"]:
-                if len(tm["derivations"]["list"]) > 0:
-                    for derived in tm["derivations"]["list"]:
-                        derived["__mib_spid"] = get_pid_name(derived)
-                else:
-                    tm["__mib_spid"] = get_pid_name(tm)
-                    
-    # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
-    for packet in standard["packets"]["TC"]["list"]:
-        #ccf_name = get_ccf_name(packet)
-        for param_i in packet["body"]:
-            param = param_i["param"]
-            standard["packets"]["TC"]["params"][param["id"]] = param
-            #print("param: "+str(param["id"]))
-=======
         else:
             continue
 
@@ -1646,7 +1631,7 @@ def prepare(app):
                     derived["__mib_spid"] = get_pid_name(derived)
             else:
                   tm["__mib_spid"] = get_pid_name(tm)
->>>>>>> origin/webapp-redesign-mod
+
 
         # NEW: Copy param information into standard["packets"]["TC"]["params"] structure
         for packet in standard["packets"]["TC"]["list"]:

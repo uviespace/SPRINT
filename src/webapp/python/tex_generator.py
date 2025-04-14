@@ -28,7 +28,7 @@ class TexGenerator(Generator):
             ['^', "\\textasciicircum"],
             ['~', "\\textasciitilde"],
             ['_', "_\\-"],
-            ["\#defaultImplementation","Default implementation"]
+            ["\\#defaultImplementation","Default implementation"]
         ]
 
         s = fig_ref_conv(s, "latex")
@@ -64,7 +64,7 @@ class TexGenerator(Generator):
             "{" + " & ".join(column_names) + "}")
 
     def end(self, close_file=True):
-        self.writeln("\end{pnptable}}\n")
+        self.writeln("\\end{pnptable}}\n")
         if close_file:
             self.close()
 
@@ -78,4 +78,4 @@ class TexGenerator(Generator):
         else:
             # Only single columns supported
             self.writeln(
-                "\multicolumn{" + str(self.col_num) + "}{|l|}{\\textbf{" + self.enc(data[0]) + "}} \\\\\\hline")
+                "\\multicolumn{" + str(self.col_num) + "}{|l|}{\\textbf{" + self.enc(data[0]) + "}} \\\\\\hline")

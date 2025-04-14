@@ -96,7 +96,7 @@ def outp_service_desc(service, g):
                 ["Kind", "Type", "Subtype", "Name", "Short Description", "Description", "Parameters", "Destination"])
         for packet in service["packets"]:
             # sort out unused services by service type and subtype
-            if check_service_subtype(int(packet["type"]), int(packet["subtype"])): 
+            if check_service_subtype(int(packet["type"]), int(packet["subtype"])):
                 g.write([packet["kind"],
                          packet["type"],
                          packet["subtype"],

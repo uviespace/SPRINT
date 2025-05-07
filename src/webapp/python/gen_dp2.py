@@ -326,6 +326,11 @@ def gen_datapool_c(path, domain_dict, params_list, vars_list):
                 element_length = length
                 nelems = "1"
 
+            # stored incorrectly, nelems must always be at least 1
+            # otherwise it will be considered size 0
+            if nelems == "0":
+                nelems = "1"
+
             # could do (minimum) size verification here, the size type table contains
             # bit widths of the more abstract types used in the PUS packets
 

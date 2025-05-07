@@ -50,6 +50,13 @@ async function toggle_derivation_visibility(packet_id)
 						})
 				};
 
+				packets[packet_id].table_handler.add_validations({
+						validations: [
+								{ id: "edit_packet_name", type: "max_length", param: 256, msg: "Names cannot be longer than 256" }
+						],
+						required_properties: [ "edit_packet_discriminant", "edit_packet_name" ]
+				});
+
 				await packets[packet_id].table_handler.load_items();
 		}
 }

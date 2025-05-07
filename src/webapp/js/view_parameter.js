@@ -49,6 +49,14 @@ function load_data()
 																					 create_item_from_modal_fn: create_item_from_modal
 																				 });
 
+		parameter_hdl.add_validations({
+				validations: [
+						{ id: "edit_parameter_name", type: "max_length", param: 256, msg: "Parameter names cannot be longer than 256 characters" },
+						{ id: "edit_parameter_domain", type: "max_length", param: 256, msg: "Parameter names cannot be longer than 256 characters" },
+				],
+				required_properties: [ "edit_parameter_name", "edit_parameter_kind", "edit_parameter_role", "edit_parameter_datatype"  ]
+		});
+
 		parameter_hdl.load_items();
 }
 

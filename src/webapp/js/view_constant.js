@@ -21,6 +21,16 @@ function load_data()
 																							create_item: {}
 																						});
 
+		constant_handler.add_validations({
+				validations: [
+						{ id: "edit_constant_domain", type: "max_length", param: 256, msg: "Domain names cannot be longer than 256" },
+						{ id: "edit_constant_name", type: "max_length", param: 256, msg: "Names for constants cannot be longer than 256" },
+						{ id: "edit_constant_value", type: "max_length", param: 256, msg: "Values cannot be longer than 256" },
+				],
+				required_properties: [ "edit_constant_name", "edit_constant_value" ]
+		});
+		
+
 		constant_handler.load_items();
 }
 

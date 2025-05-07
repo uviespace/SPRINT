@@ -28,7 +28,7 @@ class TexGenerator(Generator):
             ['^', "\\textasciicircum"],
             ['~', "\\textasciitilde"],
             ['_', "_\\-"],
-            ["\#defaultImplementation","Default implementation"]
+            ["\\#defaultImplementation","Default implementation"]
         ]
 
         s = fig_ref_conv(s, "latex")
@@ -38,7 +38,7 @@ class TexGenerator(Generator):
 
         for old, new in replacements:
             s = s.replace(old, new)
-        
+
         return s
 
     def texName(self, s):
@@ -48,28 +48,28 @@ class TexGenerator(Generator):
 
         return s.replace(" ", "").replace("_", "").replace("-", "").encode('utf8').translate(self.tblTranslate).decode('utf8')
         
-    def begin(self, base_name, caption, caption_tbl, column_names, openFile=True):
-        if self.popCol != None:
+    def begin(self, base_name, caption, caption_tbl, column_names, open_file=True):
+        if self.popCol is not None:
             column_names.pop(self.popCol)
-        if openFile:
-            self.open(u"{0}{1}.tex".format(base_name, caption))
+        if open_file:
+            self.open("{0}{1}.tex".format(base_name, caption))
         self.col_num = len(column_names)
         caption = self.texName(caption)
         self.writeln(
             #u"\\def \\print{0}#1 {{\n".format(caption) +
-            u"\\newcommand{{\\print{0}}}[1]{{\n".format(caption) +
+            f"\\newcommand{{\\print{caption}}}[1]{{\n" +
             "\\begin{pnptable}{#1}" + 
             "{" + self.enc(caption_tbl) + "}" + 
             "{tab:" + caption + "}" +
             "{" + " & ".join(column_names) + "}")
 
-    def end(self, closeFile=True):
-        self.writeln("\end{pnptable}}\n")
-        if closeFile:
+    def end(self, close_file=True):
+        self.writeln("\\end{pnptable}}\n")
+        if close_file:
             self.close()
 
     def write(self, data):
-        if self.popCol != None:
+        if self.popCol is not None:
             data.pop(self.popCol)
         data = self.conv(data)
         #print(data)
@@ -78,4 +78,4 @@ class TexGenerator(Generator):
         else:
             # Only single columns supported
             self.writeln(
-                "\multicolumn{" + str(self.col_num) + "}{|l|}{\\textbf{" + self.enc(data[0]) + "}} \\\\\\hline")
+                "\\multicolumn{" + str(self.col_num) + "}{|l|}{\\textbf{" + self.enc(data[0]) + "}} \\\\\\hline")

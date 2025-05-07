@@ -35,7 +35,7 @@ $packets = $database->select("SELECT p.id, p.`domain`, p.`type`, p.subtype, p.na
 							 "FROM packet p LEFT JOIN parametersequence ps ON p.id = ps.idPacket " .
 							 "WHERE p.idStandard = ? AND (p.discriminant = '' OR p.discriminant IS NULL) " .
 							 "GROUP BY id, `domain`, `type`, subtype, kind, name " .
-							 "ORDER BY p.`domain`, p.`type`, p.subtype ", ["i", [$_GET["idStandard"]]]);
+							 "ORDER BY p.`type`, p.subtype ", ["i", [$_GET["idStandard"]]]);
 
 
 $role_values = get_roles($database, 2);

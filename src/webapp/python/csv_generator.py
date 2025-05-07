@@ -11,7 +11,7 @@ class CsvGenerator(Generator):
 
     def __init__(self, path, setting):
         Generator.__init__(self, path)
-        self.setting = setting        
+        self.setting = setting
 
     def name(self):
         return "CSV"    
@@ -23,7 +23,7 @@ class CsvGenerator(Generator):
             ['~', "\\textasciitilde"],
             ['_', "\\_"],
             ['&', "\\&"],
-            ["\#defaultImplementation","Default implementation"]
+            ["\\#defaultImplementation","Default implementation"]
         ]
         #if isinstance(s, basestring):
         if isinstance(s, ("".__class__, u"".__class__)):  # for Python2 and Python3

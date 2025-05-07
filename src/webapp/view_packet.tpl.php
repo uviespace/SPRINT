@@ -1,10 +1,10 @@
 <h2>Packets</h2>
 
-<button id="create_packet_button_id" class="btn">
+<button id="packet_create_button" class="btn">
 	<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create Packet
 </button>
 
-<table id="table_packet" class="table">
+<table id="packet_table" class="table">
 	<thead>
 		<th>ID</th>
 		<th>Kind</th>
@@ -20,7 +20,7 @@
 	</tbody>
 </table>
 
-<template id="table_packet_row">
+<template id="packet_table_row">
 	<tr>
 		<td></td>
 		<td></td>
@@ -49,6 +49,7 @@
 		</div>
 
 		<div class="modal-body">
+			<form id="my_form" action="javascript:void(0)"> 
 			<label for="apid">Process/APID:</label>
 			<select name="apid" id="edit_packet_apid" class="form-input modal-input">
 				<?php foreach($apids as $apid): ?>
@@ -57,26 +58,26 @@
 			</select>
 
 			<label for="kind">Kind:</label>
-			<select name="kind" id="edit_packet_kind" class="form-input modal-input">
+			<select name="kind" id="edit_packet_kind" class="form-input modal-input" required>
 				<option value="0">TC</option>
 				<option value="1">TM</option>
 			</select>
 
 			<label for="type">Type:</label>
-			<select name="type" id="edit_packet_type" class="form-input modal-input">
+			<select name="type" id="edit_packet_type" class="form-input modal-input" required>
 				<?php foreach($services as $service): ?>
 					<option value="<?=$service["type"]?>"><?=$service["type"]?> (<?=$service["name"]?>) </option>
 				<?php endforeach; ?>
 			</select>
 
 			<label for="subtype">Subtype:</label>
-			<input id="edit_packet_subtype" class="form-input modal-input" type="number" name="subtype" />
+			<input id="edit_packet_subtype" class="form-input modal-input" type="number" name="subtype" required />
 
 			<label for="Domain">Domain:</label>
 			<input id="edit_packet_domain" class="form-input modal-input" type="text" name="domain" />
 
 			<label for="name">Name:</label>
-			<input id="edit_packet_name" class="form-input modal-input" type="text" name="name" />
+			<input id="edit_packet_name" class="form-input modal-input" type="text" name="name" required />
 
 			<label for="short_desc">Short Desc.:</label>
 			<input id="edit_packet_short_desc" class="form-input modal-input" type="text" name="short_desc" />
@@ -92,6 +93,7 @@
 
 			<label for="code">Code:</label>
 			<input id="edit_packet_code" class="form-input modal-input" type="text" name="code" />
+			</form>
 		</div>
 
 		<div class="modal-footer">

@@ -760,13 +760,13 @@ class ParameterController extends BaseController implements CrudController
 	{
 		$id = $this->database->insert("INSERT INTO parameter(idStandard, domain, name, " .
 									  "  kind, shortDesc, idType, multiplicity, value, " .
-									  "  unit)" .
-									  "VALUES (?,?,?,?,?,?,?,?,?)",
-									  ["issisiiss", [$route_ids["standard_id"], $item->domain,
+									  "  unit, role)" .
+									  "VALUES (?,?,?,?,?,?,?,?,?,?)",
+									  ["issisiissi", [$route_ids["standard_id"], $item->domain,
 													 $item->name, $item->kind,
 													 $item->shortDesc, $item->idType,
 													 $item->multiplicity, $item->value,
-													 $item->unit]]);
+													 $item->unit, $item->role]]);
 
 		$item->id = $id;
 
@@ -793,12 +793,12 @@ class ParameterController extends BaseController implements CrudController
 		$this->database->execute_non_query("UPDATE parameter " .
 										   "SET domain = ?, name = ?, kind = ?, " .
 										   "  shortDesc = ?, idType = ?, multiplicity = ?, " .
-										   "  value = ?, unit = ? " .
+										   "  value = ?, unit = ?, role = ? " .
 										   "WHERE id = ?",
-										   ["ssisiissi", [$item->domain, $item->name,
+										   ["ssisiissii", [$item->domain, $item->name,
 														  $item->kind, $item->shortDesc,
 														  $item->idType, $item->multiplicity,
-														  $item->value, $item->unit,
+														  $item->value, $item->unit, $item->role, 
 														  $item->id]]);
 
 		if ($item->ref_param_id != NULL) {

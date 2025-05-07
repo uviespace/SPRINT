@@ -597,6 +597,7 @@ def gen_pcf(app, path):
 
 def gen_ccf(app, path):
     f = new_file(path, "ccf")
+    packet_prefix = settings["general"]["packet_prefix"] if "packet_prefix" in settings["general"] else ""
     for relation in app["standards"]:
         if relation["relation"] == 1:
             standard = relation["standard"]
@@ -628,7 +629,7 @@ def gen_ccf(app, path):
                         for param_derived in derived["body"]:
                             npars = npars + 1
                         # !!! naming convention !!!
-                        ccf_descr = outp(derived["name"], 19, True)
+                        ccf_descr = outp(packet_prefix + derived["name"], 19, True)
                         writeln(f, [
                             get_ccf_name(derived),                  # CCF_NAME
                             ccf_descr,                              # CCF_DESCR; was: outp(packet["name"], 24, True),
@@ -657,7 +658,7 @@ def gen_ccf(app, path):
                     for param_i in packet["body"]:
                         npars = npars + 1
                     # !!! naming convention !!!
-                    ccf_descr = outp(packet["name"], 19, True)
+                    ccf_descr = outp(packet_prefix + packet["name"], 19, True)
 
                     '''
                     if packet["derivations"]["list"]:
@@ -1416,7 +1417,7 @@ def gen_pid_line(f, tm, derived=None):
     pid_tpsd = pid_spid if length2 is None else '-1'
 
     # !!! namin convention !!!
-    pid_descr = pid_descr
+    pid_descr = (settings["general"]["packet_prefix"] if "packet_prefix" in settings["general"] else "") +  pid_descr
 
     writeln(f, [
         outp(tm["type"], 3),                # PID_TYPE

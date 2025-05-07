@@ -11,8 +11,8 @@ class Generator:
 
     def open(self, name):
         s = self.validName(name)
-        self.f = open(u"{0}/{1}".format(self.path, s), "w")        
-        self.fileNames.append(s)        
+        self.f = open("{0}/{1}".format(self.path, s), "w")
+        self.fileNames.append(s)
 
     def close(self):
         self.f.close()

@@ -121,7 +121,7 @@ def outp_type_def(type_, g):
 
 def outp_type_enums(app, type_, g):
     if len(type_["enums"]) > 0:
-        g.begin(app["name"], f"Enum_{type_["name"]}", f"Enum_{type_["name"]}", ["Id", "Name", "Description"])
+        g.begin(app["name"], f"Enum_{type_['name']}", f"Enum_{type_['name']}", ["Id", "Name", "Description"])
         for enum in type_["enums"]:
             g.write([enum["Value"], enum["Name"], enum["desc"]])
         g.end()
@@ -211,7 +211,7 @@ def process_elem(elements, i, info, g, rep_desc, size_desc, depth):
             outp_cont_line(depth, g)
             ii = 0
             while ii < group:
-                ii = process_elem(elements, i+ii+1, info, g, rep_desc + f"[{element["param"]["name"]}]", size_desc, depth)-i
+                ii = process_elem(elements, i+ii+1, info, g, rep_desc + f"[{element['param']['name']}]", size_desc, depth)-i
         i = i + group
     else:
         if repetition is not None and repetition > 0:
@@ -267,7 +267,7 @@ def outp_type(name, t, g):
 
 #-------------------------------------------------------------------------------------
 def gen_packet_name(packet):
-    return f"{packet["type"]} {packet["subtype"]} {packet["name"]}"
+    return f"{packet['type']} {packet['subtype']} {packet['name']}"
 
 #-------------------------------------------------------------------------------------
 def get_discriminant_param(params):
@@ -380,7 +380,7 @@ def outp_app(app, g):
 #-------------------------------------------------------------------------------------
 def outp_gen_files(app, tex):
     file_names = tex.fileNames[:]
-    tex.open(f"{app["name"]}.tex")
+    tex.open(f"{app['name']}.tex")
     tex.writeln("\\def \\SetPacketDetailsTableSpec#1 {\\def\\@tblSpecPacketDetails{#1}}")
     tex.writeln("% Use following line to overwrite the table spec for the packet details.")
     tex.writeln("\\SetPacketDetailsTableSpec{|l|l|l|l|l|}")
@@ -433,9 +433,9 @@ def gen_icd(path, comp):
     if settings["LaTeX"]["Enabled"]:
         tex = TexGenerator(path, settings["LaTeX"])
         outp_app(app, tex)
+        outp_type_list(app, tex)
         outp_gen_files(app, tex)
         outp_packet_details(app, tex)
-        outp_type_list(app, tex)
 
 if __name__ == '__main__':
 

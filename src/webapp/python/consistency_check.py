@@ -6,7 +6,7 @@ from conformance_check import conformance_check
 from common_check import *
 
 def is_int(s):
-    try: 
+    try:
         int(s)
         return True
     except ValueError:
@@ -18,10 +18,14 @@ def check_cc001(standard, res):
     for param in standard["params"]["list"]:
         if param["type"] != None:
             if param["type"]["size"] != None:
-                my_assert(res, 
-                    "CC-001",
-                    "[{0}] Parameter '{1}' with size {2} must have size {3} or left empty.".format(standard["name"], param["name"], param["size"], param["type"]["size"]), 
-                    param["size"] == None or param["size"] == param["type"]["size"])
+                my_assert(res,
+                          "CC-001",
+                          "[{0}] Parameter '{1}' with size {2} must have size {3} or left empty."
+                          .format(standard["name"],
+                                  param["name"] + str(param["id"]),
+                                  param["size"],
+                                  param["type"]["size"]),
+                          param["size"] == None or param["size"] == param["type"]["size"])
 
 # For all parameters added to a sequence with a group value N greater than
 # zero and order number M, there are N or more parameters defined in this sequence
@@ -33,9 +37,14 @@ def check_cc002_list(standard, res, elem_list, container_name):
         m = len(elem_list)-1-i
         if n != None and int(n) > 0:
             my_assert(res,
-                "CC-002",
-                "[{0}] Parameter '{1}' in '{4}' specifies group size of N={2}, M={3} parameters follow in this sequence. M >= N.".format(standard["name"], elem["param"]["name"], n, m, container_name),
-                m >= int(n))
+                      "CC-002",
+                      "[{0}] Parameter '{1}' in '{4}' specifies group size of N={2}, M={3} parameters follow in this sequence. M >= N."
+                      .format(standard["name"],
+                              elem["param"]["name"],
+                              n,
+                              m,
+                              container_name),
+                      m >= int(n))
         i = i+1
 
 def check_cc002(standard, res):

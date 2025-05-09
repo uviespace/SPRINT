@@ -885,17 +885,24 @@ def gen_cpc(app, path):
         if int(relation["relation"]) == 1:
             standard = relation["standard"]
             for param in standard["packets"]["TC"]["params"].values():
-                if "Spare" in param["name"]:  # !!!! TODO !!!!!!!!! better solution needed
-                    #print(">>>>>>>>>>>>>>", param["name"], param["role"])
-                    continue  # if spare no entry
+                # check if param is spare in every packet it is included
+                spare = True
+                for seq in param["_sequence"]:
+                    spare = spare and seq["role"] == 8
+                # if "Spare" in param["name"]:  # !!!! TODO !!!!!!!!! better solution needed
+                #     #print(">>>>>>>>>>>>>>", param["name"], param["role"])
+                #     continue  # if spare no entry
+                if spare:
+                    continue
+                
                 ptc, pfc, width, repetition = get_ptc_pfc(param)
                 # 'C' not supported (raw to engineering value conversion)
                 # Role = 6 (Parameter ID), Role = 7 (Command ID)
                 categ = \
                     'T' if param["type"] != None and len(param["type"]["enums"]) > 0 else \
-                    'A' if int(param["role"]) == 7 else \
-                    'P' if int(param["role"]) == 6 else \
-                    'N'
+                        'A' if int(param["role"]) == 7 else \
+                        'P' if int(param["role"]) == 6 else \
+                        'N'
                 # numerische calibration 'C'
                 dispfmt = \
                     'A' if categ == 'T' else \
@@ -926,13 +933,13 @@ def gen_cpc(app, path):
                         break  # only once
                 else:
                     par_limit_id = ''
-                '''
-                if len(limit) > 1:  # TODO: DEBUG!!!
-                    for x in limit:
-                        print ("id: ", x)
-                        for y in limit[x]:
+                    '''
+                            if len(limit) > 1:  # TODO: DEBUG!!!
+                            for x in limit:
+                            print ("id: ", x)
+                            for y in limit[x]:
                             print ("key: ", y, ', value: ', limit[x][y])
-                '''
+                            '''
                 writeln(f, [
                     get_cpc_name(param),           # CPC_PNAME
                     outp(param["name"], 24),       # CPC_DESCR
@@ -1273,7 +1280,7 @@ def gen_pcpc(app, path):
             standard = relation["standard"]
             offset = 0
             for param_i in standard["headers"]["TC"]:
-                if int(param_i["role"]) in [1, 2, 4, 5] or param_i["_value"] == None:
+                if int(param_i["role"]) in [1, 2, 4, 5, 9] or param_i["_value"] == None:
                     """
                     if offset >= 48:
                         prefix = "DF"

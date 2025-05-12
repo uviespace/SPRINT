@@ -583,7 +583,7 @@ if __name__ == '__main__':
             gen_dp2("./dp2", app["components"]["hash"]["dp2"])
             print("Done")
         except Exception as e:
-            printd("Something went wrong...")
+            print("Something went wrong...")
             print(traceback.format_exc())
 
     else:

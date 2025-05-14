@@ -1,3 +1,5 @@
 src/webapp/uploads/*
 *~
 __pycache__
+src/webapp/python/settings.py
+src/webapp/db/db_config.php

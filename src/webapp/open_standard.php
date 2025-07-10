@@ -83,7 +83,7 @@ $params_cnt = $database->select("SELECT count(*) as cnt ".
 $limits_cnt = $database->select("SELECT count(*) as cnt " .
 								"FROM (SELECT DISTINCT t.id FROM `parameter` t LEFT JOIN `limit` e ON t.id = e.idParameter " .
 								"WHERE  t.idStandard = ? AND e.idParameter IS NOT NULL) q " .
-								"UNION " .
+								"UNION ALL " .
 								"SELECT count(*) as cnt " .
 								"FROM (SELECT DISTINCT t.id FROM `parameter` t LEFT JOIN `limit` e ON t.id = e.idParameter " .
 								"WHERE t.idStandard = ? AND e.idParameter IS NULL) q",

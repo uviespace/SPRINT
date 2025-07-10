@@ -117,7 +117,7 @@ include "template.php";
 
 
 
-function import_header_type($database, $import_msg, $import_results, $header_type, $import_standard_id, $own_standard_id)
+/*function import_header_type($database, $import_msg, $import_results, $header_type, $import_standard_id, $own_standard_id)
 {
 	$sql = "SELECT p.id as param_id, p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
 	                p.shortDesc as param_short_desc, p.`desc` as param_desc, p.value as param_value, p.`size` as param_size,
@@ -365,6 +365,6 @@ function subservice_exists($database, $own_standard_id, $type, $subtype)
 	return count($result) > 0;
 }
 
-
+*/
 
 ?>

@@ -10,6 +10,9 @@ class StandardImporter
 	private int $import_standard_id;
 	private int $own_standard_id;
 
+	private $added_parameters;
+	private $added_datatypes;
+
 
 	public $import_msg;
 	public $import_results;
@@ -24,9 +27,9 @@ class StandardImporter
 		$this->import_standard_id = $import_standard_id;
 		$this->own_standard_id = $own_standard_id;
 
-		
+		$this->added_parameters = array();
+		$this->added_datatypes = array();
 	}
-
 
 	public function import_headers($tc_header, $tm_header)
 	{
@@ -93,12 +96,12 @@ class StandardImporter
                          	ps.repetition param_seq_repitition, ps.value param_seq_value, ps.`desc` param_seq_desc,
                              ps.setting as param_seq_setting,  
                          	p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
-                             p.shortDesc as param_shortDesc, 
+                             p.shortDesc as param_short_desc, 
                          	p.`desc` as param_desc, p.value as param_value, p.`size` as param_size, p.unit as param_unit, 
                          	p.multiplicity as param_multiplicity,  p.setting as param_setting, p.`role` as param_role,  
                          	t.id as type_id, t.idStandard as type_standard_id, t.`domain` as type_domain,
                              t.name as type_name, t.setting as type_setting,
-                         	t.nativeType as type_nativeType, t.`desc` as type_desc, 
+                         	t.nativeType as type_native_type, t.`desc` as type_desc, 
                          	t.`size` as type_size, t.value as type_value, t.`schema` as type_schema 
                          FROM parametersequence ps 
                          	INNER JOIN `parameter` p ON p.id = ps.idParameter
@@ -111,37 +114,12 @@ class StandardImporter
 
 						foreach ($param_sequence as $param) {
 							// Insert user type or use standard type
-							$type_id = -1;
-							if ($param['type_standard_id'] == NULL) {
-								// Type is a standard type and can be used directly
-								$type_id = $param['type_id'];
-							} else {
-								// Type is a unique type to the standard and has to be inserted
-								$type_id = $this->database->insert(
-									"INSERT INTO `type` (idStandard, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, " .
-									"    `setting`, `schema`) " .
-									"VALUES (?,?,?,?,?,?,?,?,?)",
-									["issssiiss",
-									 [ $this->own_standard_id, $param['type_domain'], $param['type_name'], $param['type_nativeType'],
-									   $param['type_desc'], $param['type_size'], $param['type_value'], $param['type_setting'],
-									   $param['type_schema'] ]]);
-							}
-
+							$type_id = $this->get_type_id($param);
 
 							// Insert parameter
-
-							$param_id = $this->database->insert(
-								"INSERT INTO parameter (`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, " .
-								"    `size`, `unit`, `multiplicity`, `setting`, `role`) " .
-								"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-								["iiissssiisiss", [ $this->own_standard_id, $type_id, $param["param_kind"], $param["param_domain"],
-													$param['param_name'], $param['param_shortDesc'], $param['param_desc'],
-													$param['param_value'], $param['param_size'],
-													$param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
-													$param['param_role'] ]]);
+							$param_id = $this->get_parameter_id($param, $type_id);
 
 							// Insert parametersequence
-
 							$param_seq_id = $this->database->insert(
 								"INSERT INTO parametersequence (`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, " .
 								"    `repetition`, `value`, `desc`, `setting`) " .
@@ -224,33 +202,10 @@ class StandardImporter
 
 		foreach($header as $param) {
 			// Insert user type or use standard type
-			$type_id = -1;
-			if ($param['type_standard_id'] == NULL) {
-				// Type is a standard type and can be used directly
-				$type_id = $param['type_id'];
-			} else {
-				// Type is a unique type to the standard and has to be inserted
-				$type_id = $this->database->insert(
-					"INSERT INTO `type` (idStandard, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, " .
-					"    `setting`, `schema`) " .
-					"VALUES (?,?,?,?,?,?,?,?,?)",
-					["issssiiss",
-					 [ $this->own_standard_id, $param['type_domain'], $param['type_name'], $param['type_native_type'],
-					   $param['type_desc'], $param['type_size'], $param['type_value'], $param['type_setting'],
-					   $param['type_schema'] ]]);
-			}
+			$type_id = $this->get_type_id($param);
 
 			// Insert parameter
-
-			$param_id = $this->database->insert(
-				"INSERT INTO parameter (`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, " .
-				"    `size`, `unit`, `multiplicity`, `setting`, `role`) " .
-				"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
-				["iiissssiisiss", [ $this->own_standard_id, $type_id, $param["param_kind"], $param["param_domain"],
-									$param['param_name'], $param['param_short_desc'], $param['param_desc'],
-									$param['param_value'], $param['param_size'],
-									$param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
-									$param['param_role'] ]]);
+			$param_id = $this->get_parameter_id($param, $type_id);
 
 			// Insert parametersequence
 
@@ -259,9 +214,9 @@ class StandardImporter
 				"    `repetition`, `value`, `desc`, `setting`) " .
 				"VALUES (?,?,?,?,?,?,?,?,?,?)",
 				["iiiiiiiiss", [ $this->own_standard_id, $param_id, $param["seq_type"],
-								  $param['seq_role'], $param['seq_order'], $param['seq_group'],
-								  $param['seq_repetition'], $param['seq_value'], $param['seq_desc'],
-								  $param['seq_setting'] ]]);
+								 $param['seq_role'], $param['seq_order'], $param['seq_group'],
+								 $param['seq_repetition'], $param['seq_value'], $param['seq_desc'],
+								 $param['seq_setting'] ]]);
 
 
 			array_push($this->import_results, [
@@ -273,9 +228,94 @@ class StandardImporter
 		}
 	}
 	
+
+	private function get_type_id($param)
+	{
+		if ($param['type_standard_id'] == NULL) {
+			// Type is a standard type and can be used directly
+			$type_id = $param['type_id'];
+		} else {
+			// First check if we already have an id inside the hash map then just return it
+			if (array_key_exists($param['type_id'], $this->added_datatypes)) {
+				array_push($this->import_msg, "Taken type id from source " . $param['type_id']  . " from hash map"); 
+				return $this->added_datatypes[$param['type_id']];
+			}
+
+			// Check if same datatype already in standard then use this
+			$result = $this->database->select("SELECT id FROM `type` " .
+											  "WHERE idStandard = ? AND `domain` = ? AND `name` = ? AND nativeType = ? AND `desc` = ? AND `size` = ? AND " .
+											  "    `value` = ? AND `setting` = ? AND `schema` = ?",
+											  [ "issssiiss", [ $this->own_standard_id, $param['type_domain'], $param['type_name'],
+															   $param['type_native_type'], $param['type_desc'], $param['type_size'],
+															   $param['type_value'], $param['type_setting'], $param['type_schema']] ]);
+
+			if (count($result) > 0) {
+				array_push($this->import_msg, "Found type id from source " . $param['type_id']  . " already in standard"); 
+				$this->added_datatypes += [ $param['type_id'] => $result[0]['id']];
+				return $result[0]['id'];
+			}
+			
+			
+			// Datatype does not exist so add it
+			$type_id = $this->database->insert(
+				"INSERT INTO `type` (idStandard, `domain`, `name`, `nativeType`, `desc`, `size`, `value`, " .
+				"    `setting`, `schema`) " .
+				"VALUES (?,?,?,?,?,?,?,?,?)",
+				["issssiiss",
+				 [ $this->own_standard_id, $param['type_domain'], $param['type_name'], $param['type_native_type'],
+				   $param['type_desc'], $param['type_size'], $param['type_value'], $param['type_setting'],
+				   $param['type_schema'] ]]);
+
+			array_push($this->import_msg, "Added type from source " . $param['type_id']  . " added"); 
+			$this->added_datatypes += [ $param['type_id'] => $type_id];
+
+			return $type_id;
+		}
+	}
 	
-	
-	
+
+	private function get_parameter_id($param, $type_id)
+	{
+		// First check if we already have an id in the hash map
+		if (array_key_exists($param['param_id'], $this->added_parameters)) {
+			array_push($this->import_msg, "Taken parameter id from source " . $param['param_id']  . "from hash map");
+			return $this->added_parameters[$param['param_id']];
+		}
+
+		// Check if the same parameter already exists in standard
+		$result = $this->database->select("SELECT id FROM parameter " .
+										  "WHERE idStandard = ? AND `kind` = ? AND `domain` = ? AND `name` = ? AND shortDesc = ? AND " .
+										  "    `desc` = ? AND `value` = ? AND `size` = ? AND `unit` = ? AND multiplicity = ?  AND " .
+										  "   `setting` = ? AND `role` = ?",
+										  [ "iissssiisiss", [ $this->own_standard_id, $param["param_kind"], $param["param_domain"],
+															  $param['param_name'], $param['param_short_desc'], $param['param_desc'],
+															  $param['param_value'], $param['param_size'],
+															  $param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
+															  $param['param_role']] ]);
+
+		if (count($result) > 0) {
+			array_push($this->import_msg, "Found parameter id from source " . $param['param_id']  . " already in standard");
+			$this->added_parameters += [ $param['param_id'] => $result[0]['id'] ];
+			return $result[0]['id'];
+		}
+
+
+		// Last if all else fails add new parameter
+		$param_id = $this->database->insert(
+			"INSERT INTO parameter (`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, " .
+			"    `size`, `unit`, `multiplicity`, `setting`, `role`) " .
+			"VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)",
+			["iiissssiisiss", [ $this->own_standard_id, $type_id, $param["param_kind"], $param["param_domain"],
+								$param['param_name'], $param['param_short_desc'], $param['param_desc'],
+								$param['param_value'], $param['param_size'],
+								$param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
+								$param['param_role'] ]]);
+
+		array_push($this->import_msg, "Added new parameter from source " . $param['param_id']);
+		$this->added_parameters += [ $param['param_id'] => $param_id ];
+
+		return $param_id;
+	}
 }
 
 

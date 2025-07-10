@@ -84,6 +84,13 @@ class FunctionController extends BaseController {
 										   ["si", [$value, $param_id]]);
 		$this->send_output("", array("HTTP/1.1 200 OK"));
 	}
+
+	public function set_component_settings($application_id, $component_id, $settings)
+	{
+		$this->database->execute_non_query("UPDATE applicationcomponent SET setting = ? WHERE idApplication = ? AND idComponent = ?",
+										   ["sii", [$settings, $application_id, $component_id]]);
+		$this->send_output($settings, array("HTTP/1.1 200 OK"));
+	}
 }
 
 /*public function get_packet_size($standard_id, $packet_id)

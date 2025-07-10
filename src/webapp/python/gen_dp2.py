@@ -436,7 +436,7 @@ def gen_app_types(path, app):
     gen_file(f, path, gen_file_name_h("Types"), True, False)
 
 #------------------------------------------------------------------------------
-def gen_dp(path, comp):
+def gen_dp2(path, comp):
     def touch_param_i(param_i):
         param_i["__dp_parent"] = None
         param_i["__dp_subparams"] = []

@@ -113,6 +113,22 @@ $router->post("api/v2/projects/:project_id/standards/:standard_id/parameters/:pa
 });
 
 
+$router->post("api/v2/projects/:project_id/applications/:application_id/component_settings/:component_id",
+			  function($route_ids) {
+				  if (!check_user_can_access_project($route_ids["project_id"]))
+					  $crudController->forbidden();
+
+				  try {
+					  $functionController = new FunctionController();
+					  $functionController->set_component_settings($route_ids["application_id"],
+																  $route_ids["component_id"],
+																  file_get_contents("php://input"));
+				  } catch(\Throwable $e) {
+					  echo json_encode(array("Error" => $e->getMessage()));
+				  }				 
+});
+
+
 $router->resolve($uri);
 
 

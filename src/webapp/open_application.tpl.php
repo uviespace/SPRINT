@@ -71,6 +71,10 @@
 						<button type="submit" class="btn btn-semi-small" name="add_component" value="<?=$idx?>">Add</button>
 					<?php elseif($comp["active"] == 1): ?>
 						<button type="submit" class="btn btn-semi-small" name="deact_component" value="<?=$idx?>">Deactivate</button>
+						<a href="view_component_settings.php?idProject=<?=$_GET['idProject']?>&idApplication=<?=$_GET["idApplication"]?>&idComponent=<?=$comp["id"]?>"
+						   class="btn btn-semi-small">
+							<i class="nf nf-cod-settings_gear"></i>
+						</a>
 					<?php elseif($comp["active"] == 0): ?>
 						<button type="submit" class="btn btn-semi-small" name="del_component" value="<?=$idx?>">Delete</button>
 						<button type="submit" class="btn btn-semi-small" name="act_component" value="<?=$idx?>">Activate</button>

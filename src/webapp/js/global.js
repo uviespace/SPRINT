@@ -475,9 +475,11 @@ class DomBinder
 										value = value[bind_name_split[j]];
 								}
 
-								controls[i].value = value;
+								this.set_control_value(controls[i], value);
+								//controls[i].value = value;
 						} else {
-								controls[i].value = this.view_model[bind_name];
+								this.set_control_value(controls[i], this.view_model[bind_name]);
+								//controls[i].value = this.view_model[bind_name];
 						}
 
 						// Register event listener to write changes back to object
@@ -522,9 +524,25 @@ class DomBinder
 				}
 		}
 
+		get_control_value(control)
+		{
+				if (control.nodeName == "INPUT" && control.getAttribute("type") == "checkbox")
+						return control.checked;
+
+				return isNaN(parseFloat(control.value)) ? control.value : parseFloat(control.value);
+		}
+
+		set_control_value(control, value)
+		{
+				if (control.nodeName == "INPUT" && control.getAttribute("type") == "checkbox")
+						control.setAttribute("checked", "checked");
+				else
+						control.value = value;
+		}
+
 		event_listener(control, bind_name)
 		{
-				const control_value = isNaN(parseFloat(control.value)) ? control.value : parseFloat(control.value);
+				const control_value = this.get_control_value(control);
 		
 				if (bind_name.includes(".")) {
 						let bind_name_split = bind_name.split(".");
@@ -552,7 +570,7 @@ class DomBinder
 				array[index][property] = control_value;
 
 				if (this.update_callback)
-						update_chart();
+						this.update_callback();
 		}
 
 		event_listener_remove_array_element(array, object, control)
@@ -561,7 +579,7 @@ class DomBinder
 				control.parentElement.remove();
 
 				if (this.update_callback)
-						update_callback();
+						this.update_callback();
 
 		}
 

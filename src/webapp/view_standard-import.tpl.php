@@ -89,8 +89,17 @@
 		<div class="standard-import-sidebar"><div>Select service:</div></div>
 		<div class="standard-import-content">
 			<?php if (count($services) > 0): ?>
-				<input type="checkbox" name="sel_all_services" value="1" onchange="form.submit()" />
-				<span>Select all</span>
+				<div>
+					<input type="checkbox" name="include_derived_packets" value="2"
+						   <?=$import_derived_selected ? "checked" : ""?>/>
+					<span>Include derived packets</span>
+				</div>
+			<?php endif; ?>
+			<?php if (count($services) > 0): ?>
+				<div>
+					<input type="checkbox" name="sel_all_services" value="1" onchange="form.submit()" />
+					<span>Select all</span>
+				</div>
 			<?php endif; ?>
 			<?php foreach($services as $s): ?>
 				<div>

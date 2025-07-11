@@ -37,7 +37,7 @@ $packets = $database->select("SELECT p.id, p.`domain`, p.`type`, p.subtype, p.na
 							 "	LEFT JOIN packet p2 ON p.id = p2.idParent " .
 							 "WHERE p.idStandard = ? AND ps.`role` = 3 " .
 							 "GROUP BY p.id, p.`domain`, p.`type`, p.subtype, p.name, kind " .
-							 "ORDER BY p.`domain` , p.subtype", ["i", [$_GET["idStandard"]]]); 
+							 "ORDER BY p.`type` , p.subtype", ["i", [$_GET["idStandard"]]]); 
 
 
 $discriminants = $database->select("SELECT e.idType, e.name " .

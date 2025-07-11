@@ -438,7 +438,7 @@ class PacketController extends BaseController implements CrudController
 										"descParam, descDest, code " .
 										"FROM packet " .
 										"WHERE type IS NOT NULL AND idStandard = ? " .
-										"ORDER BY type, subtype",
+										"ORDER BY idParent, type, subtype",
 										["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));

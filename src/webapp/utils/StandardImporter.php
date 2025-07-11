@@ -31,7 +31,7 @@ class StandardImporter
 		$this->added_datatypes = array();
 	}
 
-	public function import_headers($tc_header, $tm_header)
+	public function import_headers($tc_header, $tm_header): void
 	{
 		try {
 			$this->database->begin_transaction();
@@ -52,7 +52,7 @@ class StandardImporter
 	}
 
 
-	public function import_services($services, $selected_services, $selected_subservices)
+	public function import_services($services, $selected_services, $selected_subservices, $import_derived_packets): void
 	{
 		try {
 			$this->database->begin_transaction();
@@ -88,55 +88,63 @@ class StandardImporter
 											  $sub_s['descDest'], $sub_s['code']]]);
 
 						// Inserting parameters
-						$param_sequence = $this->database->select(
-							"SELECT ps.id as param_seq_id, p.id as param_id, pa.id as packet_id,
-                         	pa.name, p.name,
-                         	ps.`type` as param_seq_type, ps.`role` as param_seq_role, ps.`order` as param_seq_order,
-                             ps.`group` as param_seq_group, 
-                         	ps.repetition param_seq_repitition, ps.value param_seq_value, ps.`desc` param_seq_desc,
-                             ps.setting as param_seq_setting,  
-                         	p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
-                             p.shortDesc as param_short_desc, 
-                         	p.`desc` as param_desc, p.value as param_value, p.`size` as param_size, p.unit as param_unit, 
-                         	p.multiplicity as param_multiplicity,  p.setting as param_setting, p.`role` as param_role,  
-                         	t.id as type_id, t.idStandard as type_standard_id, t.`domain` as type_domain,
-                             t.name as type_name, t.setting as type_setting,
-                         	t.nativeType as type_native_type, t.`desc` as type_desc, 
-                         	t.`size` as type_size, t.value as type_value, t.`schema` as type_schema 
-                         FROM parametersequence ps 
-                         	INNER JOIN `parameter` p ON p.id = ps.idParameter
-                         	INNER JOIN packet pa ON pa.id = ps.idPacket
-                         	INNER JOIN `type` t ON t.id = p.idType 
-                         WHERE ps.idPacket = ? 
-                         ORDER BY ps.`order`",
-							["i", [$sub_s['id']]]);
+						$param_sequence = $this->load_parameter_sequence($sub_s['id']);
+
+						/* $this->database->select(
+						   "SELECT ps.id as param_seq_id, p.id as param_id, pa.id as packet_id,
+                           pa.name, p.name,
+                           ps.`type` as param_seq_type, ps.`role` as param_seq_role, ps.`order` as param_seq_order,
+						 *  ps.`group` as param_seq_group, 
+                           ps.repetition param_seq_repitition, ps.value param_seq_value, ps.`desc` param_seq_desc,
+						 *  ps.setting as param_seq_setting,  
+                           p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
+						 *  p.shortDesc as param_short_desc, 
+                           p.`desc` as param_desc, p.value as param_value, p.`size` as param_size, p.unit as param_unit, 
+                           p.multiplicity as param_multiplicity,  p.setting as param_setting, p.`role` as param_role,  
+                           t.id as type_id, t.idStandard as type_standard_id, t.`domain` as type_domain,
+						 *  t.name as type_name, t.setting as type_setting,
+                           t.nativeType as type_native_type, t.`desc` as type_desc, 
+                           t.`size` as type_size, t.value as type_value, t.`schema` as type_schema 
+						   FROM parametersequence ps 
+                           INNER JOIN `parameter` p ON p.id = ps.idParameter
+                           INNER JOIN packet pa ON pa.id = ps.idPacket
+                           INNER JOIN `type` t ON t.id = p.idType 
+						   WHERE ps.idPacket = ? 
+						   ORDER BY ps.`order`",
+						   ["i", [$sub_s['id']]]); */
 
 
 						foreach ($param_sequence as $param) {
 							// Insert user type or use standard type
-							$type_id = $this->get_type_id($param);
+							/* $type_id = $this->get_type_id($param);
 
-							// Insert parameter
-							$param_id = $this->get_parameter_id($param, $type_id);
+							   // Insert parameter
+							   $param_id = $this->get_parameter_id($param, $type_id);
 
-							// Insert parametersequence
-							$param_seq_id = $this->database->insert(
-								"INSERT INTO parametersequence (`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, " .
-								"    `repetition`, `value`, `desc`, `setting`) " .
-								"VALUES (?,?,?,?,?,?,?,?,?,?,?)",
-								["iiiiiiiiiss", [ $this->own_standard_id, $param_id, $id, $param["param_seq_type"],
-												  $param['param_seq_role'], $param['param_seq_order'], $param['param_seq_group'],
-												  $param['param_seq_repitition'], $param['param_seq_value'], $param['param_seq_desc'],
-												  $param['param_seq_setting'] ]]);
+							   // Insert parametersequence
+							   $param_seq_id = $this->database->insert(
+							   "INSERT INTO parametersequence (`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, " .
+							   "    `repetition`, `value`, `desc`, `setting`) " .
+							   "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+							   ["iiiiiiiiiss", [ $this->own_standard_id, $param_id, $id, $param["param_seq_type"],
+							   $param['param_seq_role'], $param['param_seq_order'], $param['param_seq_group'],
+							   $param['param_seq_repitition'], $param['param_seq_value'], $param['param_seq_desc'],
+							   $param['param_seq_setting'] ]]);
 
 
-							
-							array_push($this->import_results, [
-								"service" => $services[$s_id]['name'],
-								"sub_service" => $sub_s['name'],
-								"param_id" => $param_id,
-								"param_name" => $param['param_name']
-							]);
+							   
+							   array_push($this->import_results, [
+							   "service" => $services[$s_id]['name'],
+							   "sub_service" => $sub_s['name'],
+							   "param_id" => $param_id,
+							   "param_name" => $param['param_name']
+							   ]); */
+
+							$this->insert_parameter_sequence($services[$s_id]['name'], $sub_s['name'], $id, $param);
+						}
+
+						if ($import_derived_packets) {
+							$this->import_derived_packets($services[$s_id]['name'], $sub_s, $id);
 						}
 						
 					} else {
@@ -160,9 +168,115 @@ class StandardImporter
 			array_push($this->import_msg, $e->getMessage());
 		}
 	}
-	
 
-	private function service_exists($type)
+
+	private function import_derived_packets($service_name, $sub_s, $parent_id): void
+	{
+		$derived_packets = $this->database->select("SELECT id, discriminant, `domain`, name, shortDesc, `desc` " .
+												   "FROM packet " .
+												   "WHERE idParent = ? ",
+												   [ "i", [$sub_s['id']]]);
+
+		foreach ($derived_packets as $pkt) {
+			$pkt_id = $this->database->insert("INSERT INTO packet (idStandard, idParent, kind, type, subtype, discriminant, " .
+											  "    domain, name, shortDesc,`desc`) " .
+											  "VALUES (?, ?, 0, 0, 0, ?, ?, ?, ?, ?)",
+											  ["iisssss" ,[$this->own_standard_id, $parent_id, $pkt['discriminant'], $pkt['domain'],
+														   $pkt['name'], $pkt['shortDesc'], $pkt['desc']]]);
+
+			$param_sequence = $this->load_parameter_sequence($pkt['id']);
+
+			foreach ($param_sequence as $param) {
+				/* Insert user type or use standard type
+				   $type_id = $this->get_type_id($param);
+
+				   // Insert parameter
+				   $param_id = $this->get_parameter_id($param, $type_id);
+
+				   // Insert parametersequence
+				   $param_seq_id = $this->database->insert(
+				   "INSERT INTO parametersequence (`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, " .
+				   "    `repetition`, `value`, `desc`, `setting`) " .
+				   "VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+				   ["iiiiiiiiiss", [ $this->own_standard_id, $param_id, $pkt_id, $param["param_seq_type"],
+				   $param['param_seq_role'], $param['param_seq_order'], $param['param_seq_group'],
+				   $param['param_seq_repitition'], $param['param_seq_value'], $param['param_seq_desc'],
+				   $param['param_seq_setting'] ]]);
+
+
+				   
+				   array_push($this->import_results, [
+				   "service" => $service_name,
+				   "sub_service" => $sub_s['name'] . "->" . $pkt['discriminant'],
+				   "param_id" => $param_id,
+				   "param_name" => $param['param_name']
+				   ]); */
+
+				$this->insert_parameter_sequence($service_name, $sub_s['name'] . "->" . $pkt['discriminant'], $pkt_id, $param);
+			}
+			
+		}
+	}
+
+	private function insert_parameter_sequence($service_name, $sub_service_name, $pkt_id, $param): void
+	{
+		// Insert user type or use standard type
+		$type_id = $this->get_type_id($param);
+
+		// Insert parameter
+		$param_id = $this->get_parameter_id($param, $type_id);
+
+		// Insert parametersequence
+		$param_seq_id = $this->database->insert(
+			"INSERT INTO parametersequence (`idStandard`, `idParameter`, `idPacket`, `type`, `role`, `order`, `group`, " .
+			"    `repetition`, `value`, `desc`, `setting`) " .
+			"VALUES (?,?,?,?,?,?,?,?,?,?,?)",
+			["iiiiiiiiiss", [ $this->own_standard_id, $param_id, $pkt_id, $param["param_seq_type"],
+							  $param['param_seq_role'], $param['param_seq_order'], $param['param_seq_group'],
+							  $param['param_seq_repitition'], $param['param_seq_value'], $param['param_seq_desc'],
+							  $param['param_seq_setting'] ]]);
+
+
+		
+		array_push($this->import_results, [
+			"service" => $service_name,
+			"sub_service" => $sub_service_name,
+			"param_id" => $param_id,
+			"param_name" => $param['param_name']
+		]);
+	}
+
+	private function load_parameter_sequence($packet_id): array
+	{
+		// Inserting parameters
+		$param_sequence = $this->database->select(
+			"SELECT ps.id as param_seq_id, p.id as param_id, pa.id as packet_id,
+                         	pa.name, p.name,
+                         	ps.`type` as param_seq_type, ps.`role` as param_seq_role, ps.`order` as param_seq_order,
+                             ps.`group` as param_seq_group, 
+                         	ps.repetition param_seq_repitition, ps.value param_seq_value, ps.`desc` param_seq_desc,
+                             ps.setting as param_seq_setting,  
+                         	p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
+                             p.shortDesc as param_short_desc, 
+                         	p.`desc` as param_desc, p.value as param_value, p.`size` as param_size, p.unit as param_unit, 
+                         	p.multiplicity as param_multiplicity,  p.setting as param_setting, p.`role` as param_role,  
+                         	t.id as type_id, t.idStandard as type_standard_id, t.`domain` as type_domain,
+                             t.name as type_name, t.setting as type_setting,
+                         	t.nativeType as type_native_type, t.`desc` as type_desc, 
+                         	t.`size` as type_size, t.value as type_value, t.`schema` as type_schema 
+                         FROM parametersequence ps 
+                         	INNER JOIN `parameter` p ON p.id = ps.idParameter
+                         	INNER JOIN packet pa ON pa.id = ps.idPacket
+                         	INNER JOIN `type` t ON t.id = p.idType 
+                         WHERE ps.idPacket = ? 
+                         ORDER BY ps.`order`",
+			["i", [$packet_id]]);
+
+
+		return $param_sequence;
+	}
+
+	private function service_exists($type): bool
 	{
 		$result = $this->database->select("SELECT id FROM service WHERE idStandard = ? AND `type` = ?",
 										  ["ii", [$this->own_standard_id, $type]]);
@@ -170,7 +284,7 @@ class StandardImporter
 		return count($result) > 0;
 	}
 
-	private function subservice_exists($type, $subtype)
+	private function subservice_exists($type, $subtype): bool
 	{
 		$result = $this->database->select("SELECT id FROM packet WHERE idStandard = ? AND `type` = ? AND subtype = ?",
 										  ["iii", [$this->own_standard_id, $type, $subtype]]);
@@ -181,7 +295,7 @@ class StandardImporter
 	
 	
 
-	private function import_header_type($header_type)
+	private function import_header_type($header_type): void
 	{
 		$sql = "SELECT p.id as param_id, p.kind as param_kind, p.`domain` as param_domain, p.name as param_name,
 	                p.shortDesc as param_short_desc, p.`desc` as param_desc, p.value as param_value, p.`size` as param_size,
@@ -208,7 +322,6 @@ class StandardImporter
 			$param_id = $this->get_parameter_id($param, $type_id);
 
 			// Insert parametersequence
-
 			$param_seq_id = $this->database->insert(
 				"INSERT INTO parametersequence (`idStandard`, `idParameter`, `type`, `role`, `order`, `group`, " .
 				"    `repetition`, `value`, `desc`, `setting`) " .
@@ -229,15 +342,15 @@ class StandardImporter
 	}
 	
 
-	private function get_type_id($param)
+	private function get_type_id($param): int
 	{
 		if ($param['type_standard_id'] == NULL) {
 			// Type is a standard type and can be used directly
-			$type_id = $param['type_id'];
+			return $param['type_id'];
 		} else {
 			// First check if we already have an id inside the hash map then just return it
 			if (array_key_exists($param['type_id'], $this->added_datatypes)) {
-				array_push($this->import_msg, "Taken type id from source " . $param['type_id']  . " from hash map"); 
+				//array_push($this->import_msg, "Taken type id from source " . $param['type_id']  . " from hash map"); 
 				return $this->added_datatypes[$param['type_id']];
 			}
 
@@ -250,7 +363,7 @@ class StandardImporter
 															   $param['type_value'], $param['type_setting'], $param['type_schema']] ]);
 
 			if (count($result) > 0) {
-				array_push($this->import_msg, "Found type id from source " . $param['type_id']  . " already in standard"); 
+				//array_push($this->import_msg, "Found type id from source " . $param['type_id']  . " already in standard"); 
 				$this->added_datatypes += [ $param['type_id'] => $result[0]['id']];
 				return $result[0]['id'];
 			}
@@ -266,7 +379,7 @@ class StandardImporter
 				   $param['type_desc'], $param['type_size'], $param['type_value'], $param['type_setting'],
 				   $param['type_schema'] ]]);
 
-			array_push($this->import_msg, "Added type from source " . $param['type_id']  . " added"); 
+			//array_push($this->import_msg, "Added type from source " . $param['type_id']  . " added"); 
 			$this->added_datatypes += [ $param['type_id'] => $type_id];
 
 			return $type_id;
@@ -274,11 +387,11 @@ class StandardImporter
 	}
 	
 
-	private function get_parameter_id($param, $type_id)
+	private function get_parameter_id($param, $type_id): int
 	{
 		// First check if we already have an id in the hash map
 		if (array_key_exists($param['param_id'], $this->added_parameters)) {
-			array_push($this->import_msg, "Taken parameter id from source " . $param['param_id']  . "from hash map");
+			//array_push($this->import_msg, "Taken parameter id from source " . $param['param_id']  . "from hash map");
 			return $this->added_parameters[$param['param_id']];
 		}
 
@@ -294,7 +407,7 @@ class StandardImporter
 															  $param['param_role']] ]);
 
 		if (count($result) > 0) {
-			array_push($this->import_msg, "Found parameter id from source " . $param['param_id']  . " already in standard");
+			//array_push($this->import_msg, "Found parameter id from source " . $param['param_id']  . " already in standard");
 			$this->added_parameters += [ $param['param_id'] => $result[0]['id'] ];
 			return $result[0]['id'];
 		}
@@ -311,7 +424,7 @@ class StandardImporter
 								$param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
 								$param['param_role'] ]]);
 
-		array_push($this->import_msg, "Added new parameter from source " . $param['param_id']);
+		//array_push($this->import_msg, "Added new parameter from source " . $param['param_id']);
 		$this->added_parameters += [ $param['param_id'] => $param_id ];
 
 		return $param_id;

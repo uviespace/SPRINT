@@ -379,6 +379,18 @@ class StandardImporter
 				   $param['type_desc'], $param['type_size'], $param['type_value'], $param['type_setting'],
 				   $param['type_schema'] ]]);
 
+			// Check if type has enums and if so add them as well
+			$enums = $this->database->select(
+				"SELECT idType, name, value, `desc`, setting, `schema`
+                 FROM enumeration
+                 WHERE idType = ?",
+				["i", [$param['type_id']]]);
+
+			foreach($enums as $e) {
+				$this->database->insert("INSERT INTO enumeration (idType, name, value, `desc`, setting, `schema`) VALUES(?,?,?,?,?,?)",
+										["isssss", [$type_id, $e["name"], $e["value"], $e["desc"], $e["setting"], $e["schema"]]]);
+			}
+
 			//array_push($this->import_msg, "Added type from source " . $param['type_id']  . " added"); 
 			$this->added_datatypes += [ $param['type_id'] => $type_id];
 

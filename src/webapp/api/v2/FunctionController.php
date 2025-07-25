@@ -91,6 +91,16 @@ class FunctionController extends BaseController {
 										   ["sii", [$settings, $application_id, $component_id]]);
 		$this->send_output($settings, array("HTTP/1.1 200 OK"));
 	}
+
+	public function check_datapool_id($project_id, $param_id, $datapool_id)
+	{
+		$result = $this->database->select(
+			"SELECT idParameter, nrParameter FROM datapoolidentifier 
+             WHERE idProject = ? AND idParameter <> ? AND nrParameter = ?",
+			["iii", [$project_id, $param_id, $datapool_id]]);
+
+		$this->send_output(json_encode([ "datapool_id_count" => count($result) ]), array("HTTP/1.1 200 OK"));
+	}
 }
 
 /*public function get_packet_size($standard_id, $packet_id)

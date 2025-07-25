@@ -611,6 +611,13 @@ legend {
 	border-color: #f5c6cb;
 }
 
+.alert-warn {
+	color: #72671c;
+	background-color: #f7f1d7;
+	border-color: #f4e8c6;
+	
+}
+
 
 .standard-import-container {
 	display: grid;

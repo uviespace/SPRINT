@@ -128,6 +128,18 @@ $router->post("api/v2/projects/:project_id/applications/:application_id/componen
 				  }				 
 });
 
+$router->get("api/v2/projects/:project_id/standards/:standard_id/datapool/:datapool_id/check_datapool_id/:datapool_nr",
+			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"]))
+					 $crudController->forbidden();
+
+				 try {
+					 $functionController = new FunctionController();
+					 $functionController->check_datapool_id($route_ids["project_id"], $route_ids["datapool_id"], $route_ids["datapool_nr"]);
+				 } catch(\Throwable $e) {
+					 echo json_encode(array("Error" => $e->getMessage()));
+				 }
+});
 
 $router->resolve($uri);
 

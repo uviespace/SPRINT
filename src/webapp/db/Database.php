@@ -8,12 +8,21 @@ class Database
 
 	public function __construct()
 	{
+		/* Report all errors as exceptions. I hope */
+		mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+		
 		$this->connection = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_DATABASE);
 		
 		if (mysqli_connect_errno()) {
 			throw new Exception("Could not connect to database");
 		}
 	}
+
+	function __destruct()
+	{
+		mysqli_close($this->connection);
+	}
+	
 
 	private function prepare($query = "", $params = [])
 	{

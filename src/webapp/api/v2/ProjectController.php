@@ -657,17 +657,15 @@ class DatapoolController extends BaseController implements CrudController
 
 	public function get_items($route_ids)
 	{
-		$data = $this->database->select("SELECT  p.id, p.domain, p.name, p.kind, " .
-										"  p.shortDesc, p.idType, " .
-										"concat(COALESCE(t.domain,  'None'), ' / ', " .
-										"       COALESCE(t.name, 'None')) AS datatype, " .
-										"p.multiplicity, p.value, p.unit " .
-										"FROM `parameter` p LEFT JOIN `type` t " .
-										"  ON p.idType = t.id " .
-										"WHERE p.idStandard  = ? " .
-										"  AND p.kind IN (3, 4, 5, 6)" .
-										"ORDER BY domain, kind, name",
-										["i", [$route_ids["standard_id"]]]);
+		$data = $this->database->select(
+			"SELECT  p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, 
+			     concat(COALESCE(t.domain,  'None'), ' / ', COALESCE(t.name, 'None')) AS datatype, 
+			     p.multiplicity, p.value, p.unit, d.nrParameter as dp_id 
+			 FROM `parameter` p LEFT JOIN `type` t ON p.idType = t.id 
+		         LEFT JOIN datapoolidentifier d ON d.idParameter = p.id 
+			 WHERE p.idStandard  = ? AND p.kind IN (3, 4, 5, 6)
+			 ORDER BY domain, kind, name",
+			["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
 	}
@@ -691,6 +689,12 @@ class DatapoolController extends BaseController implements CrudController
 													 $item->multiplicity, $item->value,
 													 $item->unit]]);
 
+
+		if ($item->dp_id) {
+			$this->database->insert("INSERT INTO datapoolidentifier VALUES (?,?,?)",
+									["iii", [$id, $item->dp_id, $route_ids["project_id"]]]);
+		}
+
 		$item->id = $id;
 		$this->send_output(json_encode($item), array('HTTP/1.1 200 OK'));
 	}
@@ -700,6 +704,9 @@ class DatapoolController extends BaseController implements CrudController
 	{
 		$this->database->execute_non_query("DELETE FROM parameter WHERE id = ?",
 										   ["i", [$item_id]]);
+
+		$this->database->execute_non_query("DELETE FROM datapoolidentifier WHERE idParameter = ? AND idProject = ?",
+										  ["ii", [$item->id, $route_ids["project_id"]]]);
 
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
@@ -717,6 +724,14 @@ class DatapoolController extends BaseController implements CrudController
 														  $item->idType, $item->multiplicity,
 														  $item->value, $item->unit,
 														  $item->id]]);
+
+
+		$this->database->execute_non_query("DELETE FROM datapoolidentifier WHERE idParameter = ? AND idProject = ?",
+										   ["ii", [$item->id, $route_ids["project_id"]]]);
+		if ($item->dp_id) {
+			$this->database->insert("INSERT INTO datapoolidentifier VALUES (?,?,?)",
+									["iii", [$item->id, $item->dp_id, $route_ids["project_id"]]]);
+		}
 
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}
@@ -763,10 +778,10 @@ class ParameterController extends BaseController implements CrudController
 									  "  unit, role)" .
 									  "VALUES (?,?,?,?,?,?,?,?,?,?)",
 									  ["issisiissi", [$route_ids["standard_id"], $item->domain,
-													 $item->name, $item->kind,
-													 $item->shortDesc, $item->idType,
-													 $item->multiplicity, $item->value,
-													 $item->unit, $item->role]]);
+													  $item->name, $item->kind,
+													  $item->shortDesc, $item->idType,
+													  $item->multiplicity, $item->value,
+													  $item->unit, $item->role]]);
 
 		$item->id = $id;
 
@@ -796,10 +811,10 @@ class ParameterController extends BaseController implements CrudController
 										   "  value = ?, unit = ?, role = ? " .
 										   "WHERE id = ?",
 										   ["ssisiissii", [$item->domain, $item->name,
-														  $item->kind, $item->shortDesc,
-														  $item->idType, $item->multiplicity,
-														  $item->value, $item->unit, $item->role, 
-														  $item->id]]);
+														   $item->kind, $item->shortDesc,
+														   $item->idType, $item->multiplicity,
+														   $item->value, $item->unit, $item->role, 
+														   $item->id]]);
 
 		if ($item->ref_param_id != NULL) {
 			$this->database->execute_non_query("DELETE FROM parameter_deduced_relation WHERE idParameter = ? ",

@@ -38,6 +38,7 @@
 			<th>Multiplicity</th>
 			<th style="max-width: 120px;">Value</th>
 			<th>Unit</th>
+			<th>Datapool Id</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -56,6 +57,7 @@
 		<td></td>
 		<td></td>
 		<td style="max-width: 120px; overflow: hidden; text-overflow: ellipsis;"></td>
+		<td></td>
 		<td></td>
 		<td>
 			<div class="btn-group">
@@ -106,6 +108,12 @@
 
 			<label for="unit">Unit:</label>
 			<input class="form-input modal-input" id="edit_datapool_unit" type="text" name="unit" />
+
+			<label for="dp_id">Datapool Id</label>
+			<input class="form-input modal-input" id="edit_datapool_dp_id" type="number" name="dp_id" oninput="check_datapool_id()" />
+			<div id="datapool_id_check_msg_id" class="alert alert-warn" style="max-width: inherit; display: none">
+				Datapool Id already in use by another datapool entry!
+			</div>
 		</div>
 
 		<div class="modal-footer">

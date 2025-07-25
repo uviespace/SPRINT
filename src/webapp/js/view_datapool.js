@@ -8,20 +8,19 @@ const edit_dialog_ids = [ "edit_datapool_domain",
 													"edit_datapool_datatype",
 													"edit_datapool_multiplicity",
 													"edit_datapool_value",
-													"edit_datapool_unit" ];
+													"edit_datapool_unit",
+												  "edit_datapool_dp_id" ];
 
 const edit_properties = [ "domain", "name", "shortDesc",
 													"kind", "idType", "multiplicity",
-													"value", "unit"];
+													"value", "unit", "dp_id"];
 
 
-function load_data()
-{
-		var datapool_hdl = new TableHandler({ table_id: "table_datapool",
+var datapool_hdl = new TableHandler({ table_id: "table_datapool",
 																					template_id: "table_datapool_row",
 																					properties: [ "id", "domain", "name", "shortDesc",
 																												"kind", "datatype", "multiplicity",
-																												"value", "unit" ],
+																												"value", "unit", "dp_id" ],
 																					modal_id: "datapool_modal",
 																					edit_dialog_ids: edit_dialog_ids,
 																					edit_properties: edit_properties,
@@ -33,6 +32,8 @@ function load_data()
 																					create_item_from_modal_fn: create_item
 																				});
 
+function load_data()
+{
 		datapool_hdl.add_validations({
 				validations: [
 						{ id: "edit_datapool_domain", type: "max_length", param: 256, msg: "Domain names cannot be longer than 256"},
@@ -58,4 +59,29 @@ function create_item(edit_item)
 		edit_item["datatype"] = document.getElementById(edit_dialog_ids[4]).selectedOptions[0].text;
 
 		return edit_item;
+}
+
+async function check_datapool_id()
+{
+		if (!datapool_hdl.edit_item)
+				return;
+
+		const datapool_id_check_msg_id = "datapool_id_check_msg_id";
+		const msg_div = document.getElementById(datapool_id_check_msg_id);
+
+		const dp_id_control = document.getElementById(edit_dialog_ids[8]);
+		const new_dp_id = dp_id_control.value;
+		
+		const endpoint = `api/v2/projects/${urlParams.get("idProject")}` +
+					`/standards/${urlParams.get("idStandard")}` +
+					`/datapool/${datapool_hdl.edit_item.id}` +
+					`/check_datapool_id/${new_dp_id}`
+
+		const response = await fetch(endpoint);
+		const result = await response.json();
+
+		if (result.datapool_id_count > 0)
+				msg_div.style.display = "block";
+		else
+				msg_div.style.display = "none";
 }

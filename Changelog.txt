@@ -1,5 +1,12 @@
 SPRINT_NEXT
 
+Version 2.00.0:
+
+- Simplified parameter movement in derived packet with arrows
+- Added datapool id to datapool
+- Added enums to datapool import for derived packets
+
+
 Version 1.99.0:
 
 - New API design in api/v2

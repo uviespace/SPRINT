@@ -27,6 +27,7 @@
 			<th>Repetition</th>
 			<th>Value</th>
 			<th>Description</th>
+			<th></th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -44,6 +45,12 @@
 		<td></td>
 		<td></td>
 		<td></td>
+		<td>
+			<div class="btn-group">
+				<button onclick="click_up(event)"><i class="nf nf-fa-arrow_up"></i></button>
+				<button onclick="click_down(event)"><i class="nf nf-fa-arrow_down"></i></button>
+			</div>
+		</td>
 		<td>
 			<div class="btn-group">
 				<button><i class="nf nf-cod-edit"></i></button>
@@ -67,9 +74,6 @@
 					<option value="<?=$param["id"]?>"><?=$param["parameter"]?></option>
 				<?php endforeach; ?>
 			</select>
-
-			<label for="order">Order:</label>
-			<input id="edit_param_order" class="form-input modal-input" type="number" name="order" />
 
 			<label for="role">Role:</label>
 			<select name="role" id="edit_param_role" class="form-input modal-input">

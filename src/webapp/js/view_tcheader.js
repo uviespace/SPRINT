@@ -39,7 +39,7 @@ const tcheader_handler = new TableHandler({ table_id: "table_tcheader",
 async function load_data()
 {
 		await tcheader_handler.load_items();
-		draw_header_size();
+		draw_header();
 }
 
 window.onload = load_data();

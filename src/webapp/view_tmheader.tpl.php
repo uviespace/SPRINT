@@ -1,5 +1,9 @@
 <h2>TM Header</h2>
 
+<div id="header_canvas_parent">
+	<canvas id="header_canvas" />
+</div>
+
 <button id="create_tmheader_button_id" class="btn">
 	<i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create TM Header Element
 </button>

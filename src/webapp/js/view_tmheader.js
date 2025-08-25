@@ -18,9 +18,7 @@ const edit_properties = ["idParameter",
 												 "desc"];
 
 
-function load_data()
-{
-		var tmheader_handler = new TableHandler({
+const tmheader_handler = new TableHandler({
 				table_id: "table_tmheader",
 				template_id: "table_tmheader_row",
 				properties: ["id", "parameter", "order",
@@ -39,8 +37,11 @@ function load_data()
 				create_item_from_modal_fn: create_item
 		});
 
-		tmheader_handler.load_items();
-		
+async function load_data()
+{
+		await tmheader_handler.load_items();
+		//draw_header_size();
+		draw_header();
 }
 
 window.onload = load_data();
@@ -54,4 +55,32 @@ function create_item(edit_item)
 		edit_item["parameter"] = document.getElementById(edit_dialog_ids[0]).selectedOptions[0].text;
 
 		return edit_item;
+}
+
+function draw_header()
+{
+		let parameter = [];
+
+		for (let i = 0; i < tmheader_handler.items.length; i++) {
+				var item = tmheader_handler.items[i];
+				parameter.push({ name: item.parameter, color: get_color(item), size: item.param_size });
+		}
+
+		draw_packet(document.getElementById("header_canvas_parent"),
+								document.getElementById("header_canvas"),
+								{ draw_crc: false, parameter: parameter });
+}
+
+function get_color(param)
+{
+		if (param.role == 1)
+				return "#96beea";
+		else if (param.role == 2)
+				return "#77a6d8";
+		else if (param.role == 4)
+				return "#77d7d8"
+		else if (param.role == 5 )
+				return "#7877d8"
+		else
+				return "#FAFAD2";
 }

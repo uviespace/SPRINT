@@ -177,10 +177,12 @@ class TCHeaderController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT ps.id, p.id AS idParameter, " .
 										"  concat(p.domain, '/', p.name) as parameter, " .
 										"  ps.order, ps.role, ps.group, ps.repetition, " .
-										"  ps.value, ps.desc " .
+										"  ps.value, ps.desc, t.size as param_size " .
 										"FROM `parameter` p " .
 										"INNER JOIN `parametersequence` ps " .
 										"  ON ps.idParameter = p.id " .
+										"INNER JOIN `type` t " .
+										"  ON t.id = p.idType " .
 										"WHERE p.idStandard = ? AND p.kind IN (0, 1) " .
 										"  AND ps.type = 0 " .
 										"ORDER BY ps.order", ["i", [$route_ids["standard_id"]]]);
@@ -251,10 +253,12 @@ class TMHeaderController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT ps.id, p.id AS idParameter, " .
 										"  concat(p.domain, '/', p.name) as parameter, " .
 										"  ps.order, ps.role, ps.group, ps.repetition, " .
-										"  ps.value, ps.desc " .
+										"  ps.value, ps.desc, t.size as param_size " .
 										"FROM `parameter` p " .
 										"INNER JOIN `parametersequence` ps " .
 										"  ON ps.idParameter = p.id " .
+										"INNER JOIN `type` t " .
+										"  ON t.id = p.idType " .
 										"WHERE p.idStandard = ? AND p.kind IN (0, 1) " .
 										"  AND ps.type = 1 " .
 										"ORDER BY ps.order", ["i", [$route_ids["standard_id"]]]);
@@ -706,7 +710,7 @@ class DatapoolController extends BaseController implements CrudController
 										   ["i", [$item_id]]);
 
 		$this->database->execute_non_query("DELETE FROM datapoolidentifier WHERE idParameter = ? AND idProject = ?",
-										  ["ii", [$item->id, $route_ids["project_id"]]]);
+										   ["ii", [$item->id, $route_ids["project_id"]]]);
 
 		$this->send_output("", array('HTTP/1.1 200 OK'));
 	}

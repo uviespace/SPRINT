@@ -621,3 +621,64 @@ class DomBinder
 				parent.appendChild(row);
 		}
 }
+
+
+function draw_packet(container, canvas, draw_packet)
+{
+		const padding_left = window.getComputedStyle(container, null).getPropertyValue("padding-left");
+		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");
+		const dpr = Math.ceil(window.devicePixelRatio) || 1;
+		const rect = container.getBoundingClientRect();
+		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right));
+
+		canvas.style.width = `${width}px`;
+		canvas.style.height = "50px";
+		canvas.width = width * dpr;
+		canvas.height = 50 * dpr;
+
+		const ctx = canvas.getContext("2d");
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+		const text_padding_top = 5 + 14;
+		const text_padding_left = 5;
+
+		const parameter = draw_packet.parameter;
+		
+		let total_size = 0;
+		for (let i = 0; i < parameter.length; i++)
+				total_size += parameter[i].size;
+
+		if (draw_packet.draw_crc)
+				total_size += 16
+		
+		const bit_size = Math.floor(rect.width / total_size);
+
+		ctx.strokeStyle = "#000";
+		ctx.font = "normal 14px Sans-serif";
+
+		let pos = 0;
+
+		// draw parameter
+		for (var i = 0; i < parameter.length; i++) {
+				ctx.fillStyle = parameter[i].color;
+				ctx.fillRect(pos, 0, parameter[i].size * bit_size, canvas.height - 1);
+				ctx.strokeRect(pos + 1, 1, parameter[i].size * bit_size, canvas.height - 1);
+
+				ctx.fillStyle = "#000";
+				ctx.fillText(parameter[i].name, pos + text_padding_left, text_padding_top);
+				ctx.fillText(`(${parameter[i].size}Bit)`, pos + text_padding_left, text_padding_top + 20);
+
+				pos += parameter[i].size * bit_size;
+		}
+
+		if (draw_packet.draw_crc) {
+				// add crc
+				ctx.fillStyle = "#FFA500";
+				ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
+				ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
+
+				ctx.fillStyle = "#000";
+				ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
+				ctx.fillText("(16Bit)", pos + text_padding_left, text_padding_top + 20);
+		}
+}

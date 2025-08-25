@@ -77,85 +77,23 @@ function create_item(edit_item, table_handler)
 
 function draw_packet_size(packet_id)
 {
-		const container = document.getElementById("packet-" + packet_id);
-		const padding_left = window.getComputedStyle(container, null).getPropertyValue("padding-left");
-		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");
-		const canvas = document.getElementById("packet_view_" + packet_id);
-		const dpr = Math.ceil(window.devicePixelRatio) || 1;
-		const rect = container.getBoundingClientRect();
+		let parameter = [];
 
-		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right));
-
-		canvas.style.width = `${width}px`;
-		canvas.style.height = "50px";
-		canvas.width = width * dpr;
-		canvas.height = 50 * dpr;
+		parameter.push({
+				name: packets[packet_id].header_size.name,
+				color: packets[packet_id].header_size.color,
+				size: packets[packet_id].header_size.size * 8
+		});
 		
-
-		const ctx = canvas.getContext("2d");
-		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-		
-		// font size 14 px
-		const text_padding_top = 5 + 14;
-		const text_padding_left = 5;
-
-		ctx.fillStyle = "#fff";
-		ctx.fillRect(0,0, canvas.width, canvas.height);
-		
-		
-		// calculate full packet size
-		var size = packets[packet_id].header_size.size * 8;
-
-		for (var i = 0; i < packets[packet_id].table_handler.items.length; i++) {
-				size += packets[packet_id].table_handler.items[i]["size"];
-		}
-
-		// add crc
-		size += 16;
-
-		const bit_size = Math.floor(rect.width / size);
-
-		// global settings
-		//ctx.lineWidth = 4;
-		ctx.strokeStyle = "#000";
-		ctx.font = "normal 14px Sans-serif";
-
-		// draw header
-		ctx.fillStyle = packets[packet_id].header_size.color;
-		ctx.fillRect(0,0, packets[packet_id].header_size.size * 8 * bit_size, canvas.height);
-		ctx.strokeRect(1, 1, packets[packet_id].header_size.size * 8 * bit_size, canvas.height - 1);
-
-		ctx.fillStyle = "#000";
-		ctx.fillText(packets[packet_id].header_size.name, text_padding_left, text_padding_top);
-		ctx.fillText(`(${packets[packet_id].header_size.size}B)`,
-									 text_padding_left, text_padding_top + 20);
-
-		var pos = packets[packet_id].header_size.size * 8 * bit_size;
-
-		// draw parameter
-		for (var i = 0; i < packets[packet_id].table_handler.items.length; i++) {
+		for (let i = 0; i < packets[packet_id].table_handler.items.length; i++) {
 				var item = packets[packet_id].table_handler.items[i];
-				ctx.fillStyle = get_color(item);
-				ctx.fillRect(pos, 0, item.size * bit_size, canvas.height);
-				ctx.strokeRect(pos + 1, 1, item.size * bit_size, canvas.height - 1);
-
-				ctx.fillStyle = "#000";
-				ctx.fillText(item.name, pos + text_padding_left, text_padding_top);
-				ctx.fillText(`(${item.size / 8}B)`, pos + text_padding_left, text_padding_top + 20);
-
-				pos += item.size * bit_size;
+				parameter.push({ name: item.name, color: get_color(item), size: item.size});
 		}
 
-		// add crc
-		ctx.fillStyle = "#FFA500";
-		ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
-		ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
-
-		ctx.fillStyle = "#000";
-		ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
-		ctx.fillText("(2B)", pos + text_padding_left, text_padding_top + 20);
+		draw_packet(document.getElementById("packet-" + packet_id),
+								document.getElementById("packet_view_" + packet_id),
+								{ draw_crc: true, parameter: parameter });
 }
-
 
 function get_color(param)
 {

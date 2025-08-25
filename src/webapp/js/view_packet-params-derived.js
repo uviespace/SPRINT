@@ -60,107 +60,33 @@ function create_item(edit_item)
 		return edit_item;
 }
 
-
 async function draw_packet_size()
 {
-		const container = document.getElementById("packet_container");
-		const padding_left = window.getComputedStyle(container, null).getPropertyValue("padding-left");
-		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");
-		const canvas = document.getElementById("packet_view");
-		const dpr = Math.ceil(window.devicePixelRatio) || 1;
-		const rect = container.getBoundingClientRect();
-		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right));
-
-		canvas.style.width = `${width}px`;
-		canvas.style.height = "50px";
-		canvas.width = width * dpr;
-		canvas.height = 50 * dpr;
-
-		const ctx = canvas.getContext("2d");
-		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-		// font size 14px
-		const text_padding_top = 5 + 14;
-		const text_padding_left = 5;
-
-		ctx.fillStyle = "#fff";
-		ctx.fillRect(0,0, canvas.width, canvas.height);
+		let parameter = [];
 
 		const parent_size_response = await fetch(endpoint + `/parent_size`);
 		const parent_size = await parent_size_response.json();
 
-		// calculate full packet size
-		let size = parent_size.header.size * 8;
+		parameter.push({
+				name: parent_size.header.name,
+				color: parent_size.header.color,
+				size: parent_size.header.size * 8,
+		});
 
-		for (let i = 0; i < parent_size.parent.length; i++) {
-				size += parent_size.parent[i].size;
-		}
-
-		for (let i = 0; i < packet_handler.items.length; i++) {
-				size += packet_handler.items[i].size;
-		}
-
-		// add crc
-		size += 16;
-
-		const bit_size = Math.floor(rect.width / size);
-
-		// global settings
-		ctx.strokeStyle = "#000";
-		ctx.font = "normal 14px Sans-serif";
-
-		// draw header
-		ctx.fillStyle = parent_size.header.color;
-		ctx.fillRect(0,0, parent_size.header.size * 8 * bit_size, canvas.height);
-		ctx.strokeRect(1, 1, parent_size.header.size * 8 * bit_size, canvas.height - 1);
-
-		ctx.fillStyle = "#000";
-		ctx.fillText(parent_size.header.name, text_padding_left, text_padding_top);
-		ctx.fillText(`(${parent_size.header.size}B)`, text_padding_left, text_padding_top + 20);
-
-		let pos = parent_size.header.size * 8 * bit_size;
-		
-		// draw parent
 		for (let i = 0; i < parent_size.parent.length; i++) {
 				let parent_param = parent_size.parent[i];
-				ctx.fillStyle = get_parent_color(parent_param);
-				ctx.fillRect(pos, 0, parent_param.size * bit_size, canvas.height);
-				ctx.strokeRect(pos + 1, 1, parent_param.size * bit_size, canvas.height - 1);
-
-				ctx.fillStyle = "#000";
-				ctx.fillText(parent_param.name, pos + text_padding_left, text_padding_top);
-				ctx.fillText(`(${parent_param.size / 8}B)`, pos + text_padding_left, text_padding_top + 20);
-
-				pos += parent_param.size * bit_size;
+				parameter.push({ name: parent_param.name, color: get_parent_color(parent_param), size: parent_param.size });
 		}
 
-
-		// draw parameter
 		for (let i = 0; i < packet_handler.items.length; i++) {
 				let item = packet_handler.items[i];
-
-				ctx.fillStyle = get_child_color(item);
-				ctx.fillRect(pos, 0, item.size * bit_size, canvas.height);
-				ctx.strokeRect(pos + 1, 1, item.size * bit_size, canvas.height - 1);
-
-				ctx.fillStyle = "#000";
-				ctx.fillText(item.name, pos + text_padding_left, text_padding_top);
-				ctx.fillText(`(${item.size / 8}B)`, pos + text_padding_left, text_padding_top + 20);
-
-				pos += item.size * bit_size;
+				parameter.push({ name: item.name, color: get_child_color(item), size: item.size });
 		}
 
-		// add crc
-		ctx.fillStyle = "#FFA500";
-		ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
-		ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
-
-		ctx.fillStyle = "#000";
-		ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
-		ctx.fillText("(2B)", pos + text_padding_left, text_padding_top + 20);
-		
+		draw_packet(document.getElementById("packet_container"),
+								document.getElementById("packet_view"),
+								{ draw_crc: true, parameter: parameter });
 }
-
 
 function get_parent_color(param)
 {

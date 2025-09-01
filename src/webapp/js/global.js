@@ -629,27 +629,31 @@ function draw_packet(container, canvas, draw_packet)
 		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");
 		const dpr = Math.ceil(window.devicePixelRatio) || 1;
 		const rect = container.getBoundingClientRect();
-		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right));
+		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right)) - 1;
+		const height = 50;
 
 		canvas.style.width = `${width}px`;
-		canvas.style.height = "50px";
-		canvas.width = width * dpr;
-		canvas.height = 50 * dpr;
+		canvas.style.height = "52px";
+		canvas.width = (width + 1) * dpr;
+		canvas.height = (height + 2) * dpr;
 
 		const ctx = canvas.getContext("2d");
 		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+		ctx.translate(0.5,0.5);
 
 		const text_padding_top = 5 + 14;
 		const text_padding_left = 5;
 
 		const parameter = draw_packet.parameter;
 		
-		let total_size = 0;
-		for (let i = 0; i < parameter.length; i++)
-				total_size += parameter[i].size;
+		// let total_size = 0;
+		// for (let i = 0; i < parameter.length; i++)
+		// 		total_size += parameter[i].size;
 
-		if (draw_packet.draw_crc)
-				total_size += 16
+		// if (draw_packet.draw_crc)
+		// 		total_size += 16
+
+		const total_size = packet_total_size(draw_packet);
 		
 		const bit_size = Math.floor(rect.width / total_size);
 
@@ -660,9 +664,12 @@ function draw_packet(container, canvas, draw_packet)
 
 		// draw parameter
 		for (var i = 0; i < parameter.length; i++) {
+				if (parameter[i].name == "TM Header" || parameter[i].name == "TC Header")
+						continue;
+				
 				ctx.fillStyle = parameter[i].color;
-				ctx.fillRect(pos, 0, parameter[i].size * bit_size, canvas.height - 1);
-				ctx.strokeRect(pos + 1, 1, parameter[i].size * bit_size, canvas.height - 1);
+				ctx.fillRect(pos, 0, parameter[i].size * bit_size, height);
+				ctx.strokeRect(pos + 1, 1, parameter[i].size * bit_size, height);
 
 				ctx.fillStyle = "#000";
 				ctx.fillText(parameter[i].name, pos + text_padding_left, text_padding_top);
@@ -671,14 +678,150 @@ function draw_packet(container, canvas, draw_packet)
 				pos += parameter[i].size * bit_size;
 		}
 
-		if (draw_packet.draw_crc) {
-				// add crc
-				ctx.fillStyle = "#FFA500";
-				ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
-				ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
+		// if (draw_packet.draw_crc) {
+		// 		// add crc
+		// 		ctx.fillStyle = "#FFA500";
+		// 		ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
+		// 		ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
 
-				ctx.fillStyle = "#000";
-				ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
-				ctx.fillText("(16Bit)", pos + text_padding_left, text_padding_top + 20);
+		// 		ctx.fillStyle = "#000";
+		// 		ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
+		// 		ctx.fillText("(16Bit)", pos + text_padding_left, text_padding_top + 20);
+		// }
+}
+
+function draw_packet_alt(container, canvas, draw_packet)
+{
+		const padding_left = window.getComputedStyle(container, null).getPropertyValue("padding-left");
+		const padding_right = window.getComputedStyle(container, null).getPropertyValue("padding-right");
+		const dpr = Math.ceil(window.devicePixelRatio) || 1;
+		const rect = container.getBoundingClientRect();
+		const width = Math.floor(rect.width - parseInt(padding_left) - parseInt(padding_right));
+		const line_height = 50;
+		const line_header_width = 100;
+		const header_height = 28;
+		const header_background = "#EFEFEF";
+		const text_fill_style = "#000";
+		const text_padding_top = 5 + 14;
+		const text_padding_left = 5;
+		const parameter = draw_packet.parameter;
+		const ctx = canvas.getContext("2d");
+
+		canvas.style.width = `${width}px`;
+		canvas.width = width * dpr;
+
+		const total_size = packet_total_size(draw_packet);
+		/* 32 bits per line */
+		const lines = Math.ceil(total_size / 32);
+		let draw_width = width - 1;
+
+		/* Ensure every bit can be aligned to pixel grid */
+		while (draw_width % 32 != 0)
+				draw_width--;
+
+		canvas.style.height = (lines * line_height) + header_height + 1;
+		canvas.height = ((lines * line_height) + header_height + 1) * dpr;
+
+		ctx.setTransform(dpr, 0, 0, dpr, 0, 0);		
+		ctx.translate(0.5,0.5);
+		ctx.strokeStyle = "#000";
+		ctx.font = "normal 14px Sans-serif";
+
+		const byte_width = (draw_width - line_header_width) / 4;
+		const bit_width = byte_width / 8;
+		let text_len;
+
+		/* draw header */
+		ctx.fillStyle = header_background;
+		ctx.fillRect(0, 0, line_header_width, header_height);
+		ctx.strokeRect(0, 0, line_header_width, header_height);
+
+		text_len = ctx.measureText("Bit offset").width;
+		ctx.fillStyle = text_fill_style;
+		ctx.fillText("Bit offset", (line_header_width - text_len) / 2.0, text_padding_top);
+
+		hdr_text = [ "0-7", "8-15", "16-23" , "24-31" ]
+		
+		for (let i = 0; i < 4; i++) {
+				ctx.fillStyle = header_background;
+				ctx.fillRect(line_header_width + i * byte_width, 0, byte_width, header_height);
+				ctx.strokeRect(line_header_width + i * byte_width, 0, byte_width, header_height);
+
+				text_len = ctx.measureText(hdr_text[i]).width;
+				ctx.fillStyle = text_fill_style;
+				ctx.fillText(hdr_text[i], line_header_width + i * byte_width + (byte_width - text_len) / 2.0, text_padding_top);
 		}
+
+		let line_bit_pos = 0;
+		let draw_line_pos = header_height;
+		let bit_offset = 0;
+		let pkt_bit_offset = 0;
+
+		/* draw line header */
+		ctx.fillStyle = header_background;
+		ctx.fillRect(0, draw_line_pos, line_header_width, line_height);
+		ctx.strokeRect(0, draw_line_pos, line_header_width, line_height);
+		text_len = ctx.measureText(bit_offset.toString()).width;
+		ctx.fillStyle = text_fill_style;
+		ctx.fillText(bit_offset.toString(), (line_header_width - text_len) / 2.0, draw_line_pos + text_padding_top);
+		
+		
+		/* draw parameter */
+		for (let i = 0; i < parameter.length; i++) {
+				let param_size = parameter[i].size;
+				do {
+						if (line_bit_pos >= 32) {
+								line_bit_pos = 0;
+								draw_line_pos += line_height;
+
+								/* draw line header */
+								bit_offset += 32;
+								ctx.fillStyle = header_background;
+								ctx.fillRect(0, draw_line_pos, line_header_width, line_height);
+								ctx.strokeRect(0, draw_line_pos, line_header_width, line_height);
+								text_len = ctx.measureText(bit_offset.toString()).width;
+								ctx.fillStyle = text_fill_style;
+								ctx.fillText(bit_offset.toString(), (line_header_width - text_len) / 2.0, draw_line_pos + text_padding_top);
+						}
+						
+						const draw_size = Math.min(param_size, 32 - line_bit_pos);
+						const col_start = line_bit_pos * bit_width + line_header_width;
+
+						ctx.fillStyle = parameter[i].color;
+						ctx.fillRect(col_start, draw_line_pos, draw_size * bit_width, line_height);
+						ctx.strokeRect(col_start, draw_line_pos, draw_size * bit_width, line_height);
+
+						if (param_size == parameter[i].size) {
+								ctx.fillStyle = "#000";
+								ctx.fillText(transform_param_name(parameter[i].name), col_start + text_padding_left, draw_line_pos + text_padding_top);
+								ctx.fillText(param_size + " Bit", col_start + text_padding_left, draw_line_pos + text_padding_top + 20);
+						}
+
+						line_bit_pos += param_size;
+						param_size -= draw_size;
+				} while(param_size > 0)
+				pkt_bit_offset += parameter[i].size;
+		}
+		
+}
+
+function transform_param_name(param_name)
+{
+		return param_name.substring(param_name.indexOf("/") + 1);
+}
+
+function packet_total_size(draw_packet)
+{
+		const parameter = draw_packet.parameter;
+
+		let total_size = 0;
+		for (let i = 0; i < parameter.length; i++) {
+				if (parameter[i].name != "TM Header" && parameter[i].name != "TC Header")
+						total_size += parameter[i].size;
+		}
+
+		// if (draw_packet.draw_crc)
+		// 		total_size += 16
+
+		return total_size;
 }

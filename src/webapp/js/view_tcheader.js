@@ -65,9 +65,9 @@ function draw_header()
 				parameter.push({ name: item.parameter, color: get_color(item), size: item.param_size });
 		}
 
-		draw_packet(document.getElementById("header_canvas_parent"),
-								document.getElementById("header_canvas"),
-								{ draw_crc: false, parameter: parameter });
+		draw_packet_alt(document.getElementById("header_canvas_parent"),
+										document.getElementById("header_canvas"),
+										{ draw_crc: false, parameter: parameter });
 }
 
 function get_color(param)

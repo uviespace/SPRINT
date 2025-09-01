@@ -35,6 +35,8 @@ class FunctionController extends BaseController {
 			// who writes string "null" into the database and why is multiplicity a string?
 			if ($header_elem["multiplicity"] != NULL AND $header_elem["multiplicity"] != "null") {
 				$mult = $header_elem["multiplicity"];
+				if ($mult ==  0)
+					$mult = 1;
 			}
 			
 			if ($header_elem["domain"] == "predefined") {

@@ -750,7 +750,7 @@ def write_file_cdf(f, ccf_name, packetbase, derivedbase, offset):
             t = param_i["param"]["type"]
             if t["setting"] != None:
                 for enum in t["setting"]["Enumerations"]:
-                    if enum["Name"] == derivedbase["disc"]:
+                    if derivedbase is not None and enum["Name"] == derivedbase["disc"]:
                         value = outp(enum["Name"], 16)  # get from enumerated value for distinct discriminant
 
             #print("discriminant = ", value)

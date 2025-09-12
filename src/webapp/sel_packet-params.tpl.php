@@ -34,6 +34,7 @@
 							<th>Group</th>
 							<th>Repetition</th>
 							<th>Value</th>
+							<th>Type</th>
 							<th>Size</th>
 							<th>Description</th>
 							<th></th>
@@ -50,6 +51,7 @@
 
 <template id="table_param_row">
 	<tr>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>

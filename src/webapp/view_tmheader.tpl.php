@@ -19,6 +19,9 @@
 			<th>Repetition</th>
 			<th>Value</th>
 			<th>Description</th>
+			<th>Type</th>
+			<th>Offset</th>
+			<th>Size</th>
 			<th>Action</th>
 		</tr>
 	</thead>
@@ -28,6 +31,9 @@
 
 <template id="table_tmheader_row">
 	<tr>
+		<td></td>
+		<td></td>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>

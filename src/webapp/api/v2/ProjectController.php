@@ -177,7 +177,9 @@ class TCHeaderController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT ps.id, p.id AS idParameter, " .
 										"  concat(p.domain, '/', p.name) as parameter, " .
 										"  ps.order, ps.role, ps.group, ps.repetition, " .
-										"  ps.value, ps.desc, t.size as param_size " .
+										"  ps.value, ps.desc, t.name as type_name, " .
+										"  (SUM(t.size) OVER(ORDER BY ps.order) - t.size) as bit_offset, " .
+                                        "  t.size as param_size " .
 										"FROM `parameter` p " .
 										"INNER JOIN `parametersequence` ps " .
 										"  ON ps.idParameter = p.id " .
@@ -253,7 +255,9 @@ class TMHeaderController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT ps.id, p.id AS idParameter, " .
 										"  concat(p.domain, '/', p.name) as parameter, " .
 										"  ps.order, ps.role, ps.group, ps.repetition, " .
-										"  ps.value, ps.desc, t.size as param_size " .
+										"  ps.value, ps.desc, t.name as type_name, " .
+										"  (SUM(t.size) OVER(ORDER BY ps.order) - t.size) as bit_offset, " .
+										"  t.size as param_size " .
 										"FROM `parameter` p " .
 										"INNER JOIN `parametersequence` ps " .
 										"  ON ps.idParameter = p.id " .
@@ -363,8 +367,8 @@ class ApidController extends BaseController implements CrudController
 	{
 		$this->database->execute_non_query("UPDATE `process` " .
 										   "SET address = ?,
-										     name = ?,
-										     `desc` = ? " .
+										name = ?,
+										`desc` = ? " .
 										   "WHERE id = ?",
 										   ["sssi", [$item->address, $item->name, $item->desc, $item->id]]);
 		$this->send_output('', array('HTTP/1.1 200 OK'));
@@ -663,12 +667,12 @@ class DatapoolController extends BaseController implements CrudController
 	{
 		$data = $this->database->select(
 			"SELECT  p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, 
-			     concat(COALESCE(t.domain,  'None'), ' / ', COALESCE(t.name, 'None')) AS datatype, 
-			     p.multiplicity, p.value, p.unit, d.nrParameter as dp_id 
-			 FROM `parameter` p LEFT JOIN `type` t ON p.idType = t.id 
-		         LEFT JOIN datapoolidentifier d ON d.idParameter = p.id 
-			 WHERE p.idStandard  = ? AND p.kind IN (3, 4, 5, 6)
-			 ORDER BY domain, kind, name",
+										concat(COALESCE(t.domain,  'None'), ' / ', COALESCE(t.name, 'None')) AS datatype, 
+										p.multiplicity, p.value, p.unit, d.nrParameter as dp_id 
+			FROM `parameter` p LEFT JOIN `type` t ON p.idType = t.id 
+		    LEFT JOIN datapoolidentifier d ON d.idParameter = p.id 
+			WHERE p.idStandard  = ? AND p.kind IN (3, 4, 5, 6)
+			ORDER BY domain, kind, name",
 			["i", [$route_ids["standard_id"]]]);
 
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
@@ -763,7 +767,7 @@ class ParameterController extends BaseController implements CrudController
 			"  LEFT JOIN parametersequence ps ON ps.idParameter = p.id " .
 			"WHERE p.idStandard = ? AND p.kind IN (0, 1, 2) " .
 			"GROUP BY p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, datatype, " .
-	        "  p.role, p.multiplicity, p.value, p.unit, ref_param_id ".
+			"  p.role, p.multiplicity, p.value, p.unit, ref_param_id ".
 			"ORDER BY p.domain, p.name ", ["i", [$route_ids["standard_id"]]]);
 		
 		$this->send_output(json_encode($data), array('HTTP/1.1 200 OK'));
@@ -851,7 +855,7 @@ class PacketParameterController extends BaseController implements CrudController
 		$data = $this->database->select("SELECT ps.id, concat(p.domain, ' / ', p.name) AS parameter, " .
 										"  p.id AS parameter_id, " .
 										"  ps.`order`, ps.`role`, ps.`group`, ps.repetition, " .
-										"  ps.value, ps.`desc`, t.size, p.name, " .
+										"  ps.value, ps.`desc`, t.name as type_name, t.size, p.name, " .
 										"  pa.idStandard as standard_id " .
 										"FROM `packet` AS pa " .
 										"  INNER JOIN parametersequence ps ON pa.id = ps.idPacket " .
@@ -986,7 +990,7 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 		$data = $this->database->select(
 			"SELECT ps.id, ps.idParameter, " .
 			"    CONCAT(p.`domain`, ' / ', p.name) as parameter,  ps.`order` , ps.`role` , " .
-			"    ps.`group`, ps.repetition, ps.value, ps.`desc`, p.name, t.size " .
+			"    ps.`group`, ps.repetition, ps.value, ps.`desc`, p.name, t.name as type_name, t.size " .
 			"FROM parametersequence ps " .
 			"    INNER JOIN `parameter` p ON p.id = ps.idParameter " .
 			"    INNER JOIN `type` t ON t.id = p.idType " .

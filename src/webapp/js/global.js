@@ -664,30 +664,24 @@ function draw_packet(container, canvas, draw_packet)
 
 		// draw parameter
 		for (var i = 0; i < parameter.length; i++) {
+				const param_size = parameter[i].size == null ? 32 : parameter[i].size
+				
 				if (parameter[i].name == "TM Header" || parameter[i].name == "TC Header")
 						continue;
 				
 				ctx.fillStyle = parameter[i].color;
-				ctx.fillRect(pos, 0, parameter[i].size * bit_size, height);
-				ctx.strokeRect(pos + 1, 1, parameter[i].size * bit_size, height);
+				ctx.fillRect(pos, 0, param_size * bit_size, height);
+				ctx.strokeRect(pos + 1, 1, param_size * bit_size, height);
 
 				ctx.fillStyle = "#000";
 				ctx.fillText(parameter[i].name, pos + text_padding_left, text_padding_top);
-				ctx.fillText(`(${parameter[i].size}Bit)`, pos + text_padding_left, text_padding_top + 20);
+				if (parameter[i].size == null)
+						ctx.fillText("(variable)", pos + text_padding_left, text_padding_top + 20);
+				else
+						ctx.fillText(`(${parameter[i].size}Bit)`, pos + text_padding_left, text_padding_top + 20);
 
 				pos += parameter[i].size * bit_size;
 		}
-
-		// if (draw_packet.draw_crc) {
-		// 		// add crc
-		// 		ctx.fillStyle = "#FFA500";
-		// 		ctx.fillRect(pos, 0, 16 * bit_size, canvas.height);
-		// 		ctx.strokeRect(pos + 1, 1, 16 * bit_size, canvas.height - 1);
-
-		// 		ctx.fillStyle = "#000";
-		// 		ctx.fillText("CRC", pos + text_padding_left, text_padding_top);
-		// 		ctx.fillText("(16Bit)", pos + text_padding_left, text_padding_top + 20);
-		// }
 }
 
 function draw_packet_alt(container, canvas, draw_packet)
@@ -816,8 +810,13 @@ function packet_total_size(draw_packet)
 
 		let total_size = 0;
 		for (let i = 0; i < parameter.length; i++) {
-				if (parameter[i].name != "TM Header" && parameter[i].name != "TC Header")
-						total_size += parameter[i].size;
+				if (parameter[i].name != "TM Header" && parameter[i].name != "TC Header") {
+						if (parameter[i].size == null)
+								total_size += 32
+						else
+								total_size += parameter[i].size;
+
+				}
 		}
 
 		// if (draw_packet.draw_crc)

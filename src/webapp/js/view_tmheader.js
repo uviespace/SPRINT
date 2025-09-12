@@ -23,7 +23,7 @@ const tmheader_handler = new TableHandler({
 				template_id: "table_tmheader_row",
 				properties: ["id", "parameter", "order",
 										 "role", "group", "repetition",
-										 "value", "desc" ],
+										 "value", "desc", "type_name", "bit_offset", "param_size" ],
 				open_url: "",
 				open_url_param_name: "",
 				modal_id: "tmheader_modal",

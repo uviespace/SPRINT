@@ -37,7 +37,7 @@ async function toggle_param_visibility(packet_id)
 								table_id: "table_param_" + packet_id,
 								template_id: "table_param_row",
 								properties: ["id", "parameter", "order", "role", "group", "repetition",
-														 "value", "size", "desc" ],
+														 "value", "type_name", "size", "desc" ],
 								modal_id: "param_modal",
 								edit_dialog_ids: edit_dialog_ids,
 								edit_properties: edit_properties,

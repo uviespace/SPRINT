@@ -30,7 +30,7 @@ if (isset($_GET['login'])) {
 			$_SESSION['email'] = $user[0]['email'];
 
 			// TODO: fix that with proper admin users
-			$_SESSION['is_admin'] = $user[0]['id'] == 1 || $user[0]['id'] == 1001;
+			$_SESSION['is_admin'] = $user[0]['id'] == 1 || $user[0]['id'] == 1014;
 
 			$date = date('Y-m-d G:i:s');
 			$database->execute_non_query("UPDATE `user` SET lastSignedIn= ? WHERE id = ?", ["si", [$date, $user[0]['id']]]);

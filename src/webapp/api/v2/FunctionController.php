@@ -118,8 +118,8 @@ class FunctionController extends BaseController {
 	{
 		$result = $this->database->select(
 			"SELECT count(*) as param_count FROM `parameter` p
-             WHERE p.idstandard = 1048 AND name LIKE CONCAT((SELECT name FROM `parameter` p2 WHERE id = ?), '%')",
-			["i", [$param_id]]);
+             WHERE p.idstandard = ? AND name LIKE CONCAT((SELECT name FROM `parameter` p2 WHERE id = ?), '%')",
+			["ii", [$standard_id, $param_id]]);
 
 		$this->send_output(json_encode([ "variable_monitored" => $result[0]["param_count"] > 1 ]), array("HTTP/1.1 200 OK"));
 	}

@@ -86,8 +86,10 @@ route_crud($router, "api/v2/projects/:project_id/standards/:standard_id/paramete
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/header_size",
 			 function($route_ids) {
-				 if (!check_user_can_access_project($route_ids["project_id"]))
-					 $crudController->forbidden();
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
 				 
 				 $functionController = new FunctionController();
 				 $functionController->get_header_size($route_ids["standard_id"], $route_ids["packet_id"]);
@@ -95,8 +97,10 @@ $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet_id/derived_packets/:child_id/parent_size",
 			 function($route_ids) {
-				 if (!check_user_can_access_project($route_ids["project_id"]))
-					 $crudController->forbidden();
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
 				 
 				 $functionController = new FunctionController();
 				 $functionController->get_parent_size($route_ids["standard_id"], $route_ids["packet_id"]);
@@ -105,8 +109,10 @@ $router->get("api/v2/projects/:project_id/standards/:standard_id/packets/:packet
 
 $router->post("api/v2/projects/:project_id/standards/:standard_id/parameters/:parameter_id/calibration_curve/:curve_id",
 			  function($route_ids) {
-				  if (!check_user_can_write_project($route_ids["project_id"]))
-					  $crudController->forbidden();
+				  if (!check_user_can_write_project($route_ids["project_id"])) {
+					  $baseController = new BaseController();
+					  $baseController->forbidden();
+				  }
 				  
 				  $functionController = new FunctionController();
 				  $functionController->set_calibration_curve_to_parameter($route_ids["parameter_id"], $route_ids["curve_id"]);
@@ -115,8 +121,10 @@ $router->post("api/v2/projects/:project_id/standards/:standard_id/parameters/:pa
 
 $router->post("api/v2/projects/:project_id/applications/:application_id/component_settings/:component_id",
 			  function($route_ids) {
-				  if (!check_user_can_access_project($route_ids["project_id"]))
-					  $crudController->forbidden();
+				  if (!check_user_can_access_project($route_ids["project_id"])) {
+					  $baseController = new BaseController();
+					  $baseController->forbidden();
+				  }
 
 				  try {
 					  $functionController = new FunctionController();
@@ -130,8 +138,10 @@ $router->post("api/v2/projects/:project_id/applications/:application_id/componen
 
 $router->get("api/v2/projects/:project_id/standards/:standard_id/datapool/:datapool_id/check_datapool_id/:datapool_nr",
 			 function($route_ids) {
-				 if (!check_user_can_access_project($route_ids["project_id"]))
-					 $crudController->forbidden();
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
 
 				 try {
 					 $functionController = new FunctionController();
@@ -140,6 +150,37 @@ $router->get("api/v2/projects/:project_id/standards/:standard_id/datapool/:datap
 					 echo json_encode(array("Error" => $e->getMessage()));
 				 }
 });
+
+$router->get("api/v2/projects/:project_id/next_datapool_id",
+			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
+
+				 try {
+					 $functionController = new FunctionController();
+					 $functionController->get_next_datapool_id($route_ids["project_id"]);
+				 } catch(\Throwable $e) {
+					 echo json_encode(array("Error" => $e->getMessage()));
+				 }
+});
+
+$router->get("api/v2/projects/:project_id/standards/:standard_id/parameters/:parameter_id/is_monitored",
+			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
+
+				 try {
+					 $functionController = new FunctionController();
+					 $functionController->is_variable_monitored($route_ids["standard_id"], $route_ids["parameter_id"]);
+				 } catch(\Throwable $e) {
+					 echo json_encode(array("Error" => $e->getMessage()));
+				 }
+			 }
+);
 
 $router->resolve($uri);
 

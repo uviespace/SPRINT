@@ -1,5 +1,10 @@
 SPRINT_NEXT
 
+
+Version 2.00.1:
+- New datapool parameters automatically get the next available id
+- Easy creation of monitored values with alarm and warn limits
+
 Version 2.00.0:
 
 - Simplified parameter movement in derived packet with arrows

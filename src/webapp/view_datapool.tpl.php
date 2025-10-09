@@ -114,6 +114,9 @@
 			<div id="datapool_id_check_msg_id" class="alert alert-warn" style="max-width: inherit; display: none">
 				Datapool Id already in use by another datapool entry!
 			</div>
+
+			<input class="form-input" id="edit_datapool_monitored_value" type="checkbox" name="monitored_value" style="display: inline-block" />
+			<label for="monitored_value">Monitored value (Creates additional DP variables for warn and alarm values )</label>
 		</div>
 
 		<div class="modal-footer">

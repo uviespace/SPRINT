@@ -4,20 +4,21 @@ class BaseController
 {
 	/**
 	 * __call magic method
+	 *
+	 * @param array $arguments arguments of the called function
 	 */
-
-	public function __call($name, $arguments)
+	public function __call(string $name, array $arguments): void
 	{
 		$this->send_output('', array('HTTP/1.1 404 Not Found'));
 	}
 
 
-	public function forbidden()
+	public function forbidden(): void
 	{
 		$this->send_output('', array('HTTP/1.1 403 Forbidden'));
 	}
 
-	public function send_error($error)
+	public function send_error(string $error): void
 	{
 		$this->send_output($error, array('HTTP/1.1 500 Internal Server Error'));
 	}
@@ -28,7 +29,7 @@ class BaseController
 	 *
 	 * @return array
 	 */
-	protected function get_uri_segments()
+	protected function get_uri_segments(): array
 	{
 		$uri = parse_url($_SERVER['REQUEST_URI']. PHP_URL_PATH);
 		$uri = explode('/', $uri);
@@ -40,11 +41,11 @@ class BaseController
 	/**
 	 * Get querystring params
 	 *
-	 * @return array
+	 * @param array $query array where query params are stored
 	 */
-	protected function getQueryStringParams()
+	protected function getQueryStringParams(array &$query): void 
 	{
-		return parse_str($_SERVER['QUERY_STRING'], $query);
+		parse_str($_SERVER['QUERY_STRING'], $query);
 	}
 
 
@@ -52,9 +53,9 @@ class BaseController
 	 * send API output
 	 *
 	 * @param mixed $data
-	 * @param string $http_header
+	 * @param array $http_headers
 	 */
-	public function send_output($data, $http_headers=array())
+	public function send_output($data, $http_headers=array()): void
 	{
 		header_remove('Set-Cookie');
 

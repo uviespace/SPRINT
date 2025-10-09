@@ -47,7 +47,7 @@ class Router
 {
 	private $supportedHttpMethods = array("GET", "POST", "PUT", "DELETE");
 
-	private $baseController;
+	protected $baseController;
 	private $get;
 	private $post;
 	private $put;
@@ -67,7 +67,7 @@ class Router
 
 	// call like this:
 	// $router->get("api/get_something", function() { });
-	function __call($name, $args)
+	function __call(string $name, array $args): void
 	{
 		list($route, $method) = $args;
 		//echo $route;
@@ -89,7 +89,7 @@ class Router
 		$method_node->method = $method;
 	}
 
-	function resolve($uri, $start_routing_with = 2)
+	function resolve(string $uri, int $start_routing_with = 2): void
 	{
 		//echo($uri);
 		$uri = explode('/', $uri);
@@ -133,13 +133,13 @@ class Router
 	}
 	
 
-	private function invalidMethodHandler()
+	private function invalidMethodHandler(): void
 	{
 		$this->baseController->send_output("", array("HTTP/1.1 405 Method not allowed"));
 		exit;
 	}
 
-	private function defaultRequestHandler()
+	private function defaultRequestHandler(): void
 	{
 		$this->baseController->send_output("", array("HTTP/1.1 404 Not Found"));
 		exit;

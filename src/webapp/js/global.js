@@ -197,7 +197,11 @@ class TableHandler
 				const modal = document.getElementById(this.props.modal_id);
 
 				for(var i = 0; i < this.props.edit_dialog_ids.length; i++) {
-						document.getElementById(this.props.edit_dialog_ids[i]).value = "";
+						const in_control = document.getElementById(this.props.edit_dialog_ids[i]);
+						if (in_control.type == "checkbox")
+								in_control.checked = false;
+						else
+								in_control.value = "";
 				}
 				
 				document.getElementById(this.props.submit_button_id).textContent = "Create";
@@ -241,7 +245,8 @@ class TableHandler
  
 						const table = document.getElementById(this.props.table_id);
 						const tbody = table.querySelector("tbody");
-						tbody.appendChild(row);
+						//tbody.appendChild(row);
+						tbody.insertBefore(row, tbody.firstChild);
 
 						this.close_modal();
 				} else {

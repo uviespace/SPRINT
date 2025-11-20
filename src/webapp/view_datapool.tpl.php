@@ -35,10 +35,10 @@
 			<th>Short Description</th>
 			<th>Kind</th>
 			<th>Datatype</th>
-			<th>Multiplicity</th>
+			<th>Mult</th>
 			<th style="max-width: 120px;">Value</th>
 			<th>Unit</th>
-			<th>Datapool Id</th>
+			<th>DP Id</th>
 			<th>Action</th>
 		</tr>
 	</thead>

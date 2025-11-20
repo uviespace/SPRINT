@@ -78,17 +78,18 @@ if (isset($_POST["build"]) && $id_role < 4) {
 	} else {
 		$message_build_app .= "Error: file could not be created!\n";
 		$message_build_app .= "Following error occured during execution:\n";
-		$message_build_app .= $file;
+		$message_build_app .= $stdout;
 	}
 }
 
 if (isset($_POST["build_dp_list"]) && $id_role < 4) {
 	$message_dp_list = "The build Datapool CSV function is called.\n\n";
 
-	$cmd = $python_settings["script_path"] . "build_dp_csv.py " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
+	$cmd = $python_settings["script_path"] . "build_dp_csv.sh " . $_GET["idProject"] . " " . $_GET["idApplication"] . " 2>&1";
 
-	$file = shell_exec($cmd);
-	$file = substr($file, 0, strlen($file) - 1);
+	$stdout = shell_exec($cmd);
+	$lines = array_filter(explode(PHP_EOL, $stdout));
+	$file = $lines[count($lines) - 1]
 
 	if (file_exists($file)) {
 		$message_dp_list .= $file . "\n\n";
@@ -96,7 +97,7 @@ if (isset($_POST["build_dp_list"]) && $id_role < 4) {
 	} else {
 		$message_dp_list .= "Error: file could not be created!\n";
 		$message_dp_list .= "Following error occured during execution:\n";
-		$message_dp_list .= $file;
+		$message_dp_list .= $stdout;
 	}
 }
 

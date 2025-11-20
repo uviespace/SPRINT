@@ -1,5 +1,4 @@
-#!C:\Python310\python.exe
-##!/usr/bin/python
+#!/usr/bin/python
 # coding: utf-8
 import os
 import sys
@@ -177,7 +176,7 @@ def get_ptc_pfc(param):
 
 def get_ptc_pfc_GEN(param):
     domain, name = (param["type"]["domain"], param["type"]["name"]) if param["type"] != None else ('', 'Deduced')
-    size = int(param["_size"])
+    size = int(param["_size"]) if param["_size"] is not None else 0
     multi = int(param["multi"]) if param["multi"] != None else -1
 
     # char and (u)int8_t arrays can be mapped to SCOS-2000 types. For arrays of other types, a repetition group
@@ -414,6 +413,41 @@ def getDatatype(ptc, pfc, width):
 
     return dt
 
+
+def gen_dp_calibration_list(app, path):
+    f = new_file(path, "dp_calibration")
+
+    delimiter = "|"
+
+    writeln(f, [
+        "Name" + delimiter,
+        #"Engfmt" + delimiter,
+        #"Rawfmt" + delimiter,
+        #"Radix" + delimiter,
+        "Unit" + delimiter,
+        #"Extrapolate" + delimiter,
+        "xval" + delimiter,
+        "yval" + delimiter
+    ])
+
+    for relation in app["standards"]:
+        if int(relation["relation"]) == 1:
+            standard = relation["standard"]
+            for calib in standard["calibrations"].values():
+                for val in calib["setting"]["values"]:
+                    writeln(f, [
+                        calib["name"] + delimiter,
+                        #calib["setting"]["engfmt"] + delimiter,
+                        #calib["setting"]["rawfmt"] + delimiter,
+                        #calib["setting"]["radix"] + delimiter,
+                        calib["setting"]["unit"] + delimiter, 
+                        #calib["setting"]["inter"] + delimiter,
+                        str(val["xval"]) + delimiter,
+                        str(val["yval"]) + delimiter
+                    ])
+
+    close_file(f)
+
 def gen_dp_enum_list(app, path):
     f = new_file(path, "dp_enum")
 
@@ -460,7 +494,7 @@ def gen_dp_list(app, path):
     settings_dp2 = comp_dp2["setting"]
     dpid_offset = settings_dp2["dpid_offset"] - 0  # -1 because dpid starts with 0+1
     delimiter = "|"
-    additionalInfo = True
+    #additionalInfo = True
 
     writeln(f, ['# IASW Version: _._ p_; commit hash: ____; MIB Version: _._._'])
     writeln(f, [
@@ -469,10 +503,12 @@ def gen_dp_list(app, path):
         'Datatype' + delimiter,  # data type
         'Bitsize' + delimiter,  # bit size
         'Multiplicity' + delimiter,  # multiplicity
-        'PAR/VAR' + delimiter,  # par/var
-        'Value' + delimiter if additionalInfo else delimiter,  # default value
-        'Description' if additionalInfo else ""  # short description
-        'Domain' if additionalInfo else ""  # domain
+        #'PAR/VAR' + delimiter,  # par/var
+        'Value' + delimiter,  # default value
+        'Description' + delimiter,  # short description
+        'Domain' + delimiter, # domain
+        'Text calibration' + delimiter,
+        'Numerical calibration'
     ])
 
     domain_dict = {}
@@ -490,62 +526,95 @@ def gen_dp_list(app, path):
                 add_elem(domain_dict, var, "vars")
                 vars_list.append(var)
 
-    if len(params_list) > 0:
-        #writeln(f, "/* Parameters */")
-        #writeln(f, "DpIdParamsLowest = {0},".format(params_list[0]["_dpid"]))
-        #writeln(f, "DpIdParamsHighest = {0},".format(params_list[len(params_list)-1]["_dpid"]))
-        for i, param in enumerate(params_list):
-            pname = cname(param["name"])
-            #writeln(f, "DpId{0} = {1}{2}".format(pname, param["_dpid"], "," if i < len(params_list)-1 or (len(vars_list) > 0) else ""))
-            ptc, pfc, width, repetition = get_ptc_pfc(param)
-            datatype = getDatatype(ptc, pfc, width)
-            if param["size"] is not None:
-                bitsize = str(param["size"])
-            elif ptc == 7:
-                bitsize = str(int(width)/int(param["multi"]))
-            else:
-                bitsize = str(width)
-            writeln(f, [
-                outp(param["name"], 24, True) + delimiter,  # name
-                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
-                datatype + delimiter,  # data type
-                #str(width) + delimiter,
-                #str(repetition) + delimiter,
-                bitsize + delimiter,  # bit size
-                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
-                'PAR'+delimiter,  # par/var
-                param["value"]+delimiter if additionalInfo else delimiter,  # default value
-                param["shortDesc"]+delimiter if additionalInfo else "",  # short description
-                param["domain"] if additionalInfo else ""  # domain
-            ])
-    if len(vars_list) > 0:
-        #writeln(f, "/* Variables */")
-        #writeln(f, "DpIdVarsLowest = {0},".format(vars_list[0]["_dpid"]))
-        #writeln(f, "DpIdVarsHighest = {0},".format(vars_list[len(vars_list)-1]["_dpid"]))
-        for i, param in enumerate(vars_list):
-            pname = cname(param["name"])
-            #writeln(f, "DpId{0} = {1}{2}".format(pname, param["_dpid"], "," if i < len(vars_list)-1 else ""))
-            ptc, pfc, width, repetition = get_ptc_pfc(param)
-            datatype = getDatatype(ptc, pfc, width)
-            if param["size"] is not None:
-                bitsize = str(param["size"])
-            elif ptc == 7:
-                bitsize = str(width/int(param["multi"]))
-            else:
-                bitsize = str(width)
-            writeln(f, [
-                outp(param["name"], 24, True) + delimiter,  # name
-                str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
-                datatype + delimiter,  # data type
-                #str(width) + delimiter,
-                #str(repetition) + delimiter,
-                bitsize + delimiter,  # bit size
-                '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
-                'VAR'+delimiter,  # par/var
-                param["value"]+delimiter if additionalInfo else delimiter,  # default value
-                param["shortDesc"]+delimiter if additionalInfo else "",  # short description
-                param["domain"] if additionalInfo else ""  # domain
-            ])
+    for i, param in enumerate(params_list + vars_list):
+        pname = cname(param["name"])
+        ptc, pfc, width, repetition = get_ptc_pfc(param)
+        datatype = getDatatype(ptc, pfc, width)
+        if param["size"] is not None:
+            bitsize = str(param["size"])
+        elif ptc == 7 and param["multi"] is not None and int(param["multi"]) != 0:
+            bitsize = str(int(width)/int(param["multi"]))
+        else:
+            bitsize = str(width)
+        num_calib = ""
+        if param["setting"] is not None and "calcurve" in param["setting"]:
+            for calib in param["standard"]["calibrations"]:
+                if param["standard"]["calibrations"][calib]["id"] == param["setting"]["calcurve"]:
+                    num_calib = calib
+            
+        writeln(f, [
+            outp(param["name"], 24, True) + delimiter,  # name
+            str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
+            datatype + delimiter,  # data type
+            bitsize + delimiter,  # bit size
+            '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
+            #'PAR' + delimiter,  # par/var
+            param["value"] + delimiter,  # default value
+            param["shortDesc"] + delimiter,  # short description
+            param["domain"] + delimiter, # domain
+            (param["type"]["name"] if len(param["type"]["enums"]) > 0 else "") + delimiter, # enum name
+            num_calib
+        ])
+
+    close_file(f)
+                
+    # if len(params_list) > 0:
+    #     #writeln(f, "/* Parameters */")
+    #     #writeln(f, "DpIdParamsLowest = {0},".format(params_list[0]["_dpid"]))
+    #     #writeln(f, "DpIdParamsHighest = {0},".format(params_list[len(params_list)-1]["_dpid"]))
+    #     for i, param in enumerate(params_list):
+    #         pname = cname(param["name"])
+    #         #writeln(f, "DpId{0} = {1}{2}".format(pname, param["_dpid"], "," if i < len(params_list)-1 or (len(vars_list) > 0) else ""))
+    #         ptc, pfc, width, repetition = get_ptc_pfc(param)
+    #         datatype = getDatatype(ptc, pfc, width)
+    #         if param["size"] is not None:
+    #             bitsize = str(param["size"])
+    #         elif ptc == 7 and param["multi"] is not None and int(param["multi"]) != 0:
+    #             bitsize = str(int(width)/int(param["multi"]))
+    #         else:
+    #             bitsize = str(width)
+    #         writeln(f, [
+    #             outp(param["name"], 24, True) + delimiter,  # name
+    #             str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
+    #             datatype + delimiter,  # data type
+    #             #str(width) + delimiter,
+    #             #str(repetition) + delimiter,
+    #             bitsize + delimiter,  # bit size
+    #             '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
+    #             'PAR'+delimiter,  # par/var
+    #             param["value"]+delimiter if additionalInfo else delimiter,  # default value
+    #             param["shortDesc"]+delimiter if additionalInfo else "",  # short description
+    #             param["domain"] if additionalInfo else ""  # domain
+    #         ])
+    # if len(vars_list) > 0:
+    #     #writeln(f, "/* Variables */")
+    #     #writeln(f, "DpIdVarsLowest = {0},".format(vars_list[0]["_dpid"]))
+    #     #writeln(f, "DpIdVarsHighest = {0},".format(vars_list[len(vars_list)-1]["_dpid"]))
+    #     for i, param in enumerate(vars_list):
+    #         pname = cname(param["name"])
+    #         #writeln(f, "DpId{0} = {1}{2}".format(pname, param["_dpid"], "," if i < len(vars_list)-1 else ""))
+    #         ptc, pfc, width, repetition = get_ptc_pfc(param)
+    #         datatype = getDatatype(ptc, pfc, width)
+    #         if param["size"] is not None:
+    #             bitsize = str(param["size"])
+    #         elif ptc == 7 and param["multi"] is not None and int(param["multi"]) != 0:
+    #             print(param["multi"])
+    #             bitsize = str(width/int(param["multi"]))
+    #         else:
+    #             bitsize = str(width)
+    #         writeln(f, [
+    #             outp(param["name"], 24, True) + delimiter,  # name
+    #             str(dpid_offset + int(param["_dpid"]))+delimiter if "_dpid" in param else delimiter,  # id
+    #             datatype + delimiter,  # data type
+    #             #str(width) + delimiter,
+    #             #str(repetition) + delimiter,
+    #             bitsize + delimiter,  # bit size
+    #             '1'+delimiter if param["multi"] is None else str(param["multi"]) + delimiter,  # multiplicity
+    #             'VAR'+delimiter,  # par/var
+    #             param["value"]+delimiter if additionalInfo else delimiter,  # default value
+    #             param["shortDesc"]+delimiter if additionalInfo else "",  # short description
+    #             param["domain"] if additionalInfo else ""  # domain
+    #         ])
 
     close_file(f)
 
@@ -717,6 +786,7 @@ def gen_dp_csv(path, comp):
     gen_dp_pckt_list(app, path)
     gen_dp_list(app, path)
     gen_dp_enum_list(app, path)
+    gen_dp_calibration_list(app, path)
 
 if __name__ == '__main__':
 

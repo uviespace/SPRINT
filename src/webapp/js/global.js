@@ -235,7 +235,7 @@ class TableHandler
 				if (response.ok) {
 						iziToast.success({ title: 'Success', message: 'Standard successfully created' });
 
-						this.items.push(response_item);
+						this.items.unshift(response_item);
 						const actions = this.props.open_url
 									? [this.action_open, this.action_edit, this.action_delete]
 									: [this.action_edit, this.action_delete];

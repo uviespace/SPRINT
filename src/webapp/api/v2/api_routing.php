@@ -4,6 +4,7 @@ require_once "BaseController.php";
 require_once "ProjectController.php";
 require_once "FunctionController.php";
 require_once "UserController.php";
+require_once "DropDownController.php";
 require_once "api_session_utils.php";
 require_once "Router.php";
 
@@ -176,6 +177,22 @@ $router->get("api/v2/projects/:project_id/standards/:standard_id/parameters/:par
 				 try {
 					 $functionController = new FunctionController();
 					 $functionController->is_variable_monitored($route_ids["standard_id"], $route_ids["parameter_id"]);
+				 } catch(\Throwable $e) {
+					 echo json_encode(array("Error" => $e->getMessage()));
+				 }
+			 }
+);
+
+$router->get("api/v2/projects/:project_id/standards/:standard_id/dropdown_datatypes",
+			 function($route_ids) {
+				 if (!check_user_can_access_project($route_ids["project_id"])) {
+					 $baseController = new BaseController();
+					 $baseController->forbidden();
+				 }
+
+				 try {
+					 $dropdownController = new DropDownController();
+					 $dropdownController->get_datatypes($route_ids["standard_id"]);
 				 } catch(\Throwable $e) {
 					 echo json_encode(array("Error" => $e->getMessage()));
 				 }

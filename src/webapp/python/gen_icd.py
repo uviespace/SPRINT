@@ -31,7 +31,8 @@ def check_service_type(service_type):
         192: False,
         193: True,
         194: True,
-        195: False,
+        195: True,
+        196: True,
         197: True,
         198: True,
         210: True,
@@ -161,7 +162,7 @@ def outp_elem(element, info, g, rep_desc, size_desc, depth):
         if param["_length"] >= 0:
             if info["length"] is not None:
                 info["length"] = info["length"] + param["_length"]
-            if param["_multi"] is not None and param["_multi"] != 1:
+            if param["_multi"] is not None and param["_multi"] > 1:
                 size = "{1}*{0}".format(save_str(param["_size"]), save_str(param["_multi"]))
             else:
                 size = save_str(param["_size"])
@@ -343,7 +344,7 @@ def outp_packet_details(app, tex):
 def outp_datapool(std_name, name, list, g):
     g.begin(std_name, name, name, ["DPID", "Name", "Description", "Default", "Type", "Size"])
     for item in list:
-        isArray = (item["multi"] is not None and item["multi"] != 1)
+        isArray = (item["multi"] is not None and int(item["multi"]) > 1)
         multi = (1 if not isArray else item["_multi"])
 
         g.write([
@@ -353,7 +354,7 @@ def outp_datapool(std_name, name, list, g):
             item["desc"] if item['desc'] is not None and len(item["desc"]) > 0 else item["shortDesc"],
             item["_value"],
             (item["type"]["name"] if item["type"] is not None else "") + ("" if not isArray else ("[" + save_str(item["multi"]) + "]")),
-            item["_size"] * multi if (item["_size"] is not None and multi is not None) else ""
+            item["_size"] * multi if (item["_size"] is not None and multi is not None and multi != 0) else ""
         ])
     g.end()
 

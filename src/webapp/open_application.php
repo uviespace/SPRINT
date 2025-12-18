@@ -89,7 +89,7 @@ if (isset($_POST["build_dp_list"]) && $id_role < 4) {
 
 	$stdout = shell_exec($cmd);
 	$lines = array_filter(explode(PHP_EOL, $stdout));
-	$file = $lines[count($lines) - 1]
+	$file = $lines[count($lines) - 1];
 
 	if (file_exists($file)) {
 		$message_dp_list .= $file . "\n\n";

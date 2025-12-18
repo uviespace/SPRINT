@@ -468,6 +468,13 @@ def gen_dp_enum_list(app, path):
             for type in standard["types"]:
                 #print("id: ", type, " | type: ", types[type]["enums"])
                 if len(types[type]["enums"]) > 0:
+                    dp_found = False
+                    for param in types[type]["params"]:
+                        print("Param: {}, kind: {}".format(param["name"], param["kind"]))
+                        if param["kind"] == 3 or param["kind"] == 4 or param["kind"] == 5 or param["kind"] == 6:
+                            dp_found = True
+                    if not dp_found:
+                        continue
                     for enum in types[type]["enums"]:
                         #print("Type: ", types[type]["name"], "Name: ", enum["Name"], "", enum["Value"])
                         writeln(f, [

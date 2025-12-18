@@ -142,6 +142,558 @@ class Validator
 
 
 /*
+ * Create a data table from json data retrieved from an end point
+ */
+class DataTable
+{
+		constructor(table_id, properties) {
+				this.modal_template = '<div id="datapool_modal" class="modal">\n' +
+				'    <div class="modal-content">\n' +
+				'        <div class="modal-header">\n' +
+				'             <span class="modal-close">&times</span>\n' +
+						          '<h3></h3>\n' +
+			  '        </div>\n' +
+				'        <div class="modal-body"></div>\n' + 
+				'        <div class="modal-footer">\n' +
+				'            <button id="submit_button" class="btn-submit">Create</button>\n' + 
+				'        </div>\n' + 
+				'    </div>\n' +
+						'</div>'
+
+				this.search_bar_template = '<div class="search-box"><input type="search" /><button><i class="nf nf-fa-search"></i></button></div>';
+				this.add_button_template = '<button class="btn"><i class="nf nf-oct-diff_added" style="margin-right: 4px; font-size: 16px;"></i>Create Item</button>'
+				
+				this.table_id = table_id;
+				this.properties = properties;
+				this.edit_item = { id: -1 };
+
+				if (!("actions" in this.properties)) {
+						this.properties.actions = [ { name: "edit" }, { name: "delete" }];
+				}
+		}
+
+		async load_items()
+		{		
+				const response = await fetch(this.properties.end_point);
+				this.items = await response.json();
+				this.list_items = this.items.slice();
+
+				this._create_table_support();
+				this._fill_table();
+		}
+
+
+		_create_from_template(template)
+		{
+				const templ = document.createElement("template");
+				templ.innerHTML = template;
+				return templ.content.firstChild;
+		}
+
+		_create_sort_button(css_class)
+		{
+				const button = document.createElement("button");
+				button.classList.add("btn-sort");
+				//button.style.cssFloat = "right";
+			
+				const i = document.createElement("i");
+				i.classList.add("nf");
+				i.classList.add(css_class);
+				button.appendChild(i);
+
+				return button;
+		}
+		
+		async _create_table_support()
+		{
+				const self = this;
+				this.table = document.getElementById(this.table_id);
+				this.tbody = this.table.querySelector("tbody");
+				if (this.tbody == null) {
+						this.tbody = document.createElement("tbody");
+						this.table.appendChild(this.tbody);
+				}
+				
+				/* Create search bar */
+				if (this.properties.filter) {
+						this.search_bar = this._create_from_template(this.search_bar_template);
+						this.search_input = this.search_bar.querySelector("input");
+						this.search_input.addEventListener("input", () => { self._filter_table(self.search_input.value); });
+
+						this.table.insertAdjacentElement("beforebegin", this.search_bar);
+				}
+				
+				
+				/* Add sorting buttons */
+				for (let i = 0; i < this.properties.columns.length; i++) {
+						const col = this.properties.columns[i];
+						const headers = this.table.querySelectorAll("thead > tr > th");
+
+						if (col.sort) {
+								const button_span = document.createElement("span");
+								button_span.style.whiteSpace = "nowrap";
+								button_span.style.marginLeft = "8px";
+								
+								const asc_btn = this._create_sort_button("nf-md-sort_ascending");
+								asc_btn.onclick = () => { self._sort_table(col.data, true); };
+
+								const desc_btn = this._create_sort_button("nf-md-sort_descending");
+								desc_btn.onclick = () => { self._sort_table(col.data, false); };
+
+								button_span.appendChild(asc_btn);
+								button_span.appendChild(desc_btn);
+								headers[i].appendChild(button_span);
+						}
+				}
+
+				/* Set up editor */
+				if ("editor" in this.properties) {
+						/* Create add button if requested */
+						if ("allow_add" in this.properties.editor && this.properties.editor.allow_add) {								
+								this.add_button = this._create_from_template(this.add_button_template);
+								this.add_button.onclick = () => { self._empty_modal(); self._open_modal(); };
+								this.table.insertAdjacentElement("beforebegin", this.add_button);
+						}
+
+						/* Setup modal dialog */
+						this.modal = this._create_from_template(this.modal_template);
+						this.modal.querySelector("h3").innerHTML = this.properties.editor.modal_header;
+						this.modal.querySelector(".modal-close").onclick = () => { self._close_modal(); };
+						window.onclick = (event) => {if (event.target == self.modal) self._close_modal(); };
+						const modal_body = this.modal.querySelector(".modal-body");
+
+						const validations = [];
+						const required_properties = [];
+						
+						for (let i = 0; i < this.properties.editor.fields.length; i++) {
+								const field = this.properties.editor.fields[i];
+								
+								const label = document.createElement("label");
+								label.setAttribute("for", field.data);
+								label.innerHTML = field.label + ":";
+
+								
+								let element = null;
+								/* Create form element */
+								if (field.type === "checkbox") {
+										element = await this._create_form_element(field, modal_body);
+										this._setup_form_element(element, field);
+										modal_body.appendChild(element);
+										modal_body.appendChild(label);
+								} else {
+										modal_body.appendChild(label);
+
+										element = await this._create_form_element(field, modal_body);
+										this._setup_form_element(element, field);
+										/* Create msg div if event was added */
+										if ("input" in field) {
+												const div = document.createElement("div");
+												div.classList.add("alert");
+												div.classList.add("alert-warn")
+												div.style.maxWidth = "inherit";
+												div.style.display = "none";
+												div.setAttribute("id", "edit_" + field.data + "_msg");
+												modal_body.appendChild(div);
+										}
+										
+										modal_body.appendChild(element);
+								}
+
+								/* Add validations */
+								if (field.validator?.required === true)
+										required_properties.push(element.getAttribute("id"));
+
+								for (let j = 0; j < field.validator?.validations?.length; j++) {
+										validations.push({
+												id: element.getAttribute("id"),
+												type: field.validator.validations[j].type,
+												param: field.validator.validations[j].param,
+												msg: field.validator.validations[j].msg,
+										})
+								}
+						}
+
+						this.modal.querySelector("#submit_button").onclick = () => { self._create_item(); };
+						this.table.insertAdjacentElement("afterend", this.modal);
+
+						/* Create validator */
+						this.validator = new Validator({ validations: validations, required_properties: required_properties });
+				}
+		}
+
+
+		async _create_form_element(field, modal_body)
+		{
+				const self = this;
+				
+				if (!("type" in field) || field.type === "text") {
+						const input = document.createElement("input");
+						input.setAttribute("type", "text");
+						return input
+				} else if (field.type === "number") {
+						const input = document.createElement("input");
+						input.setAttribute("type", "number");
+						return input;
+				} else if (field.type === "select") {
+						const select = document.createElement("select");
+
+						for (let j = 0; j < field.options.length; j++) {
+								const option = document.createElement("option");
+								option.setAttribute("value", field.options[j].value);
+								option.innerHTML = field.options[j].label;
+								select.appendChild(option);
+						}
+
+						return select;
+				} else if (field.type === "data-select") {
+						const response = await fetch(field.source);
+						const result = await response.json();
+						field.options = result;
+
+						const select = document.createElement("select");
+
+						for (let j = 0; j < result.length; j++) {
+								const option = document.createElement("option");
+								option.setAttribute("value", result[j].value);
+								option.innerHTML = result[j].label;
+								select.appendChild(option);
+						}
+
+						if ("filter" in field && field.filter === true) {
+								const filter_input = document.createElement("input");
+								filter_input.setAttribute("id", "edit_" + field.data + "_filter");
+								filter_input.setAttribute("type", "text");
+								filter_input.setAttribute("class", "form-input modal-input");
+								filter_input.setAttribute("placeholder", "Filter...");
+								filter_input.addEventListener("input", () => { self._filter_event_listener(select, filter_input, result); });
+								modal_body.appendChild(filter_input);
+						}
+						
+						return select;
+				} else if (field.type === "checkbox") {
+						const checkbox = document.createElement("input");
+						checkbox.setAttribute("type", "checkbox");
+						checkbox.style.display = "inline-block";
+
+						return checkbox;
+				}
+		}
+
+		_setup_form_element(element, field)
+		{
+				var self = this;
+				
+				element.classList.add("form-input");
+				if (element.getAttribute("type") !== "checkbox")
+						element.classList.add("modal-input");
+				element.setAttribute("name", field.data);
+				element.setAttribute("id", "edit_" + field.data);
+
+				if ("input" in field) {
+						element.oninput = async () => {
+								const result = await field.input(element.value, self.edit_item);
+								const msg_div = document.getElementById("edit_" + field.data + "_msg");
+
+								if ("msg" in result) {
+										msg_div.innerHTML = result.msg;
+										msg_div.style.display = "block";
+								} else {
+										msg_div.style.display = "none";
+								}
+
+						};
+				}
+		}
+
+		_filter_event_listener(select, input, full_list)
+		{
+				/* Remove all options */
+				select.innerHTML = "";
+
+				for(let i = 0; i < full_list.length; i++) {
+						if (full_list[i].label.toUpperCase().includes(input.value.toUpperCase())) {
+								const opt = document.createElement("option");
+								opt.value = full_list[i].value;
+								opt.text = full_list[i].label;
+								select.appendChild(opt);
+						}
+				}
+		}
+
+
+		_sort_table(column, asc)
+		{
+				const sorted_items = [];
+
+				let cmp_func;
+				if (asc)
+						cmp_func = (i, j) => { return i < j};
+				else
+						cmp_func = (i, j) => { return i > j};
+						
+				
+				for (let i = 0; i < this.list_items.length; i++) {
+						const item = this.list_items[i];
+						let inserted = false;
+						
+						for (let j = 0; j < sorted_items.length; j++) {
+								if (cmp_func(item[column], sorted_items[j][column])) {
+										sorted_items.splice(j, 0, item);
+										inserted = true;
+										break;
+								}
+						}
+
+						if (!inserted)
+								sorted_items.push(item);
+
+				}
+
+				this.list_items = sorted_items;
+				this._fill_table();
+		}
+		
+
+		_filter_table(search_string) {
+				this.list_items = [];
+
+				for (let i = 0; i < this.items.length; i++) {
+						for (let [key, value] of Object.entries(this.items[i])) {
+								if (!value)
+										continue;
+								
+								if (value.toString().toLowerCase().includes(search_string.toLowerCase())) {
+										this.list_items.push(this.items[i]);
+										break;
+								}
+						}
+				}
+
+				this._fill_table();
+		}
+		
+		
+		_fill_table()
+		{
+				/* Empty table */
+				this.tbody.innerHTML = "";
+
+				
+				/* Fill table */
+				for (let i = 0; i < this.list_items.length; i++) {
+						const row = this._build_table_row(this.list_items[i]);
+						
+						this.tbody.appendChild(row);
+				}
+		}
+
+		_build_table_row(item)
+		{
+				const self = this;
+				const row = document.createElement("tr");
+				
+				for (let j = 0; j < this.properties.columns.length; j++) {
+						const column = this.properties.columns[j];
+						const td = document.createElement("td");
+						if ("css" in column)
+								td.style.cssText = column.css;
+
+						if ("map" in column) {
+								td.innerHTML = column.map[item[column.data].toString()];
+						} else {
+								td.innerHTML = item[column.data];
+						}
+						row.appendChild(td);
+				}
+
+				/* Add actions */
+				if  ("editor" in this.properties) {
+						const button_col = document.createElement("td");
+						const button_div = document.createElement("div");
+						button_div.classList.add("btn-group");
+						button_col.appendChild(button_div);
+						for (let j = 0; j < this.properties.actions.length; j++) {
+								const button_proper = document.createElement("button");
+								const button_content = document.createElement("i");
+								
+								if (this.properties.actions[j].name == "edit") {
+										button_content.classList.add("nf");
+										button_content.classList.add("nf-cod-edit");
+										button_proper.onclick = () => { self._edit_item(item); };
+								} else if (this.properties.actions[j].name == "delete") {
+										button_content.classList.add("nf");
+										button_content.classList.add("nf-md-delete_outline");
+										button_proper.onclick = () => { self._delete_item(item); };
+								}
+								
+								button_proper.appendChild(button_content);
+								button_div.appendChild(button_proper);
+						}
+						row.appendChild(button_col);
+				}
+
+				return row;
+		}
+
+		async _empty_modal()
+		{
+				const self = this;
+				
+				for (let i = 0; i < this.properties.editor.fields.length; i++) {
+						const field = this.properties.editor.fields[i];
+						const control = document.getElementById("edit_" + field.data);
+
+						if (field.auto_fill) {
+								const value = await field.auto_fill();
+								control.value = value;
+						} else {
+								control.value = null;
+						}
+				}
+
+				this.validator.hide_all_validations_msgs();
+				const submit_button = this.modal.querySelector("#submit_button");
+				submit_button.onclick = () => { self._create_item(); };
+				submit_button.innerHTML = "Create";
+		}
+
+		async _create_item()
+		{
+				if (!this.validator.validate_form())
+						return;
+
+				const created_item = {};
+				 
+				for (let i = 0; i < this.properties.editor.fields.length; i++) {
+						const field = this.properties.editor.fields[i];
+
+						created_item[field.data] = document.getElementById("edit_" + field.data).value;
+				}
+
+				const response = await fetch(this.properties.end_point,
+																		 { method: "POST", headers: { "Content-Type": "application/json" },
+																		   body: JSON.stringify(created_item) });
+
+				const response_item = await response.json();
+				
+				if (response.ok) {
+						iziToast.success({ title: 'Success', message: 'Item successfully created' });
+
+						this.items.unshift(response_item);
+						this.list_items.unshift(response_item);
+						const row = this._build_table_row(response_item);
+						this.tbody.insertBefore(row, this.tbody.firstChild);
+
+						this._close_modal();
+				} else {
+						iziToast.error({title: 'Error', message: response_item.Error ? response_item.Error : 'Item could not be created'});
+				}
+		}
+
+		_edit_item(item)
+		{
+				const self = this;
+				this.edit_item = item;
+				const submit_button = this.modal.querySelector("#submit_button")
+				submit_button.onclick = () => { self._submit_item(); };
+				submit_button.innerHTML = "Update";
+
+				for (let i = 0; i < this.properties.editor.fields.length; i++) {
+						const field = this.properties.editor.fields[i];
+						const control = document.getElementById("edit_" + field.data);
+
+						if (field.filter) {
+								const filter_input = document.getElementById("edit_" + field.data + "_filter");
+								filter_input.value = "";
+								this._filter_event_listener(control, filter_input, field.options);
+						}
+
+						control.value = item[field.data];
+				}
+				
+				this._open_modal();
+		}
+
+		async _submit_item()
+		{
+				for (let i = 0; i < this.properties.editor.fields.length; i++) {
+						const field = this.properties.editor.fields[i];
+						const control = document.getElementById("edit_" + field.data);
+
+						this.edit_item[field.data] = control.value;
+				}
+
+				const response = await fetch(this.properties.end_point + "/" + this.edit_item.id,
+																		 { method: "PUT", header: { "Content-Type": "application/json" },
+																		   body: JSON.stringify(this.edit_item) });
+
+				//const response_item = await response.json();
+
+				if (response.ok) {
+						iziToast.success({ title: 'Success', message: 'Item successfully updated' });
+
+						const table_row = this._get_table_row(this.edit_item);
+						const new_row = this._build_table_row(this.edit_item);
+						this.tbody.insertBefore(new_row, table_row);
+						this.table.deleteRow(table_row.rowIndex);
+						this._close_modal();						
+				} else {
+						iziToast.error({title: 'Error', message: response_item.Error ? response_item.Error : 'Item could not be updated'});
+				}
+		}
+
+		async _delete_item(item)
+		{
+				var confirmation = confirm("Are you sure you want to delete this item?");
+
+				if (confirmation) {
+						const end_point = this.base_path + this.props.end_point + "/" + item.id;
+						var response = await fetch(end_point, { method: "DELETE" });
+
+						if (response.ok) {
+								iziToast.success({ title: 'Success', message: 'Item successfully deleted' });
+								const index = this.items.indexOf(item);
+								this.items.splice(index, 1);
+
+								const table_row = this._get_table_row(item);
+								this.table.deleteRow(table_row.rowIndex);
+
+								this.close_modal();
+						} else if (response.status == 403) {
+								iziToast.error({ title: "Forbidden", message: "Not enough rights to delete item" });
+						} else {
+								const result = await response.json()
+								iziToast.error({ title: "Error", message: result.Error ? result.Error : "Item could not be deleted"});
+						}
+				}
+		}
+
+		_get_table_row(item)
+		{
+				for (let i = 0; i < this.table.rows.length; i++) {
+						const row = this.table.rows[i];
+
+						if (row.firstChild.innerHTML == item.id)
+								return row;
+				}
+
+				/* Should never be here */
+				console.assert(false);
+		}
+
+		_close_modal()
+		{
+				this.modal.style.display = "none";
+		}
+
+		_open_modal()
+		{
+				this.modal.style.display = "block";
+		}
+}
+
+
+/*
  * prop: Properties
  *
  * name: easy way to set all required IDs just by name
@@ -539,10 +1091,14 @@ class DomBinder
 
 		set_control_value(control, value)
 		{
-				if (control.nodeName == "INPUT" && control.getAttribute("type") == "checkbox")
-						control.setAttribute("checked", "checked");
-				else
+				if (control.nodeName == "INPUT" && control.getAttribute("type") == "checkbox") {
+						if (value)
+								control.setAttribute("checked", "checked");
+						else
+								control.removeAttribute("checked");
+				} else {
 						control.value = value;
+				}
 		}
 
 		event_listener(control, bind_name)

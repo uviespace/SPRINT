@@ -143,6 +143,33 @@ class Validator
 
 /*
  * Create a data table from json data retrieved from an end point
+ *
+ * properties: Properties object with all settings for the DataTable
+ *
+ *   end_point: Endpoint to get the data. Editor also needs end points with creation/editing/deleting after id with id
+ *   columns: Columns from the data that will be displayed
+ *     data: property name for this column
+ *     sort: [true|false] if true allows sorting of column
+ *     map: Allows to map value to text that are displayed. array of objects like { "value": "text" }
+ *     css: Custom css for data in this column
+ *   filter: if true creates a filter textbox to filter the table
+ *   editor: if data should be editable, this describes the editor for the data
+ *     allow_add: [true|false] if true allows creation of new data
+ *     modal_header: Sets the header for the editor modal
+ *     fields: array of objects describing the form that is used for editing
+ *       data: property of the data that should be edited
+ *       label: Label in the form for this property
+ *       type: [text|number|checkbox|select|data-select] text and number are basic form inputs set to text and number. Checkbox creates a checkbox
+ *             select creates a combo box with options set in "options" propery which is an array of
+ *             options: { "value": value_in_data, label: "label in form" }
+ *
+ *             data-select: creates a combo box but with data from an endpoint. The data needs to be in form { "value": value, "label": "label" }
+ *             Alos allows additional properties.
+ *             filter: [true|false] if true add a filter text box to filter the combo box entries
+ *             source: endpoint of the dropdown data (mandatory)
+ *       input: function to execute on input event
+ *       auto_fill: fill the form of a new item with the result from this function. Expects an async function.
+ *       validator: Allows to set different validators that are run before data is actually saved. See Validator class.
  */
 class DataTable
 {
@@ -567,7 +594,13 @@ class DataTable
 				for (let i = 0; i < this.properties.editor.fields.length; i++) {
 						const field = this.properties.editor.fields[i];
 
-						created_item[field.data] = document.getElementById("edit_" + field.data).value;
+						let sanitized_input = "";
+						if (!field.type || field.type == "text")
+								sanitized_input = this._sanitize_input(document.getElementById("edit_" + field.data).value);
+						else
+								sanitized_input = document.getElementById("edit_" + field.data).value;
+						
+						created_item[field.data] = sanitized_input;
 				}
 
 				const response = await fetch(this.properties.end_point,
@@ -690,10 +723,28 @@ class DataTable
 		{
 				this.modal.style.display = "block";
 		}
+
+		_sanitize_input(input)
+		{
+				var map = {
+						'&': '&amp;',
+						'<': '&lt;',
+						'>': '&gt;',
+						'"': '&quot;',
+						"'": '&#39;',
+						'/': '&#x2F;',
+						'`': '&#x60;',
+						'=': '&#x3D;'
+				};
+
+				return input.replace(/[&<>"'`=\/]/g, (match) => (map[match]));
+		}
 }
 
 
 /*
+ * DEPRECATED
+ *	
  * prop: Properties
  *
  * name: easy way to set all required IDs just by name

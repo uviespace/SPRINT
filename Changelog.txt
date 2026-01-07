@@ -1,6 +1,9 @@
 SPRINT_NEXT
 
 
+Version 2.1:
+- New DataTable Implementation that allows sorting and filtering.
+
 Version 2.00.1:
 - New datapool parameters automatically get the next available id
 - Easy creation of monitored values with alarm and warn limits

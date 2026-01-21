@@ -62,6 +62,7 @@
 			<th style="max-width: 120px; overflow: hidden; text-overflow: ellipsis">Value</th>
 			<th>Unit</th>
 			<th>DP Id</th>
+			<th>Users</th>
 			<th>Action</th>
 		</tr>
 	</thead>

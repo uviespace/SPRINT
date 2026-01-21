@@ -82,7 +82,7 @@ function load_data()
 								   { data: "kind", map: { "3": "DpPar (3)", "4": "DpVar (4)", "5": "DpPar Imp (5)", "6": "DpVar Imp (6)" } },
 									 { data: "datatype" }, { data: "multiplicity" },
 									 { data: "value", css: "max-width: 120px; overflow: hidden; text-overflow: ellipsis;" },
-									 { data: "unit" }, { data: "dp_id", sort: true } ],
+									 { data: "unit" }, { data: "dp_id", sort: true }, { data: "user_count" } ],
 				filter: true,
 				editor: {
 						allow_add: true,

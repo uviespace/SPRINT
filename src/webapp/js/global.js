@@ -680,7 +680,7 @@ class DataTable
 				var confirmation = confirm("Are you sure you want to delete this item?");
 
 				if (confirmation) {
-						const end_point = this.base_path + this.props.end_point + "/" + item.id;
+						const end_point = this.properties.end_point + "/" + item.id;
 						var response = await fetch(end_point, { method: "DELETE" });
 
 						if (response.ok) {
@@ -691,7 +691,6 @@ class DataTable
 								const table_row = this._get_table_row(item);
 								this.table.deleteRow(table_row.rowIndex);
 
-								this.close_modal();
 						} else if (response.status == 403) {
 								iziToast.error({ title: "Forbidden", message: "Not enough rights to delete item" });
 						} else {

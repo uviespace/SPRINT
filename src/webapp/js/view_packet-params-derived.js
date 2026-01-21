@@ -184,8 +184,8 @@ async function move_parameter(event, direction)
 						error_msg += items_to_update[update_error[i]].name + ", ";
 				}
 				
-				iziToast.error({ title: "Error", message: "Could not update parameter(s): " + error_msg.slice(0, -2) });
+				iziToast.error({ title: "Error", message: "Could not update parameter(s): " + error_msg.slice(0, -2), position: "bottomLeft" });
 		} else {
-				iziToast.success({ title: "Success", message: "Parameters successfully updated" });
+				iziToast.success({ title: "Success", message: "Parameters successfully updated", position: "bottomLeft" });
 		}
 }

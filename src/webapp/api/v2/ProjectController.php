@@ -668,10 +668,13 @@ class DatapoolController extends BaseController implements CrudController
 		$data = $this->database->select(
 			"SELECT  p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, 
 										concat(COALESCE(t.domain,  'None'), ' / ', COALESCE(t.name, 'None')) AS datatype, 
-										p.multiplicity, p.value, p.unit, d.nrParameter as dp_id 
+										p.multiplicity, p.value, p.unit, d.nrParameter as dp_id,  
+                                        count(ps.id) as user_count 
 			FROM `parameter` p LEFT JOIN `type` t ON p.idType = t.id 
 		    LEFT JOIN datapoolidentifier d ON d.idParameter = p.id 
+            LEFT JOIN parametersequence ps on ps.idParameter = p.id 
 			WHERE p.idStandard  = ? AND p.kind IN (3, 4, 5, 6)
+            GROUP BY p.id, p.domain, p.name, p.kind, p.shortDesc, p.idType, datatype, p.multiplicity, p.value, p.unit, dp_id
 			ORDER BY domain, kind, name",
 			["i", [$route_ids["standard_id"]]]);
 
@@ -705,9 +708,9 @@ class DatapoolController extends BaseController implements CrudController
 
 		if ($item->monitored_value) {
 			$m_names = [ $item->name . "WarnLowerLimit", $item->name . "AlarmLowerLimit",
-									   $item->name . "WarnUpperLimit", $item->name . "AlarmUpperLimit" ];
+						 $item->name . "WarnUpperLimit", $item->name . "AlarmUpperLimit" ];
 			$m_desc = [ $item->name . " Lower Warn Limit", $item->name . " Lower Alarm Limit",
-									  $item->name . " Upper Warn Limit", $item->name . " Upper Alarm Limit" ];
+						$item->name . " Upper Warn Limit", $item->name . " Upper Alarm Limit" ];
 
 			for ($i = 0; $i < count($m_names); $i++) {
 				$id = $this->database->insert("INSERT INTO parameter(idStandard, domain, name, " .

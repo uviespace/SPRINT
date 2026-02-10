@@ -1012,7 +1012,12 @@ class DerivedPacketParameterController extends BaseController implements CrudCon
 		$data = $this->database->select(
 			"SELECT ps.id, ps.idParameter, " .
 			"    CONCAT(p.`domain`, ' / ', p.name) as parameter,  ps.`order` , ps.`role` , " .
-			"    ps.`group`, ps.repetition, ps.value, ps.`desc`, p.name, t.name as type_name, t.size " .
+			"    ps.`group`, ps.repetition, ps.value, ps.`desc`, p.name, t.name as type_name, t.size, " .
+			"CASE p.multiplicity " .
+			"    WHEN 0 THEN 1 " .
+			"    WHEN NULL THEN 1 " .
+			"    ELSE p.multiplicity " .
+			"END AS multiplicity " .
 			"FROM parametersequence ps " .
 			"    INNER JOIN `parameter` p ON p.id = ps.idParameter " .
 			"    INNER JOIN `type` t ON t.id = p.idType " .

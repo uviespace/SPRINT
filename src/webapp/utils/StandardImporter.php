@@ -426,6 +426,8 @@ class StandardImporter
 
 
 		// Last if all else fails add new parameter
+		// TODO: parameter setting contain calibration curves and deduced id
+		// calibration should just be deleted but the deduced should be updated to the new parameter
 		$param_id = $this->database->insert(
 			"INSERT INTO parameter (`idStandard`, `idType`, `kind`, `domain`, `name`, `shortDesc`, `desc`, `value`, " .
 			"    `size`, `unit`, `multiplicity`, `setting`, `role`) " .
@@ -433,7 +435,7 @@ class StandardImporter
 			["iiissssiisiss", [ $this->own_standard_id, $type_id, $param["param_kind"], $param["param_domain"],
 								$param['param_name'], $param['param_short_desc'], $param['param_desc'],
 								$param['param_value'], $param['param_size'],
-								$param['param_unit'], $param['param_multiplicity'], $param['param_setting'],
+								$param['param_unit'], $param['param_multiplicity'], '' /*$param['param_setting']*/,
 								$param['param_role'] ]]);
 
 		//array_push($this->import_msg, "Added new parameter from source " . $param['param_id']);

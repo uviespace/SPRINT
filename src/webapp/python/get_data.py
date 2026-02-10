@@ -514,16 +514,24 @@ def get_params(db, standard):
 
         # -1 := length is variable
         # None := length is unknown / undefined
-        if param["_size"] != None and param["_multi"] != None:
-            if param["_size"] != -1:
-                if param["_multi"] > 0:
-                    param["_length"] = param["_size"] * param["_multi"]
-                else:
-                    param["_length"] = param["_size"]
-            else:
-                param["_length"] = -1
-        else:
-            param["_length"] = None
+        multi = int(param["multi"]) if param["multi"] is not None and int(param["multi"]) > 0 else 1
+        size = param["_size"] if param["_size"] is not None else None
+
+        if size is None:
+            print("Parameter {} has an unknown size".format(param["name"]))
+
+        param["_length"] = size * multi if size is not None else None
+            
+        # if param["_size"] != None and param["_multi"] != None:
+        #     if param["_size"] != -1:
+        #         if param["_multi"] > 0:
+        #             param["_length"] = param["_size"] * param["_multi"]
+        #         else:
+        #             param["_length"] = param["_size"]
+        #     else:
+        #         param["_length"] = -1
+        # else:
+        #     param["_length"] = None
 
         param["_desc"] = (
             param["desc"] if param["desc"] else
@@ -1131,6 +1139,7 @@ def get_packets(db, standard):
                 packet["_param_derived"] = param
                 break
         packet["_desc"] = packet["shortDesc"] + packet["desc"] + packet["descParam"] + packet["descDest"]
+        print("Packet length calculation: {} {}".format(packet["type"], packet["subtype"]))
         packet["_length"] = get_param_sequence_length(packet["body"])
         packet['derivations'] = get_derived_packets(db, packet)
         packet["disc"] = 0
@@ -1205,6 +1214,9 @@ def get_param_sequence_length_(elements, i, info):
 
     if group != None and int(group) > 0:
         # Defines the next "group" fields to build a group
+
+        # for variable length packets assume a repetition of one    
+            
         if repetition != None and int(repetition) > 0:
             group_info = {}
             group_info["length"] = 0
@@ -1218,7 +1230,7 @@ def get_param_sequence_length_(elements, i, info):
             element_length = None
     else:
         if repetition != None and int(repetition) > 0:
-            element_length = (param["_length"] * repetition)
+            element_length = param["_length"] * repetition
         else:
             element_length = param["_length"]
 
@@ -1240,7 +1252,7 @@ def get_param_sequence_length(elements):
     while i < len(elements):
         i = get_param_sequence_length_(elements, i, info) + 1
         if info["length"] is None:
-            # print("BREAK!! i = ", i, elements[i-1]["param"]["name"])
+            print("BREAK!! i = ", i, elements[i-1]["param"]["name"])
             break
     return info["length"]
 

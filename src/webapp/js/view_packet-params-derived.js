@@ -18,7 +18,7 @@ const packet_handler = new TableHandler({
 		table_id: "table_params",
 		template_id: "table_params_row",
 		properties: [ "id", "parameter", "order", "role", "group", "repetition",
-									"value", "desc", "type_name", "size" ],
+									"value", "desc", "type_name", "size", "multiplicity" ],
 		modal_id: "params_modal",
 		edit_dialog_ids: edit_dialog_ids,
 		edit_properties: edit_properties,

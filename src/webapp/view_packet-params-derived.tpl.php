@@ -29,6 +29,7 @@
 			<th>Description</th>
 			<th>Type</th>
 			<th>Size</th>
+			<th>Mult.</th>
 			<th></th>
 			<th>Action</th>
 		</tr>
@@ -39,6 +40,7 @@
 
 <template id="table_params_row">
 	<tr>
+		<td></td>
 		<td></td>
 		<td></td>
 		<td></td>

@@ -1556,6 +1556,7 @@ def getSpidPrefix(tm_type):
         191: "FDC",  # FDIR Check
         193: "AMM",  # ASW Mode Management
         194: "ALC",  # Algorithm Control
+        196: "AOC",  # AOCS
         197: "BRP",  # Boot Report
         198: "PRC",  # Procedure Control
         210: "DPM",  # DPU Management
@@ -1566,12 +1567,18 @@ def getSpidPrefix(tm_type):
     return "KSY_"+switcher.get(tm_type, "___")
 
 def gen_tpcf_line(f, tm, derived=None):
+    nbits = 0
     if derived is None:
         spid = tm["__mib_spid"]
-        nbits = int(tm["_header_length"])
+        if tm["_length"] is not None:
+            print("Header size: {}, Packet length: {}".format(int(tm["standard"]["headers"]["TM_length"]), int(tm["_length"])))
+            nbits = (int(tm["standard"]["headers"]["TM_length"]) + int(tm["_length"]) + 16) / 8
     else:
         spid = derived["__mib_spid"]
-        nbits = int(tm["_header_length"]) + int(derived["_length"])
+        if tm["_length"] is not None and derived["_length"] is not None:
+            print("Header size: {}, Packet length: {}, Derived length: {}"
+              .format(int(tm["standard"]["headers"]["TM_length"]), int(tm["_length"]), int(derived["_length"])))
+            nbits = (int(tm["standard"]["headers"]["TM_length"]) + int(tm["_length"] + int(derived["_length"])) + 16) / 8 
 
     # !!! naming convention !!!
     # get prefix from lookup table
@@ -1584,7 +1591,8 @@ def gen_tpcf_line(f, tm, derived=None):
     writeln(f, [
         spid,
         spid_name,  # TPCF_NAME: prefix added to SPID e.g. KSY_EVTspid, KSY_HK_spid, ...
-        outp(int((int(tm["standard"]["headers"]["TM_length"]) + nbits + 16)/8), 8) if nbits != None else '0'  # checksum length: 2 Bytes = 16 bits
+        #outp(int((int(tm["standard"]["headers"]["TM_length"]) + nbits + 16)/8), 8) if nbits != None else '0'  # checksum length: 2 Bytes = 16 bits
+        outp(int(nbits), 8)
     ])
 
 def gen_tpcf(app, path):

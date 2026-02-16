@@ -258,8 +258,10 @@ def get_ptc_pfc_GEN(param):
         (4, 12, 16, multi) if domain == "C99" and name == "int16_t" else \
         (4, 14, 32, multi) if domain == "C99" and name == "int32_t" else \
         (4, 16, 64, multi) if domain == "C99" and name == "int64_t" else \
-        (5, 1, 32, multi) if domain == "C99" and name == "float" else \
-        (5, 2, 64, multi) if domain == "C99" and name == "double" else \
+        (5, 1, 32, multi) if domain == "C99" and name == "float" and multi < 2 else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "float" else \
+        (5, 2, 64, multi) if domain == "C99" and name == "double" and multi < 2 else \
+        (7, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "double" else \
         (8, int(int(param["_length"])/8), int(param["_length"]), -1) if domain == "C99" and name == "char" else \
         (3, size-4, size, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size >= 4 and size <= 16 else \
         (3, 13, 24, multi) if domain == "SCOS-2000" and name == "Unsigned Integer" and size == 24 else \
@@ -1518,7 +1520,7 @@ def gen_plf_param(f, param_i, spid, offset):
         '0',
         '1'
     ])
-    return offset + param["_size"]
+    return offset + int(param["_length"])
 
 def gen_plf_params(f, base, derived, spid, offset):
     for param_i in base:

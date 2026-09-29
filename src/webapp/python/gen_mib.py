@@ -493,7 +493,8 @@ def gen_pcf(app, path):
                             'Y',  # PCF_CORR
                             '',  # PCF_OBTID
                             '',  # PCF_DARC
-                            'B'  # PCF_ENDIAN
+                            'B',  # PCF_ENDIAN
+                            ''  # PCF_DESCR2
                         ])
 
                 else:
@@ -543,7 +544,8 @@ def gen_pcf(app, path):
                                         'Y',                                                   # PCF_CORR
                                         '',                                                    # PCF_OBTID
                                         '',                                                    # PCF_DARC
-                                        'B'                                                    # PCF_ENDIAN
+                                        'B',                                                   # PCF_ENDIAN
+                                        ''                                                     # PCF_DESCR2
                                     ])
                                     written = 1
                                     break
@@ -586,7 +588,8 @@ def gen_pcf(app, path):
                                             'Y',                                                   # PCF_CORR
                                             '',                                                    # PCF_OBTID
                                             '',                                                    # PCF_DARC
-                                            'B'                                                    # PCF_ENDIAN
+                                            'B',                                                   # PCF_ENDIAN
+                                            ''                                                     # PCF_DESCR2
                                         ])
                                         written = 1
                                         break
@@ -956,8 +959,10 @@ def gen_cpc(app, path):
                     get_paf_name(param["type"]) if categ == 'T' else '',          # CPC_PAFREF
                     'E' if categ == 'T' else 'R',  # CPC_INTER
                     outp(param["_value"], 17) if (param["multi"] is None and categ != 'T') else '',  # CPC_DEFVAL: TODO: Not supported: default for arrays. empty for discriminants (e.g. EvtId, Sid, MemoryId, ParamSetId, ProcId (where categ == 'T')
-                    'Y',
-                    '0'
+                    'Y',  # CPC_CORR
+                    '0',  # CPC_OBTID
+                    '',  # CPC_DESCR2
+                    'B'  # CPC_ENDIAN
                 ])
     close_file(f)
 

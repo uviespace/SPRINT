@@ -26,8 +26,8 @@ def get_settings():
 
         settings["tmp_path"] = "/tmp/local"
         settings["db_host"] = "spaceprojq75mysql1.mysql.univie.ac.at"
-        settings["db_user"] = "spaceprojq75"
-        settings["db_passwd"] = "Spacestorageairlock_3!"
+        settings["db_user"] = os.environ['sprint_user']
+        settings["db_passwd"] = os.environ['sprint_pass']
         settings["db_name"] = "spaceprojq75mysql1"
         
     return settings

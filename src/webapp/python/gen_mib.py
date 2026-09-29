@@ -175,7 +175,7 @@ def gen_vdf(app, path):
     writeln(f, [
         outp(app["name"], 8, True),
         outp(app["desc"], 32),
-        '1',                                      # domain ID
+        outp(settings["general"]["domain"], 5),         # domain ID
         outp(settings["general"]["release"], 5),
         outp(settings["general"]["issue"], 5)
     ])
@@ -652,7 +652,7 @@ def gen_ccf(app, path):
                             '',                                     # CCF_MAPID
                             '',                                     # CCF_DEFSET
                             '',                                     # CCF_RAPID
-                            '9',                                    # CCF_ACK
+                            str(settings['ccf'].get('ack_flag', '9')),   # CCF_ACK
                             ''                                      # CCF_SUBSCHEDID
                         ])
                 else:
@@ -722,7 +722,7 @@ def gen_ccf(app, path):
                         '',                                     # CCF_MAPID
                         '',                                     # CCF_DEFSET
                         '',                                     # CCF_RAPID
-                        '9',                                    # CCF_ACK
+                        str(settings['ccf'].get('ack_flag', '9')), # CCF_ACK
                         ''                                      # CCF_SUBSCHEDID
                     ])
     close_file(f)

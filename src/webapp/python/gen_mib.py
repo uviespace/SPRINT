@@ -1684,6 +1684,12 @@ def prepare(app):
                         type_["__mib_used_tm"] = True
 
 
+def write_version_file(app, path):
+    v = app["components"]["hash"]["mib"]["setting"]["general"]
+    version = f"{v["domain"]}.{v["release"]}.{v["issue"]}"
+    with open(os.path.join(path, 'VERSION'), 'w') as fd:
+        fd.write('{} MIB v{}, generated on {}\n'.format(app.get("name", "UNKNOWN"), version, datetime.datetime.now(datetime.UTC).isoformat(timespec='seconds')))
+
 
 def gen_mib(path, comp):
     global settings
@@ -1756,7 +1762,7 @@ def gen_mib(path, comp):
     gen_pas(app, path)  # parameter alias set which defines the text (de-)calibration values.
     gen_prf(app, path)  # parameter alias file which defines the text (de-)calibration (for command or sequence parameters).
     gen_prv(app, path)  # parameter range value file which defines the parameter allowed value ranges.
-    # TODO: generate VERSION file
+    write_version_file(app, path)  # create VERSION file for reference
 
 
 if __name__ == '__main__':
@@ -1780,10 +1786,6 @@ if __name__ == '__main__':
         except Exception as e:
             print("Something went wrong...")
             print(traceback.format_exc())
-
-        # create VERSION file
-        with open(os.path.join(outdir, 'VERSION'), 'w') as fd:
-            fd.write('IASW MIB v{}, generated on {}\n'.format(version, datetime.datetime.utcnow().strftime('%Y%m%d')))
 
     else:
         print("Usage: python gen_mib.py {project_id} {application_id}")

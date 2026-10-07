@@ -1576,7 +1576,7 @@ def getSpidPrefix(tm_type):
     }
     return "KSY_"+switcher.get(tm_type, "___")
 
-def gen_tpcf_line(f, tm, derived=None):
+def gen_tpcf_line(f, tm, derived=None, app_name=None):
     nbits = 0
     if derived is None:
         spid = tm["__mib_spid"]
@@ -1587,20 +1587,25 @@ def gen_tpcf_line(f, tm, derived=None):
         spid = derived["__mib_spid"]
         if tm["_length"] is not None and derived["_length"] is not None:
             print("Header size: {}, Packet length: {}, Derived length: {}"
-              .format(int(tm["standard"]["headers"]["TM_length"]), int(tm["_length"]), int(derived["_length"])))
-            nbits = (int(tm["standard"]["headers"]["TM_length"]) + int(tm["_length"] + int(derived["_length"])) + 16) / 8 
+                  .format(int(tm["standard"]["headers"]["TM_length"]), int(tm["_length"]), int(derived["_length"])))
+            nbits = (int(tm["standard"]["headers"]["TM_length"]) + int(tm["_length"] + int(derived["_length"])) + 16) / 8
 
     # !!! naming convention !!!
-    # get prefix from lookup table
-    spid_prefix = getSpidPrefix(int(tm["type"]))
-    spid_name = spid_prefix+spid
-    #print ""
-    #print "SPID: "+spid
-    #print "TPCF_NAME: "+spid_name
+    if "tpcf" in settings and settings["tpcf"]["preamble"]:
+        preamble = settings["tpcf"]["preamble"]
+        maxlen = settings["tpcf"]["length"]
+        spid_name = preamble + spid[-(maxlen - len(preamble)):]  # use spid instead of running counter
+    else:
+        # get prefix from lookup table
+        spid_prefix = getSpidPrefix(int(tm["type"]))
+        spid_name = spid_prefix + spid[-(12 - len(spid_prefix)):]
+        #print ""
+        #print "SPID: "+spid
+        #print "TPCF_NAME: "+spid_name
 
     writeln(f, [
         spid,
-        spid_name,  # TPCF_NAME: prefix added to SPID e.g. KSY_EVTspid, KSY_HK_spid, ...
+        outp(spid_name, 12),  # TPCF_NAME: prefix added to SPID e.g. KSY_EVTspid, KSY_HK_spid, ...
         #outp(int((int(tm["standard"]["headers"]["TM_length"]) + nbits + 16)/8), 8) if nbits != None else '0'  # checksum length: 2 Bytes = 16 bits
         outp(int(nbits), 8)
     ])
@@ -1613,9 +1618,9 @@ def gen_tpcf(app, path):
             for tm in standard["packets"]["TM"]["list"]:
                 if len(tm["derivations"]["list"]) > 0:
                     for derived in tm["derivations"]["list"]:
-                        gen_tpcf_line(f, tm, derived)
+                        gen_tpcf_line(f, tm, derived=derived, app_name=app["name"])
                 else:
-                    gen_tpcf_line(f, tm)
+                    gen_tpcf_line(f, tm, app_name=app["name"])
     close_file(f)
 
 def gen_pic(app, path):

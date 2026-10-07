@@ -1194,8 +1194,8 @@ def gen_pas(app, path):
                     for enum in type_["enums"]:
                         writeln(f, [
                             get_paf_name(type_),
-                            outp(enum["Name"], 16),   # TODO: limit 16 characters
-                            outp(enum["_dec"], 17)
+                            outp(enum["Name"], 248),  # scos v7.2
+                            outp(enum["_dec"], 248)  # scos v7.2
                         ])
     close_file(f)
 

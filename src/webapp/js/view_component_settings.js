@@ -18,8 +18,8 @@ document.addEventListener("DOMContentLoaded", function () {
 async function save_settings()
 {
 		var response = await fetch(end_point,
-															 { method: 'post' , headers: { 'Content-Type': 'application/json'},
-															   body: JSON.stringify(component_settings) });
+								   { method: 'post' , headers: { 'Content-Type': 'application/json'},
+									 body: JSON.stringify(component_settings) });
 		if (response.ok)
 				iziToast.success({ title: "Success", message: "Settings successfully updated" });
 		else

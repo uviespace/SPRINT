@@ -152,6 +152,9 @@ def outp(s, max_len, stripSpaces = False):
     if stripSpaces and " " in s:
         s = s.title().replace(' ', '')
 
+    if len(s) > max_len:
+        _frame = sys._getframe(1)
+        print("WARNING: {} item {} is too long, truncating to {} chars -> {} [line {}]".format(_frame.f_code.co_name,s, max_len, s[:max_len], _frame.f_lineno))
     return s[:max_len]
 
 def check_packet_type(app, param_ii):

@@ -1436,6 +1436,10 @@ def gen_pid_line(f, tm, derived=None):
     # !!! namin convention !!!
     pid_descr = (settings["general"]["packet_prefix"] if "packet_prefix" in settings["general"] else "") +  pid_descr
 
+    # check TM header length is byte aligned
+    if tm["standard"]["headers"]["TM_length"] % 8:
+        print("WARNING: TM header length for PID_DFHSIZE is not byte-aligned ({} bits)".format(tm["standard"]["headers"]["TM_length"]))
+
     writeln(f, [
         outp(tm["type"], 3),                # PID_TYPE
         outp(tm["subtype"], 3),             # PID_STYPE
@@ -1446,7 +1450,7 @@ def gen_pid_line(f, tm, derived=None):
         pid_descr,                          # PID_DESCR
         '0',                                # PID_UNIT
         pid_tpsd,                           # PID_TPSD
-        outp(tm["standard"]["headers"]["TM_length"]/8, 2),  # PID_DFHSIZE
+        outp(tm["standard"]["headers"]["TM_length"]//8, 2),  # PID_DFHSIZE
         'Y',     # PID_TIME
         '',      # PID_INTER
         'Y',     # PID_VALID
